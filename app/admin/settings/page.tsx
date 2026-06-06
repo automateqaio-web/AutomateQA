@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Settings, Navigation, Layout, Save, Loader2, Check, Eye, EyeOff, Rocket, Globe, Mail } from "lucide-react";
+import { Settings, Navigation, Layout, Save, Loader2, Check, Eye, EyeOff, Rocket, Globe } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
@@ -11,11 +11,6 @@ interface NavItem {
   href: string;
   enabled: boolean;
   sort_order: number;
-}
-
-interface SiteSettings {
-  contact_email: string;
-  owner_email: string;
 }
 
 interface PageSetting {
@@ -58,7 +53,6 @@ function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean
 export default function AdminSettingsPage() {
   const [navItems, setNavItems] = useState<NavItem[]>(NAV_DEFAULT);
   const [pageSettings, setPageSettings] = useState<PageSetting[]>([]);
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ contact_email: "", owner_email: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
@@ -66,14 +60,12 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const [navRes, pagesRes, siteRes] = await Promise.all([
+      const [navRes, pagesRes] = await Promise.all([
         supabase.from("nav_settings").select("*").order("sort_order"),
         supabase.from("page_settings").select("*"),
-        supabase.from("site_settings").select("contact_email,owner_email").limit(1).single(),
       ]);
       if (navRes.data?.length) setNavItems(navRes.data);
       if (pagesRes.data?.length) setPageSettings(pagesRes.data);
-      if (siteRes.data) setSiteSettings(siteRes.data);
       setLoading(false);
     };
     load();
@@ -104,18 +96,6 @@ export default function AdminSettingsPage() {
     setPageSettings((prev) =>
       prev.map((p) => p.key === key ? { ...p, [field]: value } : p)
     );
-  };
-
-  const saveSiteSetting = async (field: keyof SiteSettings) => {
-    const id = `site-${field}`;
-    setSaving(id);
-    await supabase
-      .from("site_settings")
-      .update({ [field]: siteSettings[field] })
-      .eq("id", (await supabase.from("site_settings").select("id").limit(1).single()).data?.id);
-    setSaving(null);
-    setSaved(id);
-    setTimeout(() => setSaved(null), 2000);
   };
 
   if (loading) {
@@ -296,84 +276,6 @@ export default function AdminSettingsPage() {
         <p className="text-xs text-[#9CA3AF] mt-4 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
           Coming Soon pages show a branded landing page to visitors instead of content
-        </p>
-      </motion.div>
-
-      {/* Contact Settings */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <Mail size={18} className="text-blue-400" />
-          <div>
-            <h2 className="text-lg font-bold text-white">Contact Settings</h2>
-            <p className="text-xs text-[#9CA3AF]">Configure the public contact email and where form submissions are sent</p>
-          </div>
-        </div>
-
-        <div className="space-y-5">
-          {/* Public contact email */}
-          <div>
-            <label className="block text-sm font-semibold text-white mb-1">
-              Public Contact Email
-            </label>
-            <p className="text-xs text-[#9CA3AF] mb-2">Shown in the footer and contact page for visitors to see</p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={siteSettings.contact_email}
-                onChange={(e) => setSiteSettings((s) => ({ ...s, contact_email: e.target.value }))}
-                placeholder="automate.qa.io@gmail.com"
-                className="flex-1 px-3 py-2.5 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] text-white text-sm focus:outline-none focus:border-blue-500/50 transition-all"
-              />
-              <button
-                onClick={() => saveSiteSetting("contact_email")}
-                disabled={saving === "site-contact_email"}
-                className="px-4 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-all flex items-center gap-1.5 whitespace-nowrap"
-              >
-                {saving === "site-contact_email"
-                  ? <Loader2 size={12} className="animate-spin" />
-                  : saved === "site-contact_email"
-                  ? <Check size={12} />
-                  : <Save size={12} />
-                }
-                Save
-              </button>
-            </div>
-          </div>
-
-          {/* Owner/receive email */}
-          <div>
-            <label className="block text-sm font-semibold text-white mb-1">
-              Receive Emails At
-            </label>
-            <p className="text-xs text-[#9CA3AF] mb-2">Contact form submissions will be sent to this address (private)</p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={siteSettings.owner_email}
-                onChange={(e) => setSiteSettings((s) => ({ ...s, owner_email: e.target.value }))}
-                placeholder="nagendra.meesala.puri@gmail.com"
-                className="flex-1 px-3 py-2.5 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] text-white text-sm focus:outline-none focus:border-blue-500/50 transition-all"
-              />
-              <button
-                onClick={() => saveSiteSetting("owner_email")}
-                disabled={saving === "site-owner_email"}
-                className="px-4 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-all flex items-center gap-1.5 whitespace-nowrap"
-              >
-                {saving === "site-owner_email"
-                  ? <Loader2 size={12} className="animate-spin" />
-                  : saved === "site-owner_email"
-                  ? <Check size={12} />
-                  : <Save size={12} />
-                }
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-xs text-[#9CA3AF] mt-5 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-          Changes apply immediately — no restart required
         </p>
       </motion.div>
     </div>

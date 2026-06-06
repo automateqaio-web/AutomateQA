@@ -1,14 +1,23 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  themeColor: "#00FF88",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.dev"),
@@ -20,6 +29,13 @@ export const metadata: Metadata = {
   keywords: ["QA automation", "Playwright", "Selenium", "QA memes", "software testing", "automation testing", "corporate humor"],
   authors: [{ name: "AutomateQA" }],
   creator: "AutomateQA",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "AutomateQA",
+    startupImage: ["/icons/icon-512.png"],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -40,6 +56,16 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/icons/icon-192.png",
+  },
 };
 
 export default function RootLayout({
@@ -47,10 +73,21 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="AutomateQA" />
+        <meta name="application-name" content="AutomateQA" />
+        <meta name="msapplication-TileColor" content="#00FF88" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+      </head>
       <body className="min-h-screen bg-[#0B0B0B] text-white font-sans antialiased">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <PWAInstallPrompt />
       </body>
     </html>
   );

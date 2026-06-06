@@ -185,7 +185,7 @@ export default function VideoGrid() {
           <AnimatePresence mode="wait">
             {/* Featured video hero */}
             {featuredVideo && !search && selectedCategory === "All" && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+              <motion.div key="featured" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
                 <Link href={`/videos/${featuredVideo.id}`} className="group block">
                   <div className="glass-card overflow-hidden hover:border-[#00FF88]/20 transition-all duration-300">
                     <div className="flex flex-col lg:flex-row">
@@ -219,7 +219,7 @@ export default function VideoGrid() {
             )}
 
             {/* Video grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div key="grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularVideos.map((video, i) => (
                 <VideoCard key={video.id} video={video} index={i} />
               ))}

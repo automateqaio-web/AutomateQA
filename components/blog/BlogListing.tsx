@@ -156,7 +156,7 @@ export default function BlogListing() {
           <AnimatePresence mode="wait">
             {/* Featured blog hero */}
             {featuredBlog && !search && selectedCategory === "All" && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+              <motion.div key="featured" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
                 <Link href={`/blog/${featuredBlog.slug}`} className="group block">
                   <div className="glass-card overflow-hidden hover:border-[#00FF88]/20 transition-all duration-300">
                     <div className="flex flex-col lg:flex-row">
@@ -183,7 +183,7 @@ export default function BlogListing() {
                 </Link>
               </motion.div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div key="grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularBlogs.map((blog, i) => <BlogCard key={blog.id} blog={blog} index={i} />)}
             </div>
           </AnimatePresence>

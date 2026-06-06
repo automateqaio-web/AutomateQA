@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Play, Camera, Mail, ArrowRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 
 const footerLinks = {
   Content: [
@@ -22,24 +21,8 @@ const footerLinks = {
   ],
 };
 
-async function getContactEmail(): Promise<string> {
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!supabaseUrl || supabaseUrl.includes("placeholder")) return "automate.qa.io@gmail.com";
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("site_settings")
-      .select("contact_email")
-      .limit(1)
-      .single();
-    return data?.contact_email || "automate.qa.io@gmail.com";
-  } catch {
-    return "automate.qa.io@gmail.com";
-  }
-}
-
-export default async function Footer() {
-  const contactEmail = await getContactEmail();
+export default function Footer() {
+  const contactEmail = process.env.CONTACT_EMAIL || "automate.qa.io@gmail.com";
 
   const socialLinks = [
     { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", color: "hover:text-red-500" },

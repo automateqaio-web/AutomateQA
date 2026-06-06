@@ -26,34 +26,27 @@ const CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
 };
 
-const DEFAULT_SITE = {
-  contact_email: "automate.qa.io@gmail.com",
-  owner_email: "automate.qa.io@gmail.com",
-};
-
 export async function GET() {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     if (!supabaseUrl || supabaseUrl.includes("placeholder")) {
-      return NextResponse.json({ nav: DEFAULT_NAV, pages: DEFAULT_PAGES, site: DEFAULT_SITE }, { headers: CACHE_HEADERS });
+      return NextResponse.json({ nav: DEFAULT_NAV, pages: DEFAULT_PAGES }, { headers: CACHE_HEADERS });
     }
 
     const supabase = await createClient();
-    const [navRes, pagesRes, siteRes] = await Promise.all([
+    const [navRes, pagesRes] = await Promise.all([
       supabase.from("nav_settings").select("*").order("sort_order"),
       supabase.from("page_settings").select("*"),
-      supabase.from("site_settings").select("contact_email,owner_email").limit(1).single(),
     ]);
 
     return NextResponse.json(
       {
         nav: navRes.data?.length ? navRes.data : DEFAULT_NAV,
         pages: pagesRes.data?.length ? pagesRes.data : DEFAULT_PAGES,
-        site: siteRes.data ?? DEFAULT_SITE,
       },
       { headers: CACHE_HEADERS }
     );
   } catch {
-    return NextResponse.json({ nav: DEFAULT_NAV, pages: DEFAULT_PAGES, site: DEFAULT_SITE }, { headers: CACHE_HEADERS });
+    return NextResponse.json({ nav: DEFAULT_NAV, pages: DEFAULT_PAGES }, { headers: CACHE_HEADERS });
   }
 }
