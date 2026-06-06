@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HeroSection from "@/components/home/HeroSection";
+import YouTubeChannelPromo from "@/components/home/YouTubeChannelPromo";
 import FeaturedVideos from "@/components/home/FeaturedVideos";
 import TrendingMemes from "@/components/home/TrendingMemes";
 import PlaywrightDays from "@/components/home/PlaywrightDays";
@@ -70,6 +71,7 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection />
+      <YouTubeChannelPromo />
       <FeaturedVideos videos={videos} />
       <TrendingMemes memes={memes} />
       <PlaywrightDays />
