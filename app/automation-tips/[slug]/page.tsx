@@ -30,8 +30,7 @@ async function getTip(slug: string): Promise<AutomationTip | null> {
       .single();
 
     if (data) {
-      supabase.from("automation_tips").update({ views: (data.views || 0) + 1 }).eq("id", data.id)
-        .then(() => {}).catch(() => {});
+      void supabase.from("automation_tips").update({ views: (data.views || 0) + 1 }).eq("id", data.id);
     }
     return data;
   } catch {
