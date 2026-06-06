@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, MessageSquare, Users, DollarSign, Send, Check, Loader2, Play, Camera, Briefcase, Code2 } from "lucide-react";
+import { Mail, MessageSquare, Users, DollarSign, Send, Check, Loader2, Play, Camera } from "lucide-react";
 
 const socialLinks = [
   { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", desc: "Tutorials & Meme Compilations", color: "text-red-400 bg-red-500/10 border-red-500/20" },
   { icon: Camera, href: "https://www.instagram.com/automateqa.io", label: "Instagram", desc: "Daily QA Memes", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
-  { icon: Briefcase, href: "https://linkedin.com/company/automateqa", label: "LinkedIn", desc: "Career & Professional Content", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-  { icon: Code2, href: "https://github.com/automateqa", label: "GitHub", desc: "Open Source Automation Projects", color: "text-white bg-white/10 border-white/20" },
 ];
 
 export default function ContactPage() {
