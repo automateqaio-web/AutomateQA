@@ -30,8 +30,7 @@ async function getTutorial(slug: string): Promise<LearningContent | null> {
       .single();
 
     if (data) {
-      supabase.from("learning_content").update({ views: (data.views || 0) + 1 }).eq("id", data.id)
-        .then(() => {}).catch(() => {});
+      void supabase.from("learning_content").update({ views: (data.views || 0) + 1 }).eq("id", data.id);
     }
     return data;
   } catch {
