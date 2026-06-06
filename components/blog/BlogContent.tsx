@@ -7,13 +7,42 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 
+const LANG_LABELS: Record<string, string> = {
+  typescript: "TypeScript", javascript: "JavaScript", tsx: "TSX", jsx: "JSX",
+  python: "Python", bash: "Bash", shell: "Shell", sh: "Shell",
+  css: "CSS", html: "HTML", json: "JSON", sql: "SQL", yaml: "YAML",
+  java: "Java", go: "Go", rust: "Rust", cpp: "C++", c: "C",
+};
+
+function extractLang(children: React.ReactNode): string {
+  const child = Array.isArray(children) ? children[0] : children;
+  const cls = (child as any)?.props?.className || "";
+  return cls.match(/language-([^\s]+)/)?.[1] || "";
+}
+
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node && typeof node === "object" && "props" in (node as object))
+    return extractText((node as any).props?.children);
+  return "";
+}
+
+function headingId(children: React.ReactNode) {
+  return (
+    "h-" +
+    extractText(children)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  );
+}
+
 function CodeBlock({ children }: { children: React.ReactNode }) {
   const [copied, setCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
-
-  const child = Array.isArray(children) ? children[0] : children;
-  const className = (child as any)?.props?.className || "";
-  const lang = className.match(/language-([^\s]+)/)?.[1] || "";
+  const lang = extractLang(children);
+  const label = LANG_LABELS[lang] || lang.toUpperCase() || "";
 
   const handleCopy = async () => {
     const text = preRef.current?.textContent || "";
@@ -33,9 +62,9 @@ function CodeBlock({ children }: { children: React.ReactNode }) {
               <span key={c} className="w-3 h-3 rounded-full" style={{ background: c }} />
             ))}
           </span>
-          {lang && (
-            <span className="text-xs text-[#6B7280] font-mono uppercase tracking-widest ml-2">
-              {lang}
+          {label && (
+            <span className="text-xs text-[#6B7280] font-mono tracking-widest ml-2">
+              {label}
             </span>
           )}
         </div>
@@ -93,13 +122,13 @@ export default function BlogContent({ content }: { content: string }) {
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-[1.55rem] font-bold text-white mt-10 mb-4 flex items-center gap-3 leading-snug">
+            <h2 id={headingId(children)} className="text-[1.55rem] font-bold text-white mt-10 mb-4 flex items-center gap-3 leading-snug scroll-mt-24">
               <span className="w-1 h-7 bg-[#00FF88] rounded-full flex-shrink-0 shadow-[0_0_8px_#00FF88]" />
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-[1.25rem] font-bold text-[#E5E7EB] mt-8 mb-3 leading-snug">{children}</h3>
+            <h3 id={headingId(children)} className="text-[1.25rem] font-bold text-[#E5E7EB] mt-8 mb-3 leading-snug scroll-mt-24">{children}</h3>
           ),
           h4: ({ children }) => (
             <h4 className="text-[1.05rem] font-semibold text-[#D1D5DB] mt-6 mb-2 uppercase tracking-widest text-xs">{children}</h4>
