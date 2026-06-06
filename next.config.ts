@@ -9,6 +9,8 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === "development",
   workboxOptions: {
     disableDevLogs: true,
+    // Never cache admin pages — they require live auth & data
+    navigateFallbackDenylist: [/^\/admin/],
   },
   fallbacks: {
     document: "/offline",

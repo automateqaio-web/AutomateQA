@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
+import SiteChrome from "@/components/shared/SiteChrome";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 
 const inter = Inter({
@@ -84,9 +83,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen bg-[#0B0B0B] text-white font-sans antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
         <PWAInstallPrompt />
       </body>
     </html>
