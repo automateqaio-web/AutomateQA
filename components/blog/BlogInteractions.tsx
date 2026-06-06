@@ -59,11 +59,17 @@ export default function BlogInteractions({
 
   // Share
   const [copied, setCopied] = useState(false);
+  const [pageUrl, setPageUrl] = useState("");
 
   useEffect(() => {
+    setPageUrl(window.location.href);
+
     const likedKey = `liked_${slug}`;
     const ratedKey = `rated_${slug}`;
-    if (localStorage.getItem(likedKey)) setLiked(true);
+    if (localStorage.getItem(likedKey)) {
+      setLiked(true);
+      setLikesCount((c) => Math.max(c, 1));
+    }
     const saved = localStorage.getItem(ratedKey);
     if (saved) { setHasRated(true); setUserRating(Number(saved)); }
 
@@ -141,8 +147,6 @@ export default function BlogInteractions({
     }
     setSubmitting(false);
   }
-
-  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
   async function handleCopy() {
     try {
