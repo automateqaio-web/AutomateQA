@@ -1,8 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { createClient } from "@/lib/supabase/server";
 
 const GMAIL_USER = "automate.qa.io@gmail.com";
-const OWNER_EMAIL = process.env.CONTACT_OWNER_EMAIL || "automate.qa.io@gmail.com";
+
+async function getSiteSettings() {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("site_settings")
+      .select("contact_email,owner_email")
+      .limit(1)
+      .single();
+    return {
+      contactEmail: data?.contact_email || GMAIL_USER,
+      ownerEmail: data?.owner_email || process.env.CONTACT_OWNER_EMAIL || GMAIL_USER,
+    };
+  } catch {
+    return {
+      contactEmail: GMAIL_USER,
+      ownerEmail: process.env.CONTACT_OWNER_EMAIL || GMAIL_USER,
+    };
+  }
+}
 
 const TYPE_LABELS: Record<string, string> = {
   general: "General Inquiry",
@@ -62,6 +82,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { name, email, subject, message, type } = body;
+    const { ownerEmail } = await getSiteSettings();
 
     // Validate required fields
     if (!name || !email || !subject || !message) {
@@ -95,7 +116,7 @@ export async function POST(req: NextRequest) {
     // Notification email to owner
     await transporter.sendMail({
       from: `"AutomateQA Contact" <${GMAIL_USER}>`,
-      to: OWNER_EMAIL,
+      to: ownerEmail,
       replyTo: email,
       subject: `[AutomateQA] ${typeLabel}: ${safeSubject}`,
       html: `

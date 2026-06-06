@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Play, Camera, Mail, ArrowRight } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
 const footerLinks = {
   Content: [
@@ -21,13 +22,31 @@ const footerLinks = {
   ],
 };
 
-const socialLinks = [
-  { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", color: "hover:text-red-500" },
-  { icon: Camera, href: "https://www.instagram.com/automateqa.io", label: "Instagram", color: "hover:text-pink-500" },
-  { icon: Mail, href: "mailto:automate.qa.io@gmail.com", label: "Email", color: "hover:text-[#00FF88]" },
-];
+async function getContactEmail(): Promise<string> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl.includes("placeholder")) return "automate.qa.io@gmail.com";
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("site_settings")
+      .select("contact_email")
+      .limit(1)
+      .single();
+    return data?.contact_email || "automate.qa.io@gmail.com";
+  } catch {
+    return "automate.qa.io@gmail.com";
+  }
+}
 
-export default function Footer() {
+export default async function Footer() {
+  const contactEmail = await getContactEmail();
+
+  const socialLinks = [
+    { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", color: "hover:text-red-500" },
+    { icon: Camera, href: "https://www.instagram.com/automateqa.io", label: "Instagram", color: "hover:text-pink-500" },
+    { icon: Mail, href: `mailto:${contactEmail}`, label: "Email", color: "hover:text-[#00FF88]" },
+  ];
+
   return (
     <footer className="bg-[#080808] border-t border-white/5 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,12 +56,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-5 group w-fit">
               <div className="relative w-12 h-12 flex-shrink-0 transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]">
-                <Image
-                  src="/logo.png"
-                  alt="AutomateQA Logo"
-                  fill
-                  className="object-contain rounded-full"
-                />
+                <Image src="/logo.png" alt="AutomateQA Logo" fill className="object-contain rounded-full" />
               </div>
               <span className="font-black text-xl tracking-tight">
                 <span className="text-white">Automate</span>
@@ -52,7 +66,6 @@ export default function Footer() {
             <p className="text-[#9CA3AF] text-sm leading-relaxed mb-6 max-w-xs">
               The home for QA engineers, automation testers, and developers who appreciate a good meme about production bugs.
             </p>
-            {/* Social links */}
             <div className="flex items-center gap-3">
               {socialLinks.map(({ icon: Icon, href, label, color }) => (
                 <a
@@ -101,8 +114,8 @@ export default function Footer() {
             </p>
           </div>
           <p className="text-[#9CA3AF] text-xs">
-            <a href="mailto:automate.qa.io@gmail.com" className="hover:text-[#00FF88] transition-colors">
-              automate.qa.io@gmail.com
+            <a href={`mailto:${contactEmail}`} className="hover:text-[#00FF88] transition-colors">
+              {contactEmail}
             </a>
           </p>
         </div>
