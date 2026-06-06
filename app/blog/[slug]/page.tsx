@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Tag, Eye } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { CATEGORY_COLORS } from "@/types";
 import BlogContent from "@/components/blog/BlogContent";
+import BlogViewTracker from "@/components/blog/BlogViewTracker";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
 
@@ -150,8 +151,13 @@ export default async function BlogPostPage({ params }: Props) {
               <Clock size={14} />
               {blog.read_time} min read
             </span>
+            <span className="flex items-center gap-1.5">
+              <Eye size={14} />
+              {(blog.views || 0).toLocaleString()} {blog.views === 1 ? "view" : "views"}
+            </span>
           </div>
         </header>
+        <BlogViewTracker slug={slug} />
 
         {/* Blog content */}
         <BlogContent content={blog.content} />
