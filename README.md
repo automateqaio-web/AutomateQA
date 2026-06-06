@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AutomateQA — QA Memes, Tutorials & Corporate Chaos
 
-## Getting Started
+A modern full-stack platform for QA automation content, memes, tutorials, and corporate humor.
 
-First, run the development server:
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Animations | Framer Motion |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| Storage | Supabase Storage |
+| Deployment | Vercel |
+
+## Quick Start
+
+### 1. Install dependencies
+
+```bash
+cd automateqa
+npm install
+```
+
+### 2. Set up environment variables
+
+```bash
+cp .env.local.example .env.local
+```
+
+Fill in your Supabase credentials from [supabase.com/dashboard](https://supabase.com/dashboard):
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+
+### 3. Set up Supabase database
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to **SQL Editor** → run `lib/supabase/schema.sql`
+3. Creates all tables, RLS policies, storage buckets, and sample data
+
+### 4. Create admin user
+
+1. Supabase Dashboard → **Authentication > Users** → **Add User**
+2. Use those credentials to log in at `/admin`
+
+### 5. Run dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+automateqa/
+├── app/
+│   ├── page.tsx              # Home page
+│   ├── memes/                # Meme feed + detail
+│   ├── videos/               # Video hub + detail
+│   ├── blog/                 # Blog listing + post
+│   ├── about/                # About page
+│   ├── contact/              # Contact page
+│   ├── admin/                # Admin dashboard (auth-gated)
+│   │   ├── memes/            # Meme management
+│   │   ├── videos/           # Video management
+│   │   └── blogs/            # Blog editor
+│   ├── api/                  # API routes
+│   ├── sitemap.ts            # Auto-generated sitemap
+│   └── robots.ts
+├── components/
+│   ├── shared/               # Navbar, Footer
+│   ├── home/                 # Landing page sections
+│   ├── memes/                # Meme feed components
+│   ├── videos/               # Video grid + player
+│   ├── blog/                 # Blog listing + content
+│   └── admin/                # Admin guard + sidebar
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts         # Browser client
+│   │   ├── server.ts         # Server client
+│   │   └── schema.sql        # Full DB schema
+│   └── utils.ts
+└── types/index.ts
+```
 
-## Learn More
+## Pages
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description |
+|-------|-------------|
+| `/` | Home — hero, featured videos, trending memes, 100 Days of Playwright, latest blogs, newsletter |
+| `/memes` | Infinite-scroll meme feed with category filters |
+| `/videos` | YouTube video hub with featured video + grid |
+| `/videos/[id]` | Video detail with embed + related |
+| `/blog` | Blog listing with featured post + search |
+| `/blog/[slug]` | Full markdown blog post |
+| `/about` | Mission, values, story |
+| `/contact` | Contact form + sponsorship section |
+| `/admin` | Admin dashboard (login required) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment to Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Push to GitHub
+2. Import at [vercel.com](https://vercel.com/new)
+3. Add environment variables
+4. Deploy
 
-## Deploy on Vercel
+## Brand Colors
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Background | `#0B0B0B` | Main background |
+| Neon Green | `#00FF88` | Primary accent, CTAs |
+| Secondary Text | `#9CA3AF` | Subtitles, metadata |
+| White | `#FFFFFF` | Headings, body text |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+Built with love for the QA community 🚀
