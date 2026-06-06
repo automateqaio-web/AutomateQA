@@ -24,7 +24,7 @@ export default function AdminVideosPage() {
 
   const fetchVideos = async () => {
     setLoading(true);
-    const { data } = await supabase.from("videos").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("videos").select("*").order("created_at", { ascending: false }).limit(200);
     setVideos(data || []);
     setLoading(false);
   };
@@ -72,8 +72,8 @@ export default function AdminVideosPage() {
 
       resetForm();
       fetchVideos();
-    } catch (err: any) {
-      setError(err.message || "Failed to save");
+    } catch {
+      setError("Failed to save video. Please try again.");
     } finally {
       setSaving(false);
     }

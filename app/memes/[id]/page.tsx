@@ -45,13 +45,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const meme = await getMeme(id);
   if (!meme) return { title: "Meme Not Found" };
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
+  const canonicalUrl = `${SITE_URL}/memes/${id}`;
+  const tags: string[] = Array.isArray(meme.tags) ? meme.tags : [];
   return {
     title: `${meme.title} | AutomateQA Memes`,
     description: meme.caption || meme.title,
+    keywords: [...tags, meme.category, "QA meme", "software testing humor", "automation meme", "AutomateQA"],
+    alternates: { canonical: canonicalUrl },
     openGraph: {
+      type: "article",
+      url: canonicalUrl,
       title: meme.title,
-      description: meme.caption || "",
-      images: meme.image_url ? [{ url: meme.image_url }] : [],
+      description: meme.caption || meme.title,
+      images: meme.image_url
+        ? [{ url: meme.image_url, width: 1200, height: 630, alt: meme.title }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: "AutomateQA" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meme.title,
+      description: meme.caption || meme.title,
+      images: meme.image_url ? [meme.image_url] : ["/og-image.png"],
     },
   };
 }

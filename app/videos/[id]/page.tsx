@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const supabase = await createClient();
     const { data } = await supabase.from("videos").select("*").eq("id", id).single();
     if (!data) return { title: "Video Not Found" };
-    const canonicalUrl = `https://automateqa.online/videos/${id}`;
+    const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/videos/${id}`;
     const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
     return {
       title: `${data.title} | AutomateQA Videos`,
@@ -60,14 +60,15 @@ export default async function VideoDetailPage({ params }: Props) {
     .neq("id", id)
     .limit(4);
 
-  const canonicalUrl = `https://automateqa.online/videos/${id}`;
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
+  const canonicalUrl = `${SITE_URL}/videos/${id}`;
   const tags: string[] = Array.isArray(video.tags) ? video.tags : [];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: video.title,
     description: video.description,
-    thumbnailUrl: video.thumbnail || "https://automateqa.online/og-image.png",
+    thumbnailUrl: video.thumbnail || `${SITE_URL}/og-image.png`,
     uploadDate: video.created_at,
     embedUrl: `https://www.youtube.com/embed/${video.youtube_id}`,
     url: canonicalUrl,
@@ -75,8 +76,8 @@ export default async function VideoDetailPage({ params }: Props) {
     publisher: {
       "@type": "Organization",
       name: "AutomateQA",
-      url: "https://automateqa.online",
-      logo: { "@type": "ImageObject", url: "https://automateqa.online/logo.png" },
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
     },
     inLanguage: "en-US",
   };

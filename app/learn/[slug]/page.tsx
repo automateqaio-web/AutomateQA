@@ -13,10 +13,13 @@ export const revalidate = 3600;
 
 interface Props { params: Promise<{ slug: string }> }
 
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 async function getTutorial(slug: string): Promise<LearningContent | null> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) {
     return null;
   }
+  if (!SLUG_RE.test(slug)) return null;
   try {
     const supabase = await createClient();
     const { data } = await supabase
@@ -27,7 +30,8 @@ async function getTutorial(slug: string): Promise<LearningContent | null> {
       .single();
 
     if (data) {
-      supabase.from("learning_content").update({ views: (data.views || 0) + 1 }).eq("id", data.id).then(() => {});
+      supabase.from("learning_content").update({ views: (data.views || 0) + 1 }).eq("id", data.id)
+        .then(() => {}).catch(() => {});
     }
     return data;
   } catch {
@@ -56,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tutorial = await getTutorial(slug);
   if (!tutorial) return { title: "Tutorial Not Found | AutomateQA" };
-  const canonicalUrl = `https://automateqa.online/learn/${slug}`;
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/learn/${slug}`;
   const tags: string[] = Array.isArray(tutorial.tags) ? tutorial.tags : [];
   return {
     title: `${tutorial.title} | AutomateQA Learn`,
@@ -95,23 +99,23 @@ export default async function LearnDetailPage({ params }: Props) {
     ? tutorial.youtube_url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/)?.[1]
     : null;
 
-  const canonicalUrl = `https://automateqa.online/learn/${slug}`;
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/learn/${slug}`;
   const tags: string[] = Array.isArray(tutorial.tags) ? tutorial.tags : [];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     headline: tutorial.title,
     description: tutorial.excerpt,
-    image: tutorial.cover_image || "https://automateqa.online/og-image.png",
+    image: tutorial.cover_image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/og-image.png`,
     url: canonicalUrl,
     datePublished: tutorial.created_at,
     dateModified: tutorial.updated_at || tutorial.created_at,
-    author: { "@type": "Organization", name: "AutomateQA", url: "https://automateqa.online" },
+    author: { "@type": "Organization", name: "AutomateQA", url: process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online" },
     publisher: {
       "@type": "Organization",
       name: "AutomateQA",
-      url: "https://automateqa.online",
-      logo: { "@type": "ImageObject", url: "https://automateqa.online/logo.png" },
+      url: process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online",
+      logo: { "@type": "ImageObject", url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/logo.png` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
     keywords: tags.join(", "),

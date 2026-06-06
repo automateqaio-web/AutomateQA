@@ -29,7 +29,7 @@ export default function AdminBlogsPage() {
 
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from("blogs").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("blogs").select("*").order("created_at", { ascending: false }).limit(200);
     setBlogs(data || []);
     setLoading(false);
   }, [supabase]);
@@ -68,7 +68,9 @@ export default function AdminBlogsPage() {
     try {
       let coverImageUrl = coverPreview;
       if (coverFile) {
-        const ext = coverFile.name.split(".").pop();
+        const ext = coverFile.name.split(".").pop()?.toLowerCase() || "";
+        const allowed = ["jpg", "jpeg", "png", "webp", "gif", "avif"];
+        if (!allowed.includes(ext)) { setError("Only image files are allowed (JPG, PNG, WebP, GIF)"); setSaving(false); return; }
         const filename = `covers/${Date.now()}.${ext}`;
         const { error: uploadError } = await supabase.storage.from("blogs").upload(filename, coverFile, { upsert: true });
         if (uploadError) throw uploadError;
@@ -88,8 +90,8 @@ export default function AdminBlogsPage() {
         await supabase.from("blogs").insert(payload);
       }
       resetForm(); fetchBlogs();
-    } catch (err: any) {
-      setError(err.message || "Failed to save blog");
+    } catch {
+      setError("Failed to save blog post. Please try again.");
     } finally {
       setSaving(false);
     }

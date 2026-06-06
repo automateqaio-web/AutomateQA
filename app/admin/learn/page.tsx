@@ -31,7 +31,7 @@ export default function AdminLearnPage() {
 
   const fetchItems = async () => {
     setLoading(true);
-    const { data } = await supabase.from("learning_content").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("learning_content").select("*").order("created_at", { ascending: false }).limit(200);
     setItems(data || []);
     setLoading(false);
   };
@@ -72,7 +72,9 @@ export default function AdminLearnPage() {
     try {
       let coverImageUrl = coverPreview;
       if (coverFile) {
-        const ext = coverFile.name.split(".").pop();
+        const ext = coverFile.name.split(".").pop()?.toLowerCase() || "";
+        const allowed = ["jpg", "jpeg", "png", "webp", "gif", "avif"];
+        if (!allowed.includes(ext)) { setError("Only image files are allowed (JPG, PNG, WebP, GIF)"); setSaving(false); return; }
         const filename = `learn/${Date.now()}.${ext}`;
         const { error: uploadError } = await supabase.storage.from("blogs").upload(filename, coverFile, { upsert: true });
         if (uploadError) throw uploadError;
@@ -100,8 +102,8 @@ export default function AdminLearnPage() {
 
       await fetchItems();
       resetForm();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to save");
+    } catch {
+      setError("Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }

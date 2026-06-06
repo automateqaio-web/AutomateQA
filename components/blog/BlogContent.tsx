@@ -133,10 +133,14 @@ export default function BlogContent({ content }: { content: string }) {
             ) : (
               <div className={className} {...rest}>{children}</div>
             ),
-          iframe: ({ src, title, allow }: any) => (
-            <iframe src={src} title={title} allow={allow} allowFullScreen
-              className="absolute inset-0 w-full h-full" />
-          ),
+          iframe: ({ src, title, allow }: any) => {
+            const isYouTube = typeof src === "string" && /^https:\/\/(www\.)?youtube\.com\/embed\//.test(src);
+            if (!isYouTube) return null;
+            return (
+              <iframe src={src} title={title} allow={allow} allowFullScreen
+                className="absolute inset-0 w-full h-full" />
+            );
+          },
         }}
       >
         {preprocess(content)}

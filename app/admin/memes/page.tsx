@@ -27,7 +27,7 @@ export default function AdminMemesPage() {
 
   const fetchMemes = async () => {
     setLoading(true);
-    const { data } = await supabase.from("memes").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("memes").select("*").order("created_at", { ascending: false }).limit(200);
     setMemes(data || []);
     setLoading(false);
   };
@@ -68,7 +68,9 @@ export default function AdminMemesPage() {
       let imageUrl = imagePreview;
 
       if (imageFile) {
-        const ext = imageFile.name.split(".").pop();
+        const ext = imageFile.name.split(".").pop()?.toLowerCase() || "";
+        const allowed = ["jpg", "jpeg", "png", "webp", "gif", "avif"];
+        if (!allowed.includes(ext)) { setError("Only image files are allowed (JPG, PNG, WebP, GIF)"); setSaving(false); return; }
         const filename = `${Date.now()}.${ext}`;
         const { data: uploadData, error: uploadError } = await supabase.storage.from("memes").upload(filename, imageFile, { upsert: true });
         if (uploadError) throw uploadError;
@@ -96,8 +98,8 @@ export default function AdminMemesPage() {
 
       resetForm();
       fetchMemes();
-    } catch (err: any) {
-      setError(err.message || "Failed to save meme");
+    } catch {
+      setError("Failed to save meme. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -161,7 +163,7 @@ export default function AdminMemesPage() {
                         <p className="text-xs text-[#9CA3AF]/60 mt-1">PNG, JPG, GIF, WEBP</p>
                       </div>
                     )}
-                    <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} />
+                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                   </div>
                 </div>
 
