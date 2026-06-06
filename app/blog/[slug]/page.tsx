@@ -114,9 +114,9 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* Hero */}
       {blog.cover_image && (
-        <div className="relative h-64 sm:h-80 overflow-hidden">
-          <img src={blog.cover_image} alt={blog.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-[#0B0B0B]" />
+        <div className="relative w-full h-[320px] sm:h-[400px] overflow-hidden">
+          <img src={blog.cover_image} alt={blog.title} className="w-full h-full object-cover object-top" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-[#0B0B0B]" />
         </div>
       )}
 

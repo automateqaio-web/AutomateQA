@@ -237,7 +237,7 @@ export default function BlogEditor({ value, onChange }: Props) {
     ],
     [
       { kind: "icon", Icon: Code,     tip: "Inline Code (Ctrl+`)", fn: () => insertAt("`", "`", "code") },
-      { kind: "icon", Icon: FileCode, tip: "Code Block",           fn: () => insertAt("```js\n", "\n```", "// code here") },
+      { kind: "icon", Icon: FileCode, tip: "Code Block",           fn: () => insertBlock("```typescript\n// your code here\n```") },
     ],
     [
       { kind: "icon", Icon: Quote,       tip: "Blockquote",     fn: () => insertAt("> ", "", "quote") },

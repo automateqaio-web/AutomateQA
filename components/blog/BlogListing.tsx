@@ -161,15 +161,15 @@ export default function BlogListing() {
                   <div className="glass-card overflow-hidden hover:border-[#00FF88]/20 transition-all duration-300">
                     <div className="flex flex-col lg:flex-row">
                       {featuredBlog.cover_image && (
-                        <div className="relative lg:w-1/2 aspect-[16/9] overflow-hidden rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
-                          <img src={featuredBlog.cover_image} alt={featuredBlog.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                        <div className="relative lg:w-2/5 h-48 sm:h-56 lg:h-auto overflow-hidden rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
+                          <img src={featuredBlog.cover_image} alt={featuredBlog.title} className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500" />
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20" />
                           <div className="absolute top-4 left-4">
                             <span className="px-3 py-1.5 rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/30 text-[#00FF88] text-xs font-bold">FEATURED</span>
                           </div>
                         </div>
                       )}
-                      <div className="lg:w-1/2 p-8 flex flex-col justify-center">
+                      <div className="lg:w-3/5 p-8 flex flex-col justify-center">
                         <span className={`category-badge border w-fit mb-3 ${CATEGORY_COLORS[featuredBlog.category] || ""}`}>{featuredBlog.category}</span>
                         <h2 className="text-2xl font-black text-white mb-3 group-hover:text-[#00FF88] transition-colors line-clamp-2">{featuredBlog.title}</h2>
                         <p className="text-[#9CA3AF] leading-relaxed line-clamp-3 mb-4">{featuredBlog.excerpt}</p>

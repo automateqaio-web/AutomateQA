@@ -22,7 +22,7 @@ const footerLinks = {
 };
 
 export default function Footer() {
-  const contactEmail = process.env.CONTACT_EMAIL || "automate.qa.io@gmail.com";
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "automate.qa.io@gmail.com";
 
   const socialLinks = [
     { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", color: "hover:text-red-500" },
