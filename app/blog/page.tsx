@@ -9,6 +9,21 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Blog — Automation Testing Tutorials & QA Stories",
   description: "In-depth tutorials on Playwright, Selenium, API testing, QA career tips, and corporate QA stories from the trenches.",
+  keywords: ["QA blog", "automation testing tutorials", "Playwright guide", "Selenium guide", "software testing articles", "QA career tips", "test automation blog"],
+  alternates: { canonical: "https://automateqa.online/blog" },
+  openGraph: {
+    type: "website",
+    url: "https://automateqa.online/blog",
+    title: "Blog — Automation Testing Tutorials & QA Stories | AutomateQA",
+    description: "In-depth tutorials on Playwright, Selenium, API testing, QA career tips, and corporate QA stories from the trenches.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AutomateQA Blog" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog — Automation Testing Tutorials & QA Stories | AutomateQA",
+    description: "In-depth tutorials on Playwright, Selenium, API testing, QA career tips, and corporate QA stories from the trenches.",
+    images: ["/og-image.png"],
+  },
 };
 
 async function getPageSettings() {

@@ -56,14 +56,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tutorial = await getTutorial(slug);
   if (!tutorial) return { title: "Tutorial Not Found | AutomateQA" };
+  const canonicalUrl = `https://automateqa.online/learn/${slug}`;
+  const tags: string[] = Array.isArray(tutorial.tags) ? tutorial.tags : [];
   return {
     title: `${tutorial.title} | AutomateQA Learn`,
     description: tutorial.excerpt,
+    keywords: [...tags, tutorial.category, "QA automation tutorial", "automation testing course", "software testing", "AutomateQA"],
+    alternates: { canonical: canonicalUrl },
     openGraph: {
+      type: "article",
+      url: canonicalUrl,
       title: tutorial.title,
       description: tutorial.excerpt,
-      images: tutorial.cover_image ? [tutorial.cover_image] : [],
-      type: "article",
+      images: tutorial.cover_image
+        ? [{ url: tutorial.cover_image, width: 1200, height: 630, alt: tutorial.title }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: "AutomateQA" }],
+      publishedTime: tutorial.created_at,
+      modifiedTime: tutorial.updated_at || tutorial.created_at,
+      tags,
+      section: tutorial.category,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: tutorial.title,
+      description: tutorial.excerpt,
+      images: tutorial.cover_image ? [tutorial.cover_image] : ["/og-image.png"],
     },
   };
 }
@@ -78,8 +95,34 @@ export default async function LearnDetailPage({ params }: Props) {
     ? tutorial.youtube_url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/)?.[1]
     : null;
 
+  const canonicalUrl = `https://automateqa.online/learn/${slug}`;
+  const tags: string[] = Array.isArray(tutorial.tags) ? tutorial.tags : [];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: tutorial.title,
+    description: tutorial.excerpt,
+    image: tutorial.cover_image || "https://automateqa.online/og-image.png",
+    url: canonicalUrl,
+    datePublished: tutorial.created_at,
+    dateModified: tutorial.updated_at || tutorial.created_at,
+    author: { "@type": "Organization", name: "AutomateQA", url: "https://automateqa.online" },
+    publisher: {
+      "@type": "Organization",
+      name: "AutomateQA",
+      url: "https://automateqa.online",
+      logo: { "@type": "ImageObject", url: "https://automateqa.online/logo.png" },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    keywords: tags.join(", "),
+    articleSection: tutorial.category,
+    timeRequired: `PT${tutorial.read_time}M`,
+    inLanguage: "en-US",
+  };
+
   return (
     <div className="min-h-screen pt-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Back */}
         <Link href="/learn" className="inline-flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#00FF88] transition-colors mb-8 group">

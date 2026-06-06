@@ -9,10 +9,20 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Automation Tips & Tricks | AutomateQA",
   description: "Short-form technical tips for QA automation engineers. Selenium, Playwright, API testing, Jenkins, CI/CD, and more.",
+  keywords: ["automation tips", "QA tips", "Playwright tips", "Selenium tips", "API testing tips", "CI/CD tips", "Jenkins automation", "test automation tricks", "software testing best practices"],
+  alternates: { canonical: "https://automateqa.online/automation-tips" },
   openGraph: {
-    title: "Automation Tips & Tricks | AutomateQA",
-    description: "Quick tips for QA automation engineers.",
     type: "website",
+    url: "https://automateqa.online/automation-tips",
+    title: "Automation Tips & Tricks | AutomateQA",
+    description: "Short-form technical tips for QA automation engineers. Selenium, Playwright, API testing, Jenkins, CI/CD, and more.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Automation Tips — AutomateQA" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Automation Tips & Tricks | AutomateQA",
+    description: "Short-form technical tips for QA automation engineers. Selenium, Playwright, API testing, Jenkins, CI/CD, and more.",
+    images: ["/og-image.png"],
   },
 };
 

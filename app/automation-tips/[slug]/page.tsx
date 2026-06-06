@@ -56,14 +56,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tip = await getTip(slug);
   if (!tip) return { title: "Tip Not Found | AutomateQA" };
+  const canonicalUrl = `https://automateqa.online/automation-tips/${slug}`;
+  const tags: string[] = Array.isArray(tip.tags) ? tip.tags : [];
   return {
     title: `${tip.title} | AutomateQA Tips`,
     description: tip.excerpt,
+    keywords: [...tags, tip.category, "QA automation", "automation tip", "software testing", "AutomateQA"],
+    alternates: { canonical: canonicalUrl },
     openGraph: {
+      type: "article",
+      url: canonicalUrl,
       title: tip.title,
       description: tip.excerpt,
-      images: tip.cover_image ? [tip.cover_image] : [],
-      type: "article",
+      images: tip.cover_image
+        ? [{ url: tip.cover_image, width: 1200, height: 630, alt: tip.title }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: "AutomateQA" }],
+      publishedTime: tip.created_at,
+      modifiedTime: tip.updated_at || tip.created_at,
+      tags,
+      section: tip.category,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: tip.title,
+      description: tip.excerpt,
+      images: tip.cover_image ? [tip.cover_image] : ["/og-image.png"],
     },
   };
 }
@@ -78,8 +95,34 @@ export default async function TipDetailPage({ params }: Props) {
     ? tip.youtube_url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/)?.[1]
     : null;
 
+  const canonicalUrl = `https://automateqa.online/automation-tips/${slug}`;
+  const tags: string[] = Array.isArray(tip.tags) ? tip.tags : [];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: tip.title,
+    description: tip.excerpt,
+    image: tip.cover_image || "https://automateqa.online/og-image.png",
+    url: canonicalUrl,
+    datePublished: tip.created_at,
+    dateModified: tip.updated_at || tip.created_at,
+    author: { "@type": "Organization", name: "AutomateQA", url: "https://automateqa.online" },
+    publisher: {
+      "@type": "Organization",
+      name: "AutomateQA",
+      url: "https://automateqa.online",
+      logo: { "@type": "ImageObject", url: "https://automateqa.online/logo.png" },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    keywords: tags.join(", "),
+    articleSection: tip.category,
+    timeRequired: `PT${tip.read_time}M`,
+    inLanguage: "en-US",
+  };
+
   return (
     <div className="min-h-screen pt-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link href="/automation-tips" className="inline-flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#00FF88] transition-colors mb-8 group">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />

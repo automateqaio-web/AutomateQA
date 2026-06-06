@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { CATEGORY_COLORS } from "@/types";
 import BlogContent from "@/components/blog/BlogContent";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.dev";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
 
 interface Props {
   params: Promise<{ slug: string }>;

@@ -5,9 +5,20 @@ import MemeFeed from "@/components/memes/MemeFeed";
 export const metadata: Metadata = {
   title: "QA Memes — Laugh Through the Pain",
   description: "Browse hundreds of QA memes covering Playwright, Selenium, Agile, Jira, production bugs, and corporate madness.",
+  keywords: ["QA memes", "software testing memes", "Playwright memes", "Selenium humor", "Agile memes", "developer memes", "automation testing humor", "QA engineer"],
+  alternates: { canonical: "https://automateqa.online/memes" },
   openGraph: {
-    title: "QA Memes | AutomateQA",
+    type: "website",
+    url: "https://automateqa.online/memes",
+    title: "QA Memes — Laugh Through the Pain | AutomateQA",
     description: "Browse hundreds of QA memes covering Playwright, Selenium, Agile, Jira, production bugs, and corporate madness.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "QA Memes — AutomateQA" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "QA Memes — Laugh Through the Pain | AutomateQA",
+    description: "Browse hundreds of QA memes covering Playwright, Selenium, Agile, Jira, production bugs, and corporate madness.",
+    images: ["/og-image.png"],
   },
 };
 

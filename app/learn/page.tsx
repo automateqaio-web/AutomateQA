@@ -9,6 +9,21 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Learn QA Automation | AutomateQA",
   description: "Free automation testing tutorials covering Playwright, Selenium, Cypress, API Testing, CI/CD, and more.",
+  keywords: ["learn QA automation", "Playwright tutorial free", "Selenium course", "Cypress tutorial", "API testing course", "CI/CD for testers", "automation testing for beginners", "QA engineer training"],
+  alternates: { canonical: "https://automateqa.online/learn" },
+  openGraph: {
+    type: "website",
+    url: "https://automateqa.online/learn",
+    title: "Learn QA Automation — Free Tutorials | AutomateQA",
+    description: "Free automation testing tutorials covering Playwright, Selenium, Cypress, API Testing, CI/CD, and more.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Learn QA Automation — AutomateQA" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Learn QA Automation — Free Tutorials | AutomateQA",
+    description: "Free automation testing tutorials covering Playwright, Selenium, Cypress, API Testing, CI/CD, and more.",
+    images: ["/og-image.png"],
+  },
 };
 
 const stats = [

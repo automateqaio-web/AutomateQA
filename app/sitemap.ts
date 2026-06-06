@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
@@ -25,10 +25,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     const supabase = await createClient();
-    const [blogsRes, learnRes, tipsRes] = await Promise.all([
+    const [blogsRes, learnRes, tipsRes, videosRes] = await Promise.all([
       supabase.from("blogs").select("slug, updated_at, created_at").eq("published", true),
       supabase.from("learning_content").select("slug, updated_at, created_at").eq("published", true),
       supabase.from("automation_tips").select("slug, updated_at, created_at").eq("published", true),
+      supabase.from("videos").select("id, updated_at, created_at").eq("published", true),
     ]);
 
     const blogRoutes: MetadataRoute.Sitemap = (blogsRes.data || []).map((b) => ({
@@ -52,7 +53,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    return [...staticRoutes, ...blogRoutes, ...learnRoutes, ...tipRoutes];
+    const videoRoutes: MetadataRoute.Sitemap = (videosRes.data || []).map((v) => ({
+      url: `${baseUrl}/videos/${v.id}`,
+      lastModified: new Date(v.updated_at || v.created_at),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+
+    return [...staticRoutes, ...blogRoutes, ...learnRoutes, ...tipRoutes, ...videoRoutes];
   } catch {
     return staticRoutes;
   }

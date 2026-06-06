@@ -19,7 +19,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.dev"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"),
   title: {
     default: "AutomateQA — Automation Testing Meets Corporate Chaos",
     template: "%s | AutomateQA",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://automateqa.dev",
+    url: "https://automateqa.online",
     siteName: "AutomateQA",
     title: "AutomateQA — Automation Testing Meets Corporate Chaos",
     description: "QA memes, Playwright tutorials, Selenium tips, and real corporate pain.",

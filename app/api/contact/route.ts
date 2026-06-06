@@ -148,8 +148,8 @@ export async function POST(req: NextRequest) {
           </div>
           <p style="color:#9ca3af;font-size:13px;line-height:1.7;margin:0 0 20px 0;">While you wait, feel free to explore our content:</p>
           <div style="margin-bottom:28px;">
-            <a href="https://automateqa.dev/memes" style="display:inline-block;background:#1a1a1a;color:#fff;font-size:13px;padding:8px 18px;border-radius:8px;text-decoration:none;border:1px solid #2a2a2a;margin-right:8px;">🎭 Browse Memes</a>
-            <a href="https://automateqa.dev/videos" style="display:inline-block;background:#1a1a1a;color:#fff;font-size:13px;padding:8px 18px;border-radius:8px;text-decoration:none;border:1px solid #2a2a2a;">▶️ Watch Videos</a>
+            <a href="https://automateqa.online/memes" style="display:inline-block;background:#1a1a1a;color:#fff;font-size:13px;padding:8px 18px;border-radius:8px;text-decoration:none;border:1px solid #2a2a2a;margin-right:8px;">🎭 Browse Memes</a>
+            <a href="https://automateqa.online/videos" style="display:inline-block;background:#1a1a1a;color:#fff;font-size:13px;padding:8px 18px;border-radius:8px;text-decoration:none;border:1px solid #2a2a2a;">▶️ Watch Videos</a>
           </div>
           <p style="color:#4b5563;font-size:11px;text-align:center;margin-top:8px;">AutomateQA · automate.qa.io@gmail.com</p>
         </div>

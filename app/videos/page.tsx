@@ -5,6 +5,21 @@ import VideoGrid from "@/components/videos/VideoGrid";
 export const metadata: Metadata = {
   title: "Videos — QA Tutorials & Meme Compilations",
   description: "Watch Playwright tutorials, Selenium guides, API testing videos, and QA meme compilations. Learn automation while laughing.",
+  keywords: ["QA automation videos", "Playwright tutorial", "Selenium tutorial", "API testing video", "software testing YouTube", "automation testing course", "QA engineer videos"],
+  alternates: { canonical: "https://automateqa.online/videos" },
+  openGraph: {
+    type: "website",
+    url: "https://automateqa.online/videos",
+    title: "Videos — QA Tutorials & Meme Compilations | AutomateQA",
+    description: "Watch Playwright tutorials, Selenium guides, API testing videos, and QA meme compilations. Learn automation while laughing.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AutomateQA Videos" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Videos — QA Tutorials & Meme Compilations | AutomateQA",
+    description: "Watch Playwright tutorials, Selenium guides, API testing videos, and QA meme compilations.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function VideosPage() {

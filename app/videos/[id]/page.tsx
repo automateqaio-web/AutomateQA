@@ -17,10 +17,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const supabase = await createClient();
     const { data } = await supabase.from("videos").select("*").eq("id", id).single();
     if (!data) return { title: "Video Not Found" };
+    const canonicalUrl = `https://automateqa.online/videos/${id}`;
+    const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
     return {
-      title: data.title,
+      title: `${data.title} | AutomateQA Videos`,
       description: data.description,
-      openGraph: { title: data.title, description: data.description, images: [data.thumbnail] },
+      keywords: [...tags, data.category, "QA automation video", "software testing tutorial", "AutomateQA"],
+      alternates: { canonical: canonicalUrl },
+      openGraph: {
+        type: "video.other",
+        url: canonicalUrl,
+        title: data.title,
+        description: data.description,
+        images: data.thumbnail
+          ? [{ url: data.thumbnail, width: 1280, height: 720, alt: data.title }]
+          : [{ url: "/og-image.png", width: 1200, height: 630, alt: "AutomateQA" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: data.title,
+        description: data.description,
+        images: data.thumbnail ? [data.thumbnail] : ["/og-image.png"],
+      },
     };
   } catch {
     return { title: "Video" };
@@ -42,8 +60,30 @@ export default async function VideoDetailPage({ params }: Props) {
     .neq("id", id)
     .limit(4);
 
+  const canonicalUrl = `https://automateqa.online/videos/${id}`;
+  const tags: string[] = Array.isArray(video.tags) ? video.tags : [];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.title,
+    description: video.description,
+    thumbnailUrl: video.thumbnail || "https://automateqa.online/og-image.png",
+    uploadDate: video.created_at,
+    embedUrl: `https://www.youtube.com/embed/${video.youtube_id}`,
+    url: canonicalUrl,
+    keywords: tags.join(", "),
+    publisher: {
+      "@type": "Organization",
+      name: "AutomateQA",
+      url: "https://automateqa.online",
+      logo: { "@type": "ImageObject", url: "https://automateqa.online/logo.png" },
+    },
+    inLanguage: "en-US",
+  };
+
   return (
     <div className="min-h-screen pt-16">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back link */}
         <Link href="/videos" className="inline-flex items-center gap-2 text-[#9CA3AF] hover:text-[#00FF88] text-sm font-medium mb-8 transition-colors group">
