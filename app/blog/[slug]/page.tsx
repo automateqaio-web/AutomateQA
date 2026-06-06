@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { CATEGORY_COLORS } from "@/types";
 import BlogContent from "@/components/blog/BlogContent";
 import BlogViewTracker from "@/components/blog/BlogViewTracker";
+import BlogInteractions from "@/components/blog/BlogInteractions";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
 
@@ -161,6 +162,9 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Blog content */}
         <BlogContent content={blog.content} />
+
+        {/* Interactions: like, share, rating, comments */}
+        <BlogInteractions slug={slug} initialLikes={blog.likes_count || 0} />
 
         {/* Tags */}
         {tags.length > 0 && (
