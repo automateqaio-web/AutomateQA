@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Blog, BLOG_CATEGORIES } from "@/types";
 import { formatDate, slugify, calculateReadTime } from "@/lib/utils";
 import BlogEditor from "@/components/admin/BlogEditor";
+import { fixEmojiBullets } from "@/lib/formatTipContent";
 
 const EMPTY_FORM = {
   title: "", slug: "", excerpt: "", content: "",
@@ -211,7 +212,7 @@ export default function AdminBlogsPage() {
                 {/* Rich markdown editor */}
                 <div>
                   <label className="block text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Content</label>
-                  <BlogEditor value={form.content} onChange={(v) => setForm({ ...form, content: v })} />
+                  <BlogEditor value={form.content} onChange={(v) => setForm({ ...form, content: v })} contentPreprocessor={fixEmojiBullets} />
                 </div>
 
                 {/* Tags */}

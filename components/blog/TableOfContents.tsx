@@ -66,20 +66,18 @@ export function TableOfContentsMobile({ headings }: { headings: Heading[] }) {
             <button
               key={h.id}
               onClick={() => { scrollToId(h.id); setOpen(false); }}
-              className={`flex items-center gap-2 w-full text-left px-3 py-2 rounded-lg text-[0.8rem] transition-all duration-150 ${
-                h.level === 3 ? "ml-3" : ""
-              } ${
+              className={`relative flex items-center gap-2 w-full text-left px-3 py-2 rounded-lg text-[0.8rem] transition-all duration-150 ${
                 activeId === h.id
-                  ? "bg-[#00FF88]/8 text-[#00FF88] font-medium"
+                  ? "text-[#00FF88] font-medium"
                   : "text-[#9CA3AF] hover:text-white hover:bg-white/[0.04]"
               }`}
             >
-              {activeId === h.id && (
-                <span className="w-1 h-1 rounded-full bg-[#00FF88] flex-shrink-0" />
-              )}
-              {h.level === 3 && activeId !== h.id && (
-                <span className="w-1 h-1 rounded-full bg-[#374151] flex-shrink-0" />
-              )}
+              <span className={`absolute left-0 top-1/2 -translate-y-1/2 rounded-r-full transition-all ${
+                activeId === h.id ? "w-[3px] h-4 bg-[#00FF88]" : "w-0"
+              }`} />
+              <span className={`flex-shrink-0 w-[5px] h-[5px] rounded-full transition-colors ${
+                activeId === h.id ? "bg-[#00FF88]" : "bg-[#374151]"
+              }`} />
               {h.text}
             </button>
           ))}
@@ -108,7 +106,7 @@ export function TableOfContentsDesktop({ headings }: { headings: Heading[] }) {
   if (headings.length < 2) return null;
 
   return (
-    <div className="sticky top-24">
+    <div>
       {/* Card */}
       <div className="rounded-2xl border border-white/8 bg-[#0E0E0E] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
         {/* Header */}
@@ -137,26 +135,22 @@ export function TableOfContentsDesktop({ headings }: { headings: Heading[] }) {
               <button
                 key={h.id}
                 onClick={() => scrollToId(h.id)}
-                className={`relative flex items-start gap-2.5 w-full text-left px-3 py-2 rounded-lg text-[0.75rem] leading-snug transition-all duration-200 group ${
-                  h.level === 3 ? "ml-3 mr-1" : ""
-                } ${
+                className={`relative flex items-center gap-2 w-full text-left px-3 py-1.5 rounded-lg text-[0.75rem] leading-snug transition-all duration-200 group ${
                   isActive
-                    ? "bg-[#00FF88]/8 text-[#00FF88] font-semibold shadow-[inset_0_0_0_1px_rgba(0,255,136,0.12)]"
+                    ? "text-[#00FF88] font-semibold"
                     : "text-[#6B7280] hover:text-[#C9D1D9] hover:bg-white/[0.04]"
                 }`}
               >
-                {/* Active indicator bar */}
-                {isActive && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-[#00FF88] shadow-[0_0_6px_#00FF88]" />
-                )}
-                {/* Dot for h3 */}
-                {h.level === 3 && (
-                  <span
-                    className={`flex-shrink-0 w-[5px] h-[5px] rounded-full mt-[4px] transition-colors ${
-                      isActive ? "bg-[#00FF88]" : "bg-[#2A2A2A] group-hover:bg-[#4B5563]"
-                    }`}
-                  />
-                )}
+                {/* Green left bar for active */}
+                <span className={`absolute left-0 top-1/2 -translate-y-1/2 rounded-r-full transition-all duration-200 ${
+                  isActive
+                    ? "w-[3px] h-4 bg-[#00FF88] shadow-[0_0_6px_#00FF88]"
+                    : "w-[2px] h-3 bg-transparent group-hover:bg-white/10"
+                }`} />
+                {/* Bullet */}
+                <span className={`flex-shrink-0 w-[5px] h-[5px] rounded-full transition-colors ${
+                  isActive ? "bg-[#00FF88]" : "bg-[#374151] group-hover:bg-[#6B7280]"
+                }`} />
                 <span className="flex-1">{h.text}</span>
               </button>
             );

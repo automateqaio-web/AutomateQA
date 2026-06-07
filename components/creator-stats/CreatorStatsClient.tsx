@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   Play, Users, Eye, TrendingUp, Heart, MessageCircle,
-  ExternalLink, Loader2, RefreshCw, Clock, Flame, Star
+  ExternalLink, Loader2, RefreshCw, Clock, Flame, Star, Bell, Tv2
 } from "lucide-react";
 
 function YoutubeLogo({ size = 16, className = "" }: { size?: number; className?: string }) {
@@ -12,6 +13,103 @@ function YoutubeLogo({ size = 16, className = "" }: { size?: number; className?:
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
     </svg>
+  );
+}
+
+const channelContent = [
+  { emoji: "🎭", title: "QA Memes", desc: "Weekly dose of relatable testing humor" },
+  { emoji: "🎬", title: "Playwright Tutorials", desc: "Step-by-step automation with real examples" },
+  { emoji: "💡", title: "Selenium & API Tips", desc: "Practical tips for automation engineers" },
+];
+
+function YouTubeChannelCard() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.1 }}
+    >
+      <div className="relative rounded-3xl border border-red-500/20 overflow-hidden bg-gradient-to-br from-[#111]/95 via-[#0e0e0e] to-[#0a0a0a] shadow-[0_0_60px_rgba(239,68,68,0.08)]">
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/70 to-transparent" />
+
+        {/* Background glow blobs */}
+        <div className="absolute -top-16 left-1/4 w-72 h-48 bg-red-500/6 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-48 h-32 bg-red-600/5 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 p-6 sm:p-10">
+          {/* Header: avatar + info + CTA */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10 mb-8">
+            {/* Avatar block */}
+            <div className="flex items-center gap-5">
+              <div className="relative flex-shrink-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden ring-2 ring-red-500/40 shadow-[0_0_32px_rgba(239,68,68,0.35)]">
+                  <Image src="/logo.png" alt="AutomateQA YouTube channel" width={96} height={96} className="object-cover" />
+                </div>
+                {/* YouTube play badge */}
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-red-600 border-2 border-[#0a0a0a] flex items-center justify-center shadow-lg shadow-red-600/40">
+                  <Play size={10} className="text-white fill-white ml-px" />
+                </div>
+              </div>
+
+              <div>
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-red-400 bg-red-500/10 border border-red-500/25 px-2.5 py-1 rounded-full uppercase tracking-widest mb-2">
+                  <Tv2 size={9} /> YouTube
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight tracking-tight">AutomateQA</h2>
+                <p className="text-[#6B7280] text-sm font-mono mt-0.5">@automateqa</p>
+                <p className="text-[#9CA3AF] text-sm mt-2 leading-relaxed hidden sm:block max-w-xs">
+                  QA memes, Playwright tutorials &amp; real corporate chaos — every week.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA buttons */}
+            <div className="sm:ml-auto flex items-center gap-3 flex-wrap">
+              <a
+                href="https://www.youtube.com/@automateqa?sub_confirmation=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-black transition-all duration-200 hover:shadow-[0_0_28px_rgba(239,68,68,0.5)] active:scale-95"
+              >
+                <Bell size={14} className="fill-white stroke-none" />
+                Subscribe
+              </a>
+              <a
+                href="https://www.youtube.com/@automateqa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/25 text-[#9CA3AF] hover:text-white text-sm font-semibold transition-all duration-200"
+              >
+                <ExternalLink size={14} />
+                Visit Channel
+              </a>
+            </div>
+          </div>
+
+          {/* Mobile description */}
+          <p className="text-[#9CA3AF] text-sm mb-6 sm:hidden leading-relaxed">
+            QA memes, Playwright tutorials &amp; real corporate chaos — every week.
+          </p>
+
+          {/* Content type cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 border-t border-white/[0.06]">
+            {channelContent.map(({ emoji, title, desc }) => (
+              <div key={title} className="flex items-start gap-3.5 p-4 rounded-2xl bg-white/[0.025] border border-white/[0.06] hover:border-red-500/25 hover:bg-red-500/[0.04] transition-all duration-300 group cursor-default">
+                <span className="text-xl mt-0.5 flex-shrink-0">{emoji}</span>
+                <div>
+                  <div className="text-sm font-black text-white group-hover:text-red-300 transition-colors mb-0.5">{title}</div>
+                  <div className="text-xs text-[#6B7280] leading-relaxed">{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom accent */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      </div>
+    </motion.div>
   );
 }
 import {
@@ -275,6 +373,9 @@ export default function CreatorStatsClient() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+
+        {/* YouTube Channel Promo Card */}
+        <YouTubeChannelCard />
 
         {/* Loading state */}
         {loading && !ytStats && (

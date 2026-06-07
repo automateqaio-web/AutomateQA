@@ -75,6 +75,7 @@ export interface AutomationTip {
   featured: boolean;
   published: boolean;
   views: number;
+  likes: number;
   read_time: number;
   created_at: string;
   updated_at: string;

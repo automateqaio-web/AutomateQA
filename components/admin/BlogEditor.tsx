@@ -158,10 +158,10 @@ function TBBtn({ item }: { item: TBItem }) {
 
 /* ──────────────────────────── main component ───────────────────── */
 
-interface Props { value: string; onChange: (v: string) => void }
+interface Props { value: string; onChange: (v: string) => void; contentPreprocessor?: (raw: string) => string }
 type Mode = "write" | "preview" | "split";
 
-export default function BlogEditor({ value, onChange }: Props) {
+export default function BlogEditor({ value, onChange, contentPreprocessor }: Props) {
   const [mode, setMode] = useState<Mode>("write");
   const [showYT, setShowYT] = useState(false);
   const [ytUrl, setYtUrl] = useState("");
@@ -315,7 +315,7 @@ export default function BlogEditor({ value, onChange }: Props) {
           <div className={`${mode === "split" ? "w-1/2" : "w-full"} p-5 overflow-y-auto`} style={{ minHeight: 480 }}>
             {value.trim() ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={mdComponents}>
-                {preprocess(value)}
+                {preprocess(contentPreprocessor ? contentPreprocessor(value) : value)}
               </ReactMarkdown>
             ) : (
               <div className="flex flex-col items-center justify-center h-60 text-center">

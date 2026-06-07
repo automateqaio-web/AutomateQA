@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { Heart, Star, MessageCircle, Link2 } from "lucide-react";
+import { Heart, MessageCircle, Link2 } from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,19 +37,10 @@ export default function BlogInteractions({
   slug: string;
   initialLikes?: number;
 }) {
-  // Like
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikes);
   const [liking, setLiking] = useState(false);
 
-  // Rating
-  const [hoverRating, setHoverRating] = useState(0);
-  const [userRating, setUserRating] = useState(0);
-  const [hasRated, setHasRated] = useState(false);
-  const [avgRating, setAvgRating] = useState(0);
-  const [ratingCount, setRatingCount] = useState(0);
-
-  // Comments
   const [comments, setComments] = useState<Comment[]>([]);
   const [name, setName] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -57,38 +48,17 @@ export default function BlogInteractions({
   const [submitted, setSubmitted] = useState(false);
   const [commentError, setCommentError] = useState("");
 
-  // Share
   const [copied, setCopied] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
 
   useEffect(() => {
     setPageUrl(window.location.href);
-
-    const likedKey = `liked_${slug}`;
-    const ratedKey = `rated_${slug}`;
-    if (localStorage.getItem(likedKey)) {
+    if (localStorage.getItem(`liked_${slug}`)) {
       setLiked(true);
       setLikesCount((c) => Math.max(c, 1));
     }
-    const saved = localStorage.getItem(ratedKey);
-    if (saved) { setHasRated(true); setUserRating(Number(saved)); }
-
-    fetchRatings();
     fetchComments();
   }, [slug]);
-
-  async function fetchRatings() {
-    try {
-      const { data } = await supabase
-        .from("blog_ratings")
-        .select("rating")
-        .eq("blog_slug", slug);
-      if (data && data.length > 0) {
-        setAvgRating(data.reduce((s, r) => s + r.rating, 0) / data.length);
-        setRatingCount(data.length);
-      }
-    } catch {}
-  }
 
   async function fetchComments() {
     try {
@@ -112,17 +82,6 @@ export default function BlogInteractions({
       if (data != null) setLikesCount(data);
     } catch {}
     setLiking(false);
-  }
-
-  async function handleRate(rating: number) {
-    if (hasRated) return;
-    setHasRated(true);
-    setUserRating(rating);
-    localStorage.setItem(`rated_${slug}`, rating.toString());
-    try {
-      await supabase.from("blog_ratings").insert({ blog_slug: slug, rating });
-      await fetchRatings();
-    } catch {}
   }
 
   async function handleComment(e: React.FormEvent) {
@@ -156,14 +115,11 @@ export default function BlogInteractions({
     } catch {}
   }
 
-  const displayStars = hoverRating || userRating || Math.round(avgRating);
-
   return (
     <div className="mt-16 space-y-10 border-t border-white/5 pt-10">
 
-      {/* Like + Share row */}
+      {/* Like + Share */}
       <div className="flex flex-wrap items-center gap-3">
-        {/* Like */}
         <button
           onClick={handleLike}
           disabled={liked}
@@ -178,27 +134,11 @@ export default function BlogInteractions({
           <span className="text-xs opacity-75">{liked ? "Liked!" : "Like"}</span>
         </button>
 
-        {/* Rating pill */}
-        {ratingCount > 0 && (
-          <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-white/8 bg-white/[0.03] text-sm">
-            <div className="flex">
-              {[1,2,3,4,5].map((s) => (
-                <Star key={s} size={11} className={s <= Math.round(avgRating) ? "fill-amber-400 text-amber-400" : "text-[#374151]"} />
-              ))}
-            </div>
-            <span className="text-white font-semibold ml-1">{avgRating.toFixed(1)}</span>
-            <span className="text-[#6B7280]">· {ratingCount}</span>
-          </div>
-        )}
-
-        {/* Share buttons */}
         <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-[#6B7280] hidden sm:block">Share:</span>
           <a
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=Check this out on AutomateQA`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Share on X"
+            target="_blank" rel="noopener noreferrer" title="Share on X"
             className="p-2.5 rounded-xl border border-white/8 bg-white/[0.03] text-[#9CA3AF] hover:border-sky-500/30 hover:text-sky-400 hover:bg-sky-500/5 transition-all"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -207,22 +147,17 @@ export default function BlogInteractions({
           </a>
           <a
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Share on LinkedIn"
+            target="_blank" rel="noopener noreferrer" title="Share on LinkedIn"
             className="p-2.5 rounded-xl border border-white/8 bg-white/[0.03] text-[#9CA3AF] hover:border-blue-500/30 hover:text-blue-400 hover:bg-blue-500/5 transition-all"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-              <rect x="2" y="9" width="4" height="12" />
-              <circle cx="4" cy="4" r="2" />
+              <rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" />
             </svg>
           </a>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(pageUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Share on WhatsApp"
+            target="_blank" rel="noopener noreferrer" title="Share on WhatsApp"
             className="p-2.5 rounded-xl border border-white/8 bg-white/[0.03] text-[#9CA3AF] hover:border-green-500/30 hover:text-green-400 hover:bg-green-500/5 transition-all"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -230,8 +165,7 @@ export default function BlogInteractions({
             </svg>
           </a>
           <button
-            onClick={handleCopy}
-            title="Copy link"
+            onClick={handleCopy} title="Copy link"
             className={`p-2.5 rounded-xl border transition-all ${
               copied
                 ? "border-[#00FF88]/30 text-[#00FF88] bg-[#00FF88]/5"
@@ -240,55 +174,6 @@ export default function BlogInteractions({
           >
             <Link2 size={14} />
           </button>
-        </div>
-      </div>
-
-      {/* Rate This Article */}
-      <div className="glass-card p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
-          <div>
-            <h3 className="text-white font-bold text-lg">Rate This Article</h3>
-            <p className="text-[#9CA3AF] text-sm mt-1">
-              {hasRated
-                ? `You rated this ${userRating} out of 5 — thank you!`
-                : "Was this article helpful? Tap a star to rate it."}
-            </p>
-          </div>
-          {ratingCount > 0 && (
-            <div className="text-right">
-              <div className="text-2xl font-black text-white">{avgRating.toFixed(1)}<span className="text-[#6B7280] text-base font-normal">/5</span></div>
-              <div className="text-xs text-[#6B7280]">{ratingCount} rating{ratingCount !== 1 ? "s" : ""}</div>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5">
-          {[1,2,3,4,5].map((s) => (
-            <button
-              key={s}
-              onClick={() => handleRate(s)}
-              onMouseEnter={() => !hasRated && setHoverRating(s)}
-              onMouseLeave={() => !hasRated && setHoverRating(0)}
-              disabled={hasRated}
-              className="transition-all duration-100 hover:scale-110 disabled:cursor-default active:scale-95"
-            >
-              <Star
-                size={36}
-                className={`transition-colors duration-100 ${
-                  s <= displayStars
-                    ? "fill-amber-400 text-amber-400"
-                    : "text-[#2A2A2A] hover:text-amber-400/40"
-                }`}
-              />
-            </button>
-          ))}
-          {hasRated && (
-            <span className="ml-3 text-[#00FF88] text-sm flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Saved
-            </span>
-          )}
         </div>
       </div>
 
@@ -304,23 +189,21 @@ export default function BlogInteractions({
           )}
         </h3>
 
-        {/* Comment form */}
+        {/* Form */}
         <form onSubmit={handleComment} className="glass-card p-6 mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
-                Your Name *
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                maxLength={100}
-                required
-                className="w-full bg-[#0D0D0D] border border-white/8 rounded-xl px-4 py-3 text-white text-sm placeholder-[#374151] focus:outline-none focus:border-[#00FF88]/40 focus:ring-1 focus:ring-[#00FF88]/10 transition-all"
-              />
-            </div>
+          <div className="mb-4">
+            <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
+              Your Name *
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="John Doe"
+              maxLength={100}
+              required
+              className="w-full sm:w-1/2 bg-[#0D0D0D] border border-white/8 rounded-xl px-4 py-3 text-white text-sm placeholder-[#374151] focus:outline-none focus:border-[#00FF88]/40 focus:ring-1 focus:ring-[#00FF88]/10 transition-all"
+            />
           </div>
           <div className="mb-5">
             <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
@@ -348,8 +231,7 @@ export default function BlogInteractions({
             {submitting ? (
               <>
                 <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                  <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" /><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
                 </svg>
                 Posting...
               </>
@@ -360,9 +242,7 @@ export default function BlogInteractions({
                 </svg>
                 Posted!
               </>
-            ) : (
-              "Post Comment →"
-            )}
+            ) : "Post Comment →"}
           </button>
         </form>
 
@@ -376,18 +256,18 @@ export default function BlogInteractions({
         ) : (
           <div className="space-y-4">
             {comments.map((c) => (
-              <div key={c.id} className="glass-card p-5 group">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-[#00FF88]/15 to-[#00FF88]/5 border border-[#00FF88]/20 flex items-center justify-center text-[#00FF88] font-bold text-sm">
+              <div key={c.id} className="glass-card p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-[#00FF88]/15 to-transparent border border-[#00FF88]/20 flex items-center justify-center text-[#00FF88] font-bold text-sm">
                     {c.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-1.5">
                       <span className="text-white font-semibold text-sm">{c.name}</span>
                       <span className="text-[#4B5563] text-xs">·</span>
                       <span className="text-[#4B5563] text-xs">{timeAgo(c.created_at)}</span>
                     </div>
-                    <p className="text-[#C9D1D9] text-sm leading-relaxed mt-2">{c.comment}</p>
+                    <p className="text-[#C9D1D9] text-sm leading-relaxed">{c.comment}</p>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Search, Clock, Calendar, X } from "lucide-react";
@@ -78,11 +79,14 @@ function SkeletonCard() {
   );
 }
 
-export default function BlogListing() {
+function BlogListingInner() {
+  const searchParams = useSearchParams();
+  const initialTag = searchParams.get("tag") || "";
+
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState(initialTag);
+  const [searchInput, setSearchInput] = useState(initialTag);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const supabase = createClient();
 
@@ -190,5 +194,13 @@ export default function BlogListing() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function BlogListing() {
+  return (
+    <Suspense>
+      <BlogListingInner />
+    </Suspense>
   );
 }
