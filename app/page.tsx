@@ -4,6 +4,7 @@ import FeaturedVideos from "@/components/home/FeaturedVideos";
 import TrendingMemes from "@/components/home/TrendingMemes";
 import PlaywrightDays from "@/components/home/PlaywrightDays";
 import LatestBlogs from "@/components/home/LatestBlogs";
+import FeaturedTips from "@/components/home/FeaturedTips";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-const EMPTY = { memes: [], videos: [], blogs: [] };
+const EMPTY = { memes: [], videos: [], blogs: [], tips: [] };
 
 async function getHomeData() {
   // Skip fetch entirely if Supabase isn't configured yet
@@ -31,7 +32,7 @@ async function getHomeData() {
 
     const fetch = async () => {
       const supabase = await createClient();
-      const [memesRes, videosRes, blogsRes] = await Promise.all([
+      const [memesRes, videosRes, blogsRes, tipsRes] = await Promise.all([
         supabase
           .from("memes")
           .select("*")
@@ -50,11 +51,19 @@ async function getHomeData() {
           .eq("published", true)
           .order("created_at", { ascending: false })
           .limit(3),
+        supabase
+          .from("automation_tips")
+          .select("*")
+          .eq("published", true)
+          .order("featured", { ascending: false })
+          .order("created_at", { ascending: false })
+          .limit(3),
       ]);
       return {
         memes: memesRes.data || [],
         videos: videosRes.data || [],
         blogs: blogsRes.data || [],
+        tips: tipsRes.data || [],
       };
     };
 
@@ -65,13 +74,14 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const { memes, videos, blogs } = await getHomeData();
+  const { memes, videos, blogs, tips } = await getHomeData();
 
   return (
     <>
       <HeroSection />
       <FeaturedVideos videos={videos} />
       <TrendingMemes memes={memes} />
+      <FeaturedTips tips={tips} />
       <PlaywrightDays />
       <LatestBlogs blogs={blogs} />
     </>

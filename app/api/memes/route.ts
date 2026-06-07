@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+// Strip characters that could manipulate PostgREST filter syntax
+function sanitizeSearch(raw: string): string {
+  return raw.trim().replace(/[%_*()[\]{}"'\\;,]/g, "").slice(0, 100);
+}
+
+const ALLOWED_CATEGORIES = ["Playwright", "Selenium", "Cypress", "API Testing", "CI/CD", "Career", "General", "Meme"];
+const MAX_LIMIT = 50;
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const category = searchParams.get("category");
-  const search = searchParams.get("search");
+  const categoryRaw = searchParams.get("category");
+  const category = categoryRaw && ALLOWED_CATEGORIES.includes(categoryRaw) ? categoryRaw : null;
+  const searchRaw = searchParams.get("search") || "";
+  const search = searchRaw ? sanitizeSearch(searchRaw) : "";
   const featured = searchParams.get("featured");
-  const page = parseInt(searchParams.get("page") || "0");
-  const limit = parseInt(searchParams.get("limit") || "12");
+  const page = Math.max(0, parseInt(searchParams.get("page") || "0"));
+  const limit = Math.min(MAX_LIMIT, Math.max(1, parseInt(searchParams.get("limit") || "12")));
 
   try {
     const supabase = await createClient();

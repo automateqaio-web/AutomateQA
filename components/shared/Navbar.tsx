@@ -22,7 +22,7 @@ const DEFAULT_NAV: NavItem[] = [
   { key: "learn",   label: "Learn",         href: "/learn",          enabled: true, sort_order: 4 },
   { key: "tips",    label: "Tips & Tricks", href: "/automation-tips",enabled: true, sort_order: 5 },
   { key: "blog",    label: "Blog",          href: "/blog",           enabled: true, sort_order: 6 },
-  { key: "youtube", label: "YouTube",       href: "/creator-stats",  enabled: true, sort_order: 7 },
+  { key: "socials", label: "Socials",        href: "/creator-stats",  enabled: true, sort_order: 7 },
   { key: "about",   label: "About",         href: "/about",          enabled: true, sort_order: 8 },
 ];
 
@@ -77,7 +77,10 @@ export default function Navbar() {
       .catch(() => {});
   }, []);
 
-  const visibleLinks = navItems.filter((n) => n.enabled);
+  const LABEL_OVERRIDES: Record<string, string> = { youtube: "Socials", socials: "Socials" };
+  const visibleLinks = navItems
+    .filter((n) => n.enabled)
+    .map((n) => ({ ...n, label: LABEL_OVERRIDES[n.key] ?? n.label }));
 
   return (
     <motion.header

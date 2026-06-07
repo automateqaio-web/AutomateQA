@@ -27,7 +27,6 @@ export default function Footer() {
   const socialLinks = [
     { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", color: "hover:text-red-500" },
     { icon: Camera, href: "https://www.instagram.com/automateqa.io", label: "Instagram", color: "hover:text-pink-500" },
-    { icon: Mail, href: `mailto:${contactEmail}`, label: "Email", color: "hover:text-[#00FF88]" },
   ];
 
   return (
@@ -96,11 +95,6 @@ export default function Footer() {
               © {new Date().getFullYear()} AutomateQA. Built with ❤️ for the QA community.
             </p>
           </div>
-          <p className="text-[#9CA3AF] text-xs">
-            <a href={`mailto:${contactEmail}`} className="hover:text-[#00FF88] transition-colors">
-              {contactEmail}
-            </a>
-          </p>
         </div>
       </div>
     </footer>

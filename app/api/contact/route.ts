@@ -73,9 +73,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Input exceeds maximum allowed length." }, { status: 400 });
     }
 
-    // Basic email format check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // RFC-compliant email check: local@domain.tld, min 2-char TLD, no consecutive dots
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email) || email.includes("..")) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
 

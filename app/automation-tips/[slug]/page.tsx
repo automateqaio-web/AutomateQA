@@ -10,6 +10,7 @@ import BlogContent from "@/components/blog/BlogContent";
 import TipShareButtons from "@/components/tips/TipShareButtons";
 import TipInteractions from "@/components/tips/TipInteractions";
 import ReadingProgress from "@/components/blog/ReadingProgress";
+import TipViewTracker from "@/components/tips/TipViewTracker";
 import { TableOfContentsMobile, TableOfContentsDesktop } from "@/components/blog/TableOfContents";
 import type { Heading } from "@/components/blog/TableOfContents";
 import { formatTipContent } from "@/lib/formatTipContent";
@@ -55,9 +56,6 @@ async function getTip(slug: string): Promise<AutomationTip | null> {
       .eq("slug", slug)
       .eq("published", true)
       .single();
-    if (data) {
-      void supabase.from("automation_tips").update({ views: (data.views || 0) + 1 }).eq("id", data.id);
-    }
     return data;
   } catch { return null; }
 }
@@ -187,6 +185,7 @@ export default async function TipDetailPage({ params }: Props) {
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
       ))}
       <ReadingProgress />
+      <TipViewTracker tipId={tip.id} />
 
       <div className="h-8" />
 

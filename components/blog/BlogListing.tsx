@@ -79,6 +79,10 @@ function SkeletonCard() {
   );
 }
 
+function sanitizeSearch(raw: string): string {
+  return raw.trim().replace(/[%_*()[\]{}"'\\;,]/g, "").slice(0, 100);
+}
+
 function BlogListingInner({ initialBlogs = [] }: { initialBlogs?: Blog[] }) {
   const searchParams = useSearchParams();
   const initialTag = searchParams.get("tag") || "";
@@ -112,7 +116,8 @@ function BlogListingInner({ initialBlogs = [] }: { initialBlogs?: Blog[] }) {
           .eq("published", true)
           .order("created_at", { ascending: false });
         if (selectedCategory !== "All") query = query.eq("category", selectedCategory);
-        if (search) query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%`);
+        const safeSearch = sanitizeSearch(search);
+        if (safeSearch) query = query.or(`title.ilike.%${safeSearch}%,excerpt.ilike.%${safeSearch}%`);
         const { data } = await query;
         return data || [];
       }, [] as Blog[], 3000);

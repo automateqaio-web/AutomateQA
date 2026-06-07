@@ -24,18 +24,18 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const supabase = createClient();
 
-  // Restore lockout from sessionStorage
+  // Restore lockout from localStorage
   useEffect(() => {
-    const stored = sessionStorage.getItem("admin_lockout");
+    const stored = localStorage.getItem("admin_lockout");
     if (stored) {
       const until = parseInt(stored);
       if (until > Date.now()) {
         setLockedUntil(until);
       } else {
-        sessionStorage.removeItem("admin_lockout");
+        localStorage.removeItem("admin_lockout");
       }
     }
-    const storedAttempts = sessionStorage.getItem("admin_attempts");
+    const storedAttempts = localStorage.getItem("admin_attempts");
     if (storedAttempts) setAttempts(parseInt(storedAttempts));
   }, []);
 
@@ -47,8 +47,8 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       if (remaining <= 0) {
         setLockedUntil(null);
         setAttempts(0);
-        sessionStorage.removeItem("admin_lockout");
-        sessionStorage.removeItem("admin_attempts");
+        localStorage.removeItem("admin_lockout");
+        localStorage.removeItem("admin_attempts");
         if (timerRef.current) clearInterval(timerRef.current);
       } else {
         setCountdown(remaining);
@@ -85,20 +85,20 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
     if (error) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
-      sessionStorage.setItem("admin_attempts", String(newAttempts));
+      localStorage.setItem("admin_attempts", String(newAttempts));
 
       if (newAttempts >= MAX_ATTEMPTS) {
         const until = Date.now() + LOCKOUT_MS;
         setLockedUntil(until);
-        sessionStorage.setItem("admin_lockout", String(until));
+        localStorage.setItem("admin_lockout", String(until));
         setError("");
       } else {
         setError(`Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempt${MAX_ATTEMPTS - newAttempts === 1 ? "" : "s"} remaining.`);
       }
     } else {
       setAttempts(0);
-      sessionStorage.removeItem("admin_attempts");
-      sessionStorage.removeItem("admin_lockout");
+      localStorage.removeItem("admin_attempts");
+      localStorage.removeItem("admin_lockout");
       setAuthenticated(true);
     }
     setSigning(false);

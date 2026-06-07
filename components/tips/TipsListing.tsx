@@ -70,7 +70,7 @@ function TipCard({ item, index }: { item: AutomationTip; index: number }) {
             )}
             <div className="flex items-center justify-between text-xs text-[#9CA3AF] pt-3 border-t border-white/5 mt-auto">
               <span className="flex items-center gap-1.5"><Clock size={11} />{item.read_time} min</span>
-              <span className="flex items-center gap-1.5"><Eye size={11} />{item.views.toLocaleString()}</span>
+              {item.views > 0 && <span className="flex items-center gap-1.5"><Eye size={11} />{item.views.toLocaleString()}</span>}
               <span>{formatRelativeDate(item.created_at)}</span>
             </div>
             {item.tags?.length > 0 && (

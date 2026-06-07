@@ -4,9 +4,18 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, MessageSquare, Users, DollarSign, Send, Check, Loader2, Play, Camera } from "lucide-react";
 
+function FacebookIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  );
+}
+
 const socialLinks = [
   { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", desc: "Tutorials & Meme Compilations", color: "text-red-400 bg-red-500/10 border-red-500/20" },
-  { icon: Camera, href: "https://www.instagram.com/automateqa.io", label: "Instagram", desc: "Daily QA Memes", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
+  { icon: Camera, href: "https://www.instagram.com/automateqa.online", label: "Instagram", desc: "Daily QA Memes", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
+  { icon: FacebookIcon, href: "https://www.facebook.com/people/Automate-QA/61590680690708/?mibextid=wwXIfr&rdid=g6rV6XD2Nx4Q1vHf&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1D9b4HsLFm%2F%3Fmibextid%3DwwXIfr", label: "Facebook", desc: "Community & Announcements", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
 ];
 
 export default function ContactPage() {
@@ -87,15 +96,6 @@ export default function ContactPage() {
                   </a>
                 ))}
               </div>
-            </div>
-
-            {/* Direct email */}
-            <div className="glass-card p-5 text-center border border-[#00FF88]/10">
-              <Mail size={20} className="text-[#00FF88] mx-auto mb-2" />
-              <p className="text-sm text-[#9CA3AF]">Direct email</p>
-              <a href="mailto:automate.qa.io@gmail.com" className="text-[#00FF88] font-semibold hover:underline">
-                automate.qa.io@gmail.com
-              </a>
             </div>
           </div>
 
