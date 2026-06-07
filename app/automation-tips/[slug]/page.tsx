@@ -236,8 +236,8 @@ export default async function TipDetailPage({ params }: Props) {
                       <Image src="/logo.png" alt="AutomateQA" fill className="object-contain rounded-full" />
                     </div>
                     <div className="leading-none">
-                      <p className="text-sm font-semibold text-white">AutomateQA Team</p>
-                      <p className="text-xs text-[#4B5563] mt-0.5">Author</p>
+                      <p className="text-sm font-semibold text-white">Nagendra Meesala</p>
+                      <p className="text-xs text-[#4B5563] mt-0.5">QA Automation Engineer</p>
                     </div>
                   </div>
 
@@ -248,10 +248,12 @@ export default async function TipDetailPage({ params }: Props) {
                     {formatDate(tip.created_at)}
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-[#6B7280] text-sm">
-                    <Eye size={13} className="text-[#4B5563]" />
-                    {tip.views.toLocaleString()} views
-                  </div>
+                  {tip.views >= 5 && (
+                    <div className="flex items-center gap-1.5 text-[#6B7280] text-sm">
+                      <Eye size={13} className="text-[#4B5563]" />
+                      {tip.views.toLocaleString()} views
+                    </div>
+                  )}
                 </div>
                 <TipShareButtons title={tip.title} />
               </div>

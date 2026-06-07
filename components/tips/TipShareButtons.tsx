@@ -19,6 +19,8 @@ export default function TipShareButtons({ title }: { title: string }) {
     } catch {}
   }
 
+  if (!url) return null;
+
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-[#6B7280] mr-1 hidden sm:block">Share:</span>

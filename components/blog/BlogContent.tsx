@@ -128,7 +128,9 @@ export default function BlogContent({ content }: { content: string }) {
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 id={headingId(children)} className="text-[1.25rem] font-bold text-[#E5E7EB] mt-8 mb-3 leading-snug scroll-mt-24">{children}</h3>
+            <h3 id={headingId(children)} className="text-[1.25rem] font-bold text-[#E5E7EB] mt-8 mb-3 leading-snug scroll-mt-24 pl-3 border-l-2 border-[#00FF88]/35">
+              {children}
+            </h3>
           ),
           h4: ({ children }) => (
             <h4 className="text-[1.05rem] font-semibold text-[#D1D5DB] mt-6 mb-2 uppercase tracking-widest text-xs">{children}</h4>

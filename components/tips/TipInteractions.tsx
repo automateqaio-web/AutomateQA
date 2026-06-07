@@ -129,12 +129,12 @@ export default function TipInteractions({
           }`}
         >
           <Heart size={15} className={`transition-all ${liked ? "fill-red-400 text-red-400 scale-110" : ""}`} />
-          <span>{likesCount}</span>
+          {(likesCount > 0 || liked) && <span>{likesCount}</span>}
           <span className="text-xs opacity-75">{liked ? "Liked!" : "Like"}</span>
         </button>
 
-        {/* Share buttons */}
-        <div className="ml-auto flex items-center gap-2">
+        {/* Share buttons — only render once page URL is available */}
+        {pageUrl && <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-[#4B5563] hidden sm:block mr-1">Share</span>
           {/* X */}
           <a
@@ -182,7 +182,7 @@ export default function TipInteractions({
           >
             <Link2 size={14} />
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Comments — collapsible */}
@@ -195,10 +195,12 @@ export default function TipInteractions({
           <span className="flex items-center gap-2.5 text-white font-bold text-base">
             <MessageCircle size={18} className="text-[#00FF88]" />
             Comments
-            {comments.length > 0 && (
+            {comments.length > 0 ? (
               <span className="text-xs font-normal text-[#6B7280] bg-white/5 border border-white/8 px-2 py-0.5 rounded-full">
                 {comments.length}
               </span>
+            ) : (
+              <span className="text-xs font-normal text-[#4B5563]">— got a question? Drop it below 👇</span>
             )}
           </span>
           <ChevronDown
