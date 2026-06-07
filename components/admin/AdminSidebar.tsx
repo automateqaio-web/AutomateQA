@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Laugh, Play, FileText, LogOut, Home,
-  BookOpen, Lightbulb, BarChart3, Settings, Menu, X, MessageCircle,
+  BookOpen, Lightbulb, BarChart3, Settings, Menu, X, MessageCircle, BrainCircuit,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,8 +19,9 @@ const navGroups = [
       { href: "/admin/videos",  icon: Play,            label: "Videos" },
       { href: "/admin/blogs",   icon: FileText,        label: "Blogs" },
       { href: "/admin/learn",   icon: BookOpen,        label: "Learn" },
-      { href: "/admin/tips",     icon: Lightbulb,       label: "Tips & Tricks" },
-      { href: "/admin/comments", icon: MessageCircle,   label: "Comments" },
+      { href: "/admin/tips",           icon: Lightbulb,       label: "Tips & Tricks" },
+      { href: "/admin/interview-prep", icon: BrainCircuit,    label: "Interview Prep" },
+      { href: "/admin/comments",       icon: MessageCircle,   label: "Comments" },
     ],
   },
   {

@@ -22,8 +22,9 @@ const DEFAULT_NAV: NavItem[] = [
   { key: "learn",   label: "Learn",         href: "/learn",          enabled: true, sort_order: 4 },
   { key: "tips",    label: "Tips & Tricks", href: "/automation-tips",enabled: true, sort_order: 5 },
   { key: "blog",    label: "Blog",          href: "/blog",           enabled: true, sort_order: 6 },
-  { key: "socials", label: "Socials",        href: "/creator-stats",  enabled: true, sort_order: 7 },
-  { key: "about",   label: "About",         href: "/about",          enabled: true, sort_order: 8 },
+  { key: "interview-prep", label: "Interview Prep", href: "/interview-prep", enabled: true, sort_order: 7 },
+  { key: "socials", label: "Socials",        href: "/creator-stats",  enabled: true, sort_order: 8 },
+  { key: "about",   label: "About",         href: "/about",          enabled: true, sort_order: 9 },
 ];
 
 export default function Navbar() {
@@ -43,13 +44,20 @@ export default function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
-    const CACHE_KEY = "aq_nav_settings";
+    const CACHE_KEY = "aq_nav_settings_v2";
     const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
     const applyNav = (data: { nav: NavItem[] }) => {
       if (data?.nav?.length) {
+        // Merge API items with DEFAULT_NAV, deduplicating by both key and href
+        const apiKeys  = new Set(data.nav.map((n) => n.key));
+        const apiHrefs = new Set(data.nav.map((n) => n.href));
+        const merged = [
+          ...data.nav,
+          ...DEFAULT_NAV.filter((n) => !apiKeys.has(n.key) && !apiHrefs.has(n.href)),
+        ];
         setNavItems(
-          [...data.nav]
+          merged
             .filter((n) => n.enabled)
             .sort((a, b) => a.sort_order - b.sort_order)
         );
@@ -80,7 +88,8 @@ export default function Navbar() {
   const LABEL_OVERRIDES: Record<string, string> = { youtube: "Socials", socials: "Socials" };
   const visibleLinks = navItems
     .filter((n) => n.enabled)
-    .map((n) => ({ ...n, label: LABEL_OVERRIDES[n.key] ?? n.label }));
+    .map((n) => ({ ...n, label: LABEL_OVERRIDES[n.key] ?? n.label }))
+    .filter((n, i, arr) => arr.findIndex((x) => x.label === n.label) === i);
 
   return (
     <motion.header

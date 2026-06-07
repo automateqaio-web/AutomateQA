@@ -235,6 +235,71 @@ export const DIFFICULTY_COLORS: Record<Difficulty, string> = {
   Advanced: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
+// ── Interview Prep ────────────────────────────────────────────────────────────
+
+export type InterviewTechnology =
+  | "Selenium" | "Playwright" | "Cypress" | "WebdriverIO"
+  | "Rest Assured" | "Postman" | "API Automation"
+  | "Core Java" | "Collections" | "Multithreading" | "OOPs" | "Streams" | "Exception Handling"
+  | "Page Object Model" | "Hybrid Framework" | "Data-Driven Framework" | "Keyword-Driven Framework" | "CI/CD Integration"
+  | "Cucumber" | "TestNG" | "BDD" | "Gherkin"
+  | "Jenkins" | "GitHub Actions" | "Azure DevOps"
+  | "SQL" | "Database Testing"
+  | "Scenario-Based" | "Managerial" | "HR" | "General";
+
+export type InterviewQuestionType =
+  | "Technical" | "Scenario-Based" | "Coding" | "Managerial" | "HR"
+  | "Framework Design" | "API Testing" | "Real-Time Issues" | "CI/CD" | "Debugging";
+
+export type InterviewExperienceLevel =
+  | "Fresher" | "1-2 Years" | "3-5 Years" | "5+ Years" | "Senior SDET";
+
+export interface InterviewQuestion {
+  id: string;
+  question: string;
+  slug: string;
+  short_description: string | null;
+  answer: string | null;
+  real_world_example: string | null;
+  best_practices: string | null;
+  common_mistakes: string | null;
+  code_snippet: string | null;
+  code_language: string | null;
+  technology: InterviewTechnology;
+  question_type: InterviewQuestionType;
+  experience_level: InterviewExperienceLevel;
+  difficulty: Difficulty;
+  youtube_url: string | null;
+  tags: string[];
+  featured: boolean;
+  published: boolean;
+  views: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const INTERVIEW_TECHNOLOGIES: InterviewTechnology[] = [
+  "Selenium", "Playwright", "Cypress", "WebdriverIO",
+  "Rest Assured", "Postman", "API Automation",
+  "Core Java", "Collections", "Multithreading", "OOPs", "Streams", "Exception Handling",
+  "Page Object Model", "Hybrid Framework", "Data-Driven Framework", "Keyword-Driven Framework", "CI/CD Integration",
+  "Cucumber", "TestNG", "BDD", "Gherkin",
+  "Jenkins", "GitHub Actions", "Azure DevOps",
+  "SQL", "Database Testing",
+  "Scenario-Based", "Managerial", "HR", "General",
+];
+
+export const INTERVIEW_QUESTION_TYPES: InterviewQuestionType[] = [
+  "Technical", "Scenario-Based", "Coding", "Managerial", "HR",
+  "Framework Design", "API Testing", "Real-Time Issues", "CI/CD", "Debugging",
+];
+
+export const INTERVIEW_EXPERIENCE_LEVELS: InterviewExperienceLevel[] = [
+  "Fresher", "1-2 Years", "3-5 Years", "5+ Years", "Senior SDET",
+];
+
+export const INTERVIEW_CODE_LANGUAGES = ["java", "javascript", "typescript", "python", "sql", "json", "xml", "bash", "gherkin"];
+
 export const CATEGORY_COLORS: Record<string, string> = {
   "QA vs Dev": "bg-red-500/20 text-red-400 border-red-500/30",
   Corporate: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -269,4 +334,25 @@ export const CATEGORY_COLORS: Record<string, string> = {
   "Corporate QA Tips": "bg-slate-500/20 text-slate-400 border-slate-500/30",
   "Production Issues": "bg-red-600/20 text-red-400 border-red-600/30",
   "Debugging Tips": "bg-purple-600/20 text-purple-400 border-purple-600/30",
+  // Interview-prep specific technologies
+  "Core Java": "bg-orange-600/20 text-orange-400 border-orange-600/30",
+  "Collections": "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  "Multithreading": "bg-rose-500/20 text-rose-400 border-rose-500/30",
+  "OOPs": "bg-orange-500/20 text-orange-400 border-orange-500/30",
+  "Streams": "bg-teal-500/20 text-teal-400 border-teal-500/30",
+  "Exception Handling": "bg-red-500/20 text-red-400 border-red-500/30",
+  "Page Object Model": "bg-purple-600/20 text-purple-400 border-purple-600/30",
+  "Hybrid Framework": "bg-violet-500/20 text-violet-400 border-violet-500/30",
+  "Data-Driven Framework": "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  "Keyword-Driven Framework": "bg-cyan-600/20 text-cyan-400 border-cyan-600/30",
+  "CI/CD Integration": "bg-sky-500/20 text-sky-400 border-sky-500/30",
+  "BDD": "bg-green-600/20 text-green-400 border-green-600/30",
+  "Gherkin": "bg-lime-500/20 text-lime-400 border-lime-500/30",
+  "API Automation": "bg-emerald-600/20 text-emerald-400 border-emerald-600/30",
+  "Azure DevOps": "bg-blue-600/20 text-blue-400 border-blue-600/30",
+  "Database Testing": "bg-indigo-600/20 text-indigo-400 border-indigo-600/30",
+  "Scenario-Based": "bg-amber-600/20 text-amber-400 border-amber-600/30",
+  "Managerial": "bg-slate-500/20 text-slate-300 border-slate-500/30",
+  "HR": "bg-pink-500/20 text-pink-400 border-pink-500/30",
+  "General": "bg-gray-500/20 text-gray-300 border-gray-500/30",
 };
