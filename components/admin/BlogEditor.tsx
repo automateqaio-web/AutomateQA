@@ -267,10 +267,11 @@ export default function BlogEditor({ value, onChange, contentPreprocessor }: Pro
   const previewId = ytId(ytUrl.trim());
 
   return (
-    <div className="relative border border-[#2A2A2A] rounded-2xl overflow-hidden bg-[#0B0B0B] flex flex-col">
+    <div className="relative border border-[#2A2A2A] rounded-2xl bg-[#0B0B0B] flex flex-col"
+      style={{ height: "clamp(520px, calc(100vh - 340px), 780px)" }}>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-0.5 px-3 py-2 border-b border-[#1E1E1E] bg-[#0F0F0F] flex-wrap gap-y-1.5">
+      {/* Toolbar — always visible; flex-shrink-0 keeps it out of the scroll area */}
+      <div className="flex items-center gap-0.5 px-3 py-2 border-b border-[#1E1E1E] bg-[#0F0F0F] flex-wrap gap-y-1.5 flex-shrink-0 rounded-t-2xl">
         {groups.map((group, gi) => (
           <div key={gi} className="flex items-center gap-0.5">
             {gi > 0 && <div className="w-px h-4 bg-[#2A2A2A] mx-1.5 flex-shrink-0" />}
@@ -295,8 +296,8 @@ export default function BlogEditor({ value, onChange, contentPreprocessor }: Pro
         </div>
       </div>
 
-      {/* Editor/Preview area */}
-      <div className={`flex flex-1 ${mode === "split" ? "divide-x divide-[#1E1E1E]" : ""}`}>
+      {/* Editor/Preview area — flex-1 + overflow-hidden so it fills remaining height and scrolls internally */}
+      <div className={`flex flex-1 overflow-hidden ${mode === "split" ? "divide-x divide-[#1E1E1E]" : ""}`}>
 
         {(mode === "write" || mode === "split") && (
           <textarea
@@ -306,13 +307,12 @@ export default function BlogEditor({ value, onChange, contentPreprocessor }: Pro
             onKeyDown={onKeyDown}
             spellCheck
             placeholder={`# Your Blog Post Title\n\nStart writing...\n\nShortcuts: Ctrl+B Bold · Ctrl+I Italic · Ctrl+K Link · Ctrl+\` Code\nTab = 2 spaces · Use toolbar for headings, lists, images & YouTube embeds`}
-            className={`${mode === "split" ? "w-1/2" : "w-full"} p-5 bg-transparent text-[#C9D1D9] text-[13px] leading-7 resize-none focus:outline-none font-mono placeholder-[#252525]`}
-            style={{ minHeight: 480 }}
+            className={`${mode === "split" ? "w-1/2" : "w-full"} h-full p-5 bg-transparent text-[#C9D1D9] text-[13px] leading-7 resize-none focus:outline-none font-mono placeholder-[#252525] overflow-y-auto`}
           />
         )}
 
         {(mode === "preview" || mode === "split") && (
-          <div className={`${mode === "split" ? "w-1/2" : "w-full"} p-5 overflow-y-auto`} style={{ minHeight: 480 }}>
+          <div className={`${mode === "split" ? "w-1/2" : "w-full"} h-full p-5 overflow-y-auto`}>
             {value.trim() ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={mdComponents}>
                 {preprocess(contentPreprocessor ? contentPreprocessor(value) : value)}
