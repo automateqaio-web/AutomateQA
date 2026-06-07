@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { Heart, MessageCircle, Link2 } from "lucide-react";
+import { Heart, MessageCircle, Link2, ChevronDown } from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -50,6 +50,7 @@ export default function BlogInteractions({
 
   const [copied, setCopied] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
+  const [commentsOpen, setCommentsOpen] = useState(false);
 
   useEffect(() => {
     setPageUrl(window.location.href);
@@ -178,100 +179,111 @@ export default function BlogInteractions({
       </div>
 
       {/* Comments */}
-      <div>
-        <h3 className="text-white font-bold text-xl mb-6 flex items-center gap-2.5">
-          <MessageCircle size={20} className="text-[#00FF88]" />
-          Comments
+      <div className="border border-white/[0.06] rounded-2xl overflow-hidden">
+        <button
+          onClick={() => setCommentsOpen((o) => !o)}
+          className="w-full flex items-center gap-2.5 px-6 py-4 hover:bg-white/[0.02] transition-colors text-left"
+        >
+          <MessageCircle size={18} className="text-[#00FF88] flex-shrink-0" />
+          <span className="text-white font-bold text-lg">Comments</span>
           {comments.length > 0 && (
             <span className="text-sm font-normal text-[#6B7280] bg-white/5 border border-white/8 px-2.5 py-0.5 rounded-full">
               {comments.length}
             </span>
           )}
-        </h3>
+          <ChevronDown
+            size={16}
+            className={`ml-auto text-[#6B7280] transition-transform duration-200 ${commentsOpen ? "rotate-180" : ""}`}
+          />
+        </button>
 
-        {/* Form */}
-        <form onSubmit={handleComment} className="glass-card p-6 mb-8">
-          <div className="mb-4">
-            <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
-              Your Name *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              maxLength={100}
-              required
-              className="w-full sm:w-1/2 bg-[#0D0D0D] border border-white/8 rounded-xl px-4 py-3 text-white text-sm placeholder-[#374151] focus:outline-none focus:border-[#00FF88]/40 focus:ring-1 focus:ring-[#00FF88]/10 transition-all"
-            />
-          </div>
-          <div className="mb-5">
-            <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
-              Comment *
-            </label>
-            <textarea
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Share your thoughts, questions, or feedback about this article..."
-              maxLength={2000}
-              rows={4}
-              required
-              className="w-full bg-[#0D0D0D] border border-white/8 rounded-xl px-4 py-3 text-white text-sm placeholder-[#374151] focus:outline-none focus:border-[#00FF88]/40 focus:ring-1 focus:ring-[#00FF88]/10 transition-all resize-none"
-            />
-            <div className="flex justify-between items-center mt-1.5">
-              {commentError && <p className="text-red-400 text-xs">{commentError}</p>}
-              <span className="text-[#374151] text-xs ml-auto">{commentText.length}/2000</span>
-            </div>
-          </div>
-          <button
-            type="submit"
-            disabled={submitting || !name.trim() || !commentText.trim()}
-            className="px-6 py-2.5 bg-[#00FF88] text-black font-bold text-sm rounded-xl hover:bg-[#00E67A] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {submitting ? (
-              <>
-                <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" /><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-                </svg>
-                Posting...
-              </>
-            ) : submitted ? (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Posted!
-              </>
-            ) : "Post Comment →"}
-          </button>
-        </form>
-
-        {/* Comment list */}
-        {comments.length === 0 ? (
-          <div className="text-center py-14 border border-dashed border-white/8 rounded-2xl">
-            <MessageCircle size={36} className="mx-auto mb-3 text-[#2A2A2A]" />
-            <p className="text-[#4B5563] text-sm">No comments yet.</p>
-            <p className="text-[#374151] text-xs mt-1">Be the first to share your thoughts!</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {comments.map((c) => (
-              <div key={c.id} className="glass-card p-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-[#00FF88]/15 to-transparent border border-[#00FF88]/20 flex items-center justify-center text-[#00FF88] font-bold text-sm">
-                    {c.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-white font-semibold text-sm">{c.name}</span>
-                      <span className="text-[#4B5563] text-xs">·</span>
-                      <span className="text-[#4B5563] text-xs">{timeAgo(c.created_at)}</span>
-                    </div>
-                    <p className="text-[#C9D1D9] text-sm leading-relaxed">{c.comment}</p>
-                  </div>
+        {commentsOpen && (
+          <div className="px-6 pb-6 pt-2 border-t border-white/[0.06]">
+            {/* Form */}
+            <form onSubmit={handleComment} className="glass-card p-6 mb-6">
+              <div className="mb-4">
+                <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
+                  Your Name *
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  maxLength={100}
+                  required
+                  className="w-full sm:w-1/2 bg-[#0D0D0D] border border-white/8 rounded-xl px-4 py-3 text-white text-sm placeholder-[#374151] focus:outline-none focus:border-[#00FF88]/40 focus:ring-1 focus:ring-[#00FF88]/10 transition-all"
+                />
+              </div>
+              <div className="mb-5">
+                <label className="block text-xs text-[#9CA3AF] mb-2 font-semibold uppercase tracking-wide">
+                  Comment *
+                </label>
+                <textarea
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Share your thoughts, questions, or feedback about this article..."
+                  maxLength={2000}
+                  rows={4}
+                  required
+                  className="w-full bg-[#0D0D0D] border border-white/8 rounded-xl px-4 py-3 text-white text-sm placeholder-[#374151] focus:outline-none focus:border-[#00FF88]/40 focus:ring-1 focus:ring-[#00FF88]/10 transition-all resize-none"
+                />
+                <div className="flex justify-between items-center mt-1.5">
+                  {commentError && <p className="text-red-400 text-xs">{commentError}</p>}
+                  <span className="text-[#374151] text-xs ml-auto">{commentText.length}/2000</span>
                 </div>
               </div>
-            ))}
+              <button
+                type="submit"
+                disabled={submitting || !name.trim() || !commentText.trim()}
+                className="px-6 py-2.5 bg-[#00FF88] text-black font-bold text-sm rounded-xl hover:bg-[#00E67A] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" /><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                    </svg>
+                    Posting...
+                  </>
+                ) : submitted ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Posted!
+                  </>
+                ) : "Post Comment →"}
+              </button>
+            </form>
+
+            {/* Comment list */}
+            {comments.length === 0 ? (
+              <div className="text-center py-12 border border-dashed border-white/8 rounded-2xl">
+                <MessageCircle size={32} className="mx-auto mb-3 text-[#2A2A2A]" />
+                <p className="text-[#4B5563] text-sm">No comments yet.</p>
+                <p className="text-[#374151] text-xs mt-1">Be the first to share your thoughts!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {comments.map((c) => (
+                  <div key={c.id} className="glass-card p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-[#00FF88]/15 to-transparent border border-[#00FF88]/20 flex items-center justify-center text-[#00FF88] font-bold text-sm">
+                        {c.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-white font-semibold text-sm">{c.name}</span>
+                          <span className="text-[#4B5563] text-xs">·</span>
+                          <span className="text-[#4B5563] text-xs">{timeAgo(c.created_at)}</span>
+                        </div>
+                        <p className="text-[#C9D1D9] text-sm leading-relaxed">{c.comment}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

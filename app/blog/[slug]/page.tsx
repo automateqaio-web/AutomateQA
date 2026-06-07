@@ -247,40 +247,34 @@ export default async function BlogPostPage({ params }: Props) {
             {/* Blog content */}
             <BlogContent content={blog.content} />
 
-            {/* ── CTA ── */}
-            <div className="mt-16 relative rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#00FF88]/10 via-[#00FF88]/4 to-[#0B0B0B]" />
-              <div className="absolute inset-0 border border-[#00FF88]/15 rounded-2xl" />
-              <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#00FF88]/8 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative p-8 sm:p-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#00FF88]/15 border border-[#00FF88]/20">
-                    <BookOpen size={14} className="text-[#00FF88]" />
-                  </span>
-                  <span className="text-[#00FF88] text-xs font-bold uppercase tracking-[0.15em]">Keep Learning</span>
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-white mb-3 leading-tight">
-                  Ready to Master QA Automation?
-                </h3>
-                <p className="text-[#6B7280] leading-relaxed mb-8 max-w-lg">
-                  Join thousands of developers and QA engineers learning Playwright, Cypress, and modern
-                  automation — one practical lesson at a time.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    href="/learn"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#00FF88] text-black font-bold text-sm rounded-xl hover:bg-[#00E67A] active:scale-95 transition-all shadow-[0_0_24px_rgba(0,255,136,0.25)]"
-                  >
-                    Start Day 1 of Playwright →
-                  </Link>
-                  <Link
-                    href="/blog"
-                    className="inline-flex items-center gap-2 px-6 py-3 border border-white/10 bg-white/[0.04] text-[#C9D1D9] text-sm font-medium rounded-xl hover:border-white/20 hover:text-white hover:bg-white/[0.07] transition-all"
-                  >
-                    Browse All Articles
-                    <ArrowRight size={13} />
-                  </Link>
-                </div>
+            {/* ── Follow AutomateQA ── */}
+            <div className="mt-10 pt-8 border-t border-white/[0.07]">
+              <p className="text-xs font-bold text-[#4B5563] uppercase tracking-widest mb-4">Follow AutomateQA</p>
+              <div className="flex flex-wrap gap-3">
+                <a href="https://www.youtube.com/@automateqa?sub_confirmation=1" target="_blank" rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/8 border border-red-500/20 hover:bg-red-500/15 hover:border-red-500/40 transition-all duration-200">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="text-red-400 flex-shrink-0">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  <span className="text-sm font-semibold text-red-400 group-hover:text-red-300 transition-colors">YouTube</span>
+                  <span className="text-xs text-[#4B5563]">@automateqa</span>
+                </a>
+                <a href="https://www.instagram.com/automateqa.online" target="_blank" rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-pink-500/8 border border-pink-500/20 hover:bg-pink-500/15 hover:border-pink-500/40 transition-all duration-200">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="text-pink-400 flex-shrink-0">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                  <span className="text-sm font-semibold text-pink-400 group-hover:text-pink-300 transition-colors">Instagram</span>
+                  <span className="text-xs text-[#4B5563]">@automateqa.online</span>
+                </a>
+                <a href="https://www.facebook.com/people/Automate-QA/61590680690708/?mibextid=wwXIfr&rdid=g6rV6XD2Nx4Q1vHf&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1D9b4HsLFm%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-blue-500/8 border border-blue-500/20 hover:bg-blue-500/15 hover:border-blue-500/40 transition-all duration-200">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400 flex-shrink-0">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  <span className="text-sm font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">Facebook</span>
+                  <span className="text-xs text-[#4B5563]">Automate QA</span>
+                </a>
               </div>
             </div>
 
@@ -361,8 +355,40 @@ export default async function BlogPostPage({ params }: Props) {
           </article>
 
           {/* ── Desktop TOC sidebar ── */}
-          <aside className="hidden lg:block w-64 shrink-0 self-start sticky top-24">
+          <aside className="hidden lg:block w-64 shrink-0 self-start sticky top-24 space-y-4">
             <TableOfContentsDesktop headings={headings} />
+
+            {/* Keep Learning CTA */}
+            <div className="relative rounded-2xl overflow-hidden border border-[#00FF88]/15">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#00FF88]/10 via-[#00FF88]/4 to-[#0B0B0B]" />
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#00FF88]/8 rounded-full blur-2xl pointer-events-none" />
+              <div className="relative p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-[#00FF88]/15 border border-[#00FF88]/20">
+                    <BookOpen size={12} className="text-[#00FF88]" />
+                  </span>
+                  <span className="text-[#00FF88] text-[10px] font-bold uppercase tracking-[0.15em]">Keep Learning</span>
+                </div>
+                <h4 className="text-sm font-black text-white mb-2 leading-snug">
+                  Master QA Automation
+                </h4>
+                <p className="text-[#6B7280] text-xs leading-relaxed mb-4">
+                  Playwright, Cypress &amp; modern automation — one practical lesson at a time.
+                </p>
+                <Link
+                  href="/learn"
+                  className="flex items-center justify-center gap-1.5 w-full px-4 py-2.5 bg-[#00FF88] text-black font-bold text-xs rounded-xl hover:bg-[#00E67A] active:scale-95 transition-all shadow-[0_0_16px_rgba(0,255,136,0.2)]"
+                >
+                  Start Day 1 of Playwright →
+                </Link>
+                <Link
+                  href="/blog"
+                  className="flex items-center justify-center gap-1.5 w-full mt-2 px-4 py-2 border border-white/10 bg-white/[0.03] text-[#9CA3AF] text-xs font-medium rounded-xl hover:border-white/20 hover:text-white transition-all"
+                >
+                  Browse All Articles
+                </Link>
+              </div>
+            </div>
           </aside>
 
         </div>
