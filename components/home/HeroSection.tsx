@@ -31,7 +31,7 @@ function AnimatedNumber({ value, suffix = "" }: { value: number | null; suffix?:
     requestAnimationFrame(step);
   }, [value]);
 
-  if (value === null) return <span className="text-[#9CA3AF]">—</span>;
+  if (value === null) return null;
   return <>{display.toLocaleString()}{suffix}</>;
 }
 
@@ -176,22 +176,26 @@ export default function HeroSection() {
           </Link>
         </motion.div>
 
-        {/* Live Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="flex flex-wrap gap-8 justify-center"
-        >
-          {statItems.map(({ key, value, label, suffix }) => (
-            <div key={key} className="text-center min-w-[80px]">
-              <div className="text-2xl sm:text-3xl font-black text-gradient">
-                <AnimatedNumber value={value} suffix={suffix} />
-              </div>
-              <div className="text-xs text-[#9CA3AF] font-medium mt-1">{label}</div>
-            </div>
-          ))}
-        </motion.div>
+        {/* Live Stats — only render when at least one stat has real data */}
+        {statItems.some(({ value }) => value !== null && value > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="flex flex-wrap gap-8 justify-center"
+          >
+            {statItems
+              .filter(({ value }) => value !== null && value > 0)
+              .map(({ key, value, label, suffix }) => (
+                <div key={key} className="text-center min-w-[80px]">
+                  <div className="text-2xl sm:text-3xl font-black text-gradient">
+                    <AnimatedNumber value={value} suffix={suffix} />
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] font-medium mt-1">{label}</div>
+                </div>
+              ))}
+          </motion.div>
+        )}
       </div>
 
       {/* Bottom gradient fade */}

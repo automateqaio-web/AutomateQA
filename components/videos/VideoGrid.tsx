@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Play, X, Clock } from "lucide-react";
 import Link from "next/link";
@@ -97,13 +97,14 @@ function SkeletonCard() {
   );
 }
 
-export default function VideoGrid() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function VideoGrid({ initialVideos = [] }: { initialVideos?: Video[] }) {
+  const [videos, setVideos] = useState<Video[]>(initialVideos);
+  const [loading, setLoading] = useState(initialVideos.length === 0);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const supabase = createClient();
+  const skipFirstFetch = useRef(initialVideos.length > 0);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -119,6 +120,11 @@ export default function VideoGrid() {
       setVideos(data);
       setLoading(false);
     };
+
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      return;
+    }
     fetchVideos();
   }, [search, selectedCategory]);
 

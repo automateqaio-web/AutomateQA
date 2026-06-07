@@ -256,14 +256,17 @@ export default function CreatorStatsClient() {
 
   const fetchYT = async () => {
     setLoading(true);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     try {
-      const res = await fetch("/api/analytics/youtube");
+      const res = await fetch("/api/analytics/youtube", { signal: controller.signal });
       const data = await res.json();
       if (data.stats) setYtStats(data.stats);
       if (data.latest?.length) setYtLatest(data.latest);
       if (data.videos?.length) setYtVideos(data.videos);
       if (data.bannerUrl) setBannerUrl(data.bannerUrl);
-    } catch { /* silent */ }
+    } catch { /* timeout or network error — silently fall through to fallback */ }
+    finally { clearTimeout(timer); }
     setLoading(false);
     setLastUpdated(new Date());
   };
@@ -385,6 +388,39 @@ export default function CreatorStatsClient() {
             </div>
             <p className="text-[#9CA3AF]">Fetching live YouTube analytics...</p>
           </div>
+        )}
+
+        {/* Fallback: API unavailable or key not configured */}
+        {!loading && !ytStats && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border border-white/8 bg-white/[0.02] p-10 text-center"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
+              <YoutubeLogo size={24} className="text-red-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg mb-2">Live Analytics Unavailable</h3>
+            <p className="text-[#9CA3AF] text-sm max-w-sm mx-auto mb-6 leading-relaxed">
+              YouTube API is not configured or rate-limited. Subscribe to follow along — channel stats update daily.
+            </p>
+            <div className="flex items-center gap-3 justify-center flex-wrap">
+              <a
+                href="https://www.youtube.com/@automateqa?sub_confirmation=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-bold transition-all"
+              >
+                <Bell size={14} className="fill-white stroke-none" /> Subscribe on YouTube
+              </a>
+              <button
+                onClick={fetchYT}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-[#9CA3AF] hover:text-white text-sm font-semibold transition-all"
+              >
+                <RefreshCw size={13} /> Retry
+              </button>
+            </div>
+          </motion.div>
         )}
 
         {ytStats && (

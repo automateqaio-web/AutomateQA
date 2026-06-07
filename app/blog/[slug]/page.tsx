@@ -109,32 +109,45 @@ export default async function BlogPostPage({ params }: Props) {
   const tags: string[] = Array.isArray(blog.tags) ? blog.tags : [];
   const headings = extractHeadings(blog.content || "");
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: blog.title,
-    description: blog.excerpt,
-    image: blog.cover_image || `${SITE_URL}/og-image.png`,
-    url: canonicalUrl,
-    datePublished: blog.created_at,
-    dateModified: blog.updated_at || blog.created_at,
-    author: { "@type": "Organization", name: "AutomateQA", url: SITE_URL },
-    publisher: {
-      "@type": "Organization",
-      name: "AutomateQA",
-      url: SITE_URL,
-      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: blog.title,
+      description: blog.excerpt,
+      image: blog.cover_image || `${SITE_URL}/og-image.png`,
+      url: canonicalUrl,
+      datePublished: blog.created_at,
+      dateModified: blog.updated_at || blog.created_at,
+      author: { "@type": "Person", name: "AutomateQA", url: SITE_URL },
+      publisher: {
+        "@type": "Organization",
+        name: "AutomateQA",
+        url: SITE_URL,
+        logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+      keywords: tags.join(", "),
+      articleSection: blog.category,
+      timeRequired: `PT${blog.read_time}M`,
+      inLanguage: "en-US",
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
-    keywords: tags.join(", "),
-    articleSection: blog.category,
-    timeRequired: `PT${blog.read_time}M`,
-    inLanguage: "en-US",
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+        { "@type": "ListItem", position: 3, name: blog.title, item: canonicalUrl },
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen pt-16 bg-[#0B0B0B]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {schemas.map((s, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
+      ))}
       <ReadingProgress />
 
       {/* ── Hero ── */}

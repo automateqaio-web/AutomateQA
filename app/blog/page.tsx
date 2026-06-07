@@ -42,8 +42,25 @@ async function getPageSettings() {
   }
 }
 
+async function getInitialBlogs() {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl.includes("placeholder")) return [];
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(12);
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function BlogPage() {
-  const settings = await getPageSettings();
+  const [settings, initialBlogs] = await Promise.all([getPageSettings(), getInitialBlogs()]);
 
   if (settings?.coming_soon) {
     return (
@@ -75,7 +92,7 @@ export default async function BlogPage() {
           </p>
         </div>
       </div>
-      <BlogListing />
+      <BlogListing initialBlogs={initialBlogs} />
     </div>
   );
 }

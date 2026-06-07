@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const EFFECTIVE_DATE = "June 6, 2025";
+const EFFECTIVE_DATE = "June 6, 2026";
 const CONTACT_EMAIL = "automate.qa.io@gmail.com";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

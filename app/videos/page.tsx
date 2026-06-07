@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Play } from "lucide-react";
 import VideoGrid from "@/components/videos/VideoGrid";
+import { createClient } from "@/lib/supabase/server";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Videos — QA Tutorials & Meme Compilations",
@@ -22,7 +25,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function VideosPage() {
+async function getInitialVideos() {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl.includes("placeholder")) return [];
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("videos")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(12);
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function VideosPage() {
+  const initialVideos = await getInitialVideos();
   return (
     <div className="min-h-screen pt-16">
       <div className="relative overflow-hidden py-16 sm:py-20">
@@ -44,7 +65,7 @@ export default function VideosPage() {
           </p>
         </div>
       </div>
-      <VideoGrid />
+      <VideoGrid initialVideos={initialVideos} />
     </div>
   );
 }

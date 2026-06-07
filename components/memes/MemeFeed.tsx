@@ -104,17 +104,18 @@ function SkeletonCard() {
   );
 }
 
-export default function MemeFeed() {
-  const [memes, setMemes] = useState<Meme[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function MemeFeed({ initialMemes = [] }: { initialMemes?: Meme[] }) {
+  const [memes, setMemes] = useState<Meme[]>(initialMemes);
+  const [loading, setLoading] = useState(initialMemes.length === 0);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(initialMemes.length === PAGE_SIZE);
+  const [page, setPage] = useState(initialMemes.length === PAGE_SIZE ? 1 : 0);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchInput, setSearchInput] = useState("");
   const loaderRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const skipFirstFetch = useRef(initialMemes.length > 0);
 
   const fetchMemes = useCallback(async (reset = false) => {
     const currentPage = reset ? 0 : page;
@@ -159,6 +160,10 @@ export default function MemeFeed() {
   }, [page, search, selectedCategory, loadingMore]);
 
   useEffect(() => {
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      return;
+    }
     fetchMemes(true);
   }, [search, selectedCategory]);
 

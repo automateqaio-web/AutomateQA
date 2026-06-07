@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { BookOpen, GraduationCap, Zap, Users } from "lucide-react";
 import LearnListing from "@/components/learn/LearnListing";
-import ComingSoon from "@/components/shared/ComingSoon";
+import LearnWaitlist from "@/components/learn/LearnWaitlist";
 import { createClient } from "@/lib/supabase/server";
+
 
 export const revalidate = 60;
 
@@ -53,13 +54,7 @@ export default async function LearnPage() {
   const settings = await getPageSettings();
 
   if (settings?.coming_soon) {
-    return (
-      <ComingSoon
-        title={settings.coming_soon_title}
-        message={settings.coming_soon_message}
-        pageLabel="the Learning Hub"
-      />
-    );
+    return <LearnWaitlist />;
   }
 
   return (

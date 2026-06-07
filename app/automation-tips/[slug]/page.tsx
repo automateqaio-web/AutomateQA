@@ -146,32 +146,46 @@ export default async function TipDetailPage({ params }: Props) {
   const formattedContent = formatTipContent(tip.content || "");
   const headings = extractHeadings(formattedContent);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    headline: tip.title,
-    description: tip.excerpt,
-    image: tip.cover_image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/og-image.png`,
-    url: canonicalUrl,
-    datePublished: tip.created_at,
-    dateModified: tip.updated_at || tip.created_at,
-    author: { "@type": "Organization", name: "AutomateQA", url: process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online" },
-    publisher: {
-      "@type": "Organization",
-      name: "AutomateQA",
-      url: process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online",
-      logo: { "@type": "ImageObject", url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online"}/logo.png` },
+  const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
+  const schemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      headline: tip.title,
+      description: tip.excerpt,
+      image: tip.cover_image || `${SITE}/og-image.png`,
+      url: canonicalUrl,
+      datePublished: tip.created_at,
+      dateModified: tip.updated_at || tip.created_at,
+      author: { "@type": "Person", name: "AutomateQA", url: SITE },
+      publisher: {
+        "@type": "Organization",
+        name: "AutomateQA",
+        url: SITE,
+        logo: { "@type": "ImageObject", url: `${SITE}/logo.png` },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+      keywords: tags.join(", "),
+      articleSection: tip.category,
+      timeRequired: `PT${tip.read_time}M`,
+      inLanguage: "en-US",
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
-    keywords: tags.join(", "),
-    articleSection: tip.category,
-    timeRequired: `PT${tip.read_time}M`,
-    inLanguage: "en-US",
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Automation Tips", item: `${SITE}/automation-tips` },
+        { "@type": "ListItem", position: 3, name: tip.title, item: canonicalUrl },
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen pt-16 bg-[#0B0B0B]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {schemas.map((s, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
+      ))}
       <ReadingProgress />
 
       <div className="h-8" />

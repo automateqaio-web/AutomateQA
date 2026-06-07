@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -79,18 +79,24 @@ function SkeletonCard() {
   );
 }
 
-function BlogListingInner() {
+function BlogListingInner({ initialBlogs = [] }: { initialBlogs?: Blog[] }) {
   const searchParams = useSearchParams();
   const initialTag = searchParams.get("tag") || "";
 
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
+  const [loading, setLoading] = useState(initialBlogs.length === 0);
   const [search, setSearch] = useState(initialTag);
   const [searchInput, setSearchInput] = useState(initialTag);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const supabase = createClient();
+  // Skip the first fetch if server provided data and no tag filter is active
+  const skipFirstFetch = useRef(initialBlogs.length > 0 && !initialTag);
 
   useEffect(() => {
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      return;
+    }
     const fetchBlogs = async () => {
       setLoading(true);
 
@@ -197,10 +203,10 @@ function BlogListingInner() {
   );
 }
 
-export default function BlogListing() {
+export default function BlogListing({ initialBlogs = [] }: { initialBlogs?: Blog[] }) {
   return (
     <Suspense>
-      <BlogListingInner />
+      <BlogListingInner initialBlogs={initialBlogs} />
     </Suspense>
   );
 }

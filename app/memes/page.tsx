@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Laugh } from "lucide-react";
 import MemeFeed from "@/components/memes/MemeFeed";
+import { createClient } from "@/lib/supabase/server";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "QA Memes — Laugh Through the Pain",
@@ -22,7 +25,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MemesPage() {
+async function getInitialMemes() {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl.includes("placeholder")) return [];
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("memes")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(12);
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function MemesPage() {
+  const initialMemes = await getInitialMemes();
   return (
     <div className="min-h-screen pt-16">
       {/* Page header */}
@@ -47,7 +68,7 @@ export default function MemesPage() {
         </div>
       </div>
 
-      <MemeFeed />
+      <MemeFeed initialMemes={initialMemes} />
     </div>
   );
 }

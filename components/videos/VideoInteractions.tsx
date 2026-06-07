@@ -126,7 +126,7 @@ export default function VideoInteractions({
           <span className="text-xs opacity-75">{liked ? "Liked!" : "Like"}</span>
         </button>
 
-        <div className="ml-auto flex items-center gap-2">
+        {pageUrl && <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-[#4B5563] hidden sm:block mr-1">Share</span>
           <a href={`https://twitter.com/intent/tweet?url=${enc(pageUrl)}&text=${enc(title)}`} target="_blank" rel="noopener noreferrer"
             className="p-2.5 rounded-xl border border-white/8 bg-white/[0.03] text-[#9CA3AF] hover:border-sky-500/30 hover:text-sky-400 hover:bg-sky-500/5 transition-all" title="Share on X">
@@ -151,7 +151,7 @@ export default function VideoInteractions({
             className={`p-2.5 rounded-xl border transition-all ${copied ? "border-[#00FF88]/30 text-[#00FF88] bg-[#00FF88]/5" : "border-white/8 bg-white/[0.03] text-[#9CA3AF] hover:border-white/20 hover:text-white"}`}>
             <Link2 size={14} />
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Comments — collapsible */}

@@ -133,8 +133,8 @@ export default function MemeInteractions({
           <span className="text-xs opacity-75">{liked ? "Liked!" : "Like"}</span>
         </button>
 
-        {/* Share buttons */}
-        <div className="ml-auto flex items-center gap-2">
+        {/* Share buttons — only render once page URL is available */}
+        {pageUrl && <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-[#4B5563] hidden sm:block mr-1">Share</span>
           {/* X */}
           <a
@@ -182,7 +182,7 @@ export default function MemeInteractions({
           >
             <Link2 size={14} />
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Comments — collapsible */}

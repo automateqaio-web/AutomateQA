@@ -134,7 +134,7 @@ export default function BlogInteractions({
           <span className="text-xs opacity-75">{liked ? "Liked!" : "Like"}</span>
         </button>
 
-        <div className="ml-auto flex items-center gap-2">
+        {pageUrl && <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-[#6B7280] hidden sm:block">Share:</span>
           <a
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=Check this out on AutomateQA`}
@@ -174,7 +174,7 @@ export default function BlogInteractions({
           >
             <Link2 size={14} />
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Comments */}

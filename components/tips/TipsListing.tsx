@@ -100,18 +100,19 @@ function SkeletonCard() {
   );
 }
 
-export default function TipsListing() {
-  const [items, setItems] = useState<AutomationTip[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function TipsListing({ initialItems = [] }: { initialItems?: AutomationTip[] }) {
+  const [items, setItems] = useState<AutomationTip[]>(initialItems);
+  const [loading, setLoading] = useState(initialItems.length === 0);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(initialItems.length === PAGE_SIZE);
+  const [page, setPage] = useState(initialItems.length === PAGE_SIZE ? 1 : 0);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
   const loaderRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const skipFirstFetch = useRef(initialItems.length > 0);
 
   const fetchItems = useCallback(async (reset = false) => {
     const currentPage = reset ? 0 : page;
@@ -155,7 +156,13 @@ export default function TipsListing() {
     setLoadingMore(false);
   }, [page, search, selectedCategory, selectedDifficulty, loadingMore]);
 
-  useEffect(() => { fetchItems(true); }, [search, selectedCategory, selectedDifficulty]);
+  useEffect(() => {
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      return;
+    }
+    fetchItems(true);
+  }, [search, selectedCategory, selectedDifficulty]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
