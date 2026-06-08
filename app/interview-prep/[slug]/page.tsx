@@ -7,13 +7,13 @@ import {
   AlertTriangle, Lightbulb, ChevronRight, Star,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORY_COLORS, DIFFICULTY_COLORS, Difficulty, InterviewQuestion } from "@/types";
+import { InterviewQuestion } from "@/types";
 import { formatDate } from "@/lib/utils";
-import BlogContent from "@/components/blog/BlogContent";
 import ReadingProgress from "@/components/blog/ReadingProgress";
 import QuestionViewTracker from "@/components/interview-prep/QuestionViewTracker";
 import QuestionCodeBlock from "@/components/interview-prep/QuestionCodeBlock";
 import QuestionShareBar from "@/components/interview-prep/QuestionShareBar";
+import InterviewAnswerContent from "@/components/interview-prep/InterviewAnswerContent";
 
 export const revalidate = 3600;
 
@@ -230,8 +230,23 @@ export default async function QuestionDetailPage({ params }: Props) {
     ? q.youtube_url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/)?.[1]
     : null;
 
-  const techColor = CATEGORY_COLORS[q.technology] || "bg-gray-500/20 text-gray-400 border-gray-500/30";
-  const diffColor = DIFFICULTY_COLORS[q.difficulty as Difficulty] || "bg-gray-500/20 text-gray-400 border-gray-500/30";
+  const TECH_ACCENT: Record<string, string> = {
+    "Selenium":"#f59e0b","Playwright":"#a78bfa","Cypress":"#34d399","Core Java":"#fb923c",
+    "Rest Assured":"#a3e635","API Automation":"#4ade80","Page Object Model":"#818cf8",
+    "Cucumber":"#4ade80","TestNG":"#c084fc","Jenkins":"#f87171","GitHub Actions":"#94a3b8",
+    "Azure DevOps":"#38bdf8","SQL":"#60a5fa","Database Testing":"#3b82f6","Postman":"#fb923c",
+    "Scenario-Based":"#fbbf24","Managerial":"#94a3b8","HR":"#f9a8d4","General":"#9ca3af",
+    "OOPs":"#e879f9","Collections":"#fdba74","Multithreading":"#7dd3fc","Streams":"#86efac",
+    "Exception Handling":"#fca5a5","BDD":"#2dd4bf","Gherkin":"#86efac","CI/CD Integration":"#f472b6",
+    "Hybrid Framework":"#6366f1","Data-Driven Framework":"#22d3ee","WebdriverIO":"#f43f5e",
+  };
+  const DIFF_STYLE: Record<string, { color: string; bg: string }> = {
+    Beginner:     { color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
+    Intermediate: { color: "#fbbf24", bg: "rgba(251,191,36,0.12)" },
+    Advanced:     { color: "#f87171", bg: "rgba(248,113,113,0.12)" },
+  };
+  const techAccent = TECH_ACCENT[q.technology] || "#00FF88";
+  const diffStyle  = DIFF_STYLE[q.difficulty] || { color: "#6b7280", bg: "rgba(107,114,128,0.12)" };
 
   return (
     <div className="min-h-screen pt-16 bg-[#0B0B0B]">
@@ -270,12 +285,27 @@ export default async function QuestionDetailPage({ params }: Props) {
             {/* Header */}
             <header className="mb-10">
               <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className={`category-badge border ${techColor}`}>{q.technology}</span>
-                <span className={`category-badge border ${diffColor}`}>{q.difficulty}</span>
-                <span className="category-badge border border-white/10 bg-white/[0.04] text-[#9CA3AF]">{q.question_type}</span>
-                <span className="category-badge border border-white/10 bg-white/[0.04] text-[#9CA3AF]">{q.experience_level}</span>
+                <span className="px-2.5 py-1 rounded text-[11px] font-bold"
+                  style={{ background: `${techAccent}15`, color: techAccent, border: `1px solid ${techAccent}35` }}>
+                  {q.technology}
+                </span>
+                <span className="px-2.5 py-1 rounded text-[11px] font-semibold"
+                  style={{ background: diffStyle.bg, color: diffStyle.color, border: `1px solid ${diffStyle.color}30` }}>
+                  {q.difficulty}
+                </span>
+                <span className="px-2.5 py-1 rounded text-[11px] font-medium"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "#6B7280", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  {q.question_type}
+                </span>
+                <span className="px-2.5 py-1 rounded text-[11px] font-medium"
+                  style={{ background: "rgba(255,255,255,0.03)", color: "#4B5563", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  {q.experience_level}
+                </span>
                 {q.featured && (
-                  <span className="category-badge border bg-yellow-500/10 text-yellow-400 border-yellow-500/25">★ Featured</span>
+                  <span className="px-2.5 py-1 rounded text-[11px] font-bold"
+                    style={{ background: "rgba(251,191,36,0.1)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>
+                    ★ Featured
+                  </span>
                 )}
               </div>
 
@@ -325,42 +355,42 @@ export default async function QuestionDetailPage({ params }: Props) {
 
             {/* ── Answer ── */}
             {q.answer && (
-              <ContentSection icon={<BookOpen size={16} className="text-[#00FF88]" />} label="Answer" accent="text-[#00FF88]">
+              <ContentSection
+                label="Answer"
+                accent={techAccent}
+                icon={<BookOpen size={15} />}
+              >
                 <div itemProp="articleBody">
-                  <BlogContent content={q.answer} />
+                  <InterviewAnswerContent content={q.answer} accent={techAccent} />
                 </div>
               </ContentSection>
             )}
 
             {/* ── Real-World Example ── */}
             {q.real_world_example && (
-              <ContentSection icon={<Star size={16} className="text-amber-400" />} label="Real-World Example" accent="text-amber-400">
-                <div className="p-5 rounded-xl border border-amber-500/10 bg-amber-500/[0.03]">
-                  <BlogContent content={q.real_world_example} />
-                </div>
+              <ContentSection label="Real-World Example" accent="#fbbf24" icon={<Star size={15} />}>
+                <InterviewAnswerContent content={q.real_world_example} accent="#fbbf24" />
               </ContentSection>
             )}
 
             {/* ── Code Example ── */}
             {q.code_snippet && (
-              <ContentSection icon={<Code2 size={16} className="text-sky-400" />} label="Code Example" accent="text-sky-400">
+              <ContentSection label="Code Example" accent="#38bdf8" icon={<Code2 size={15} />}>
                 <QuestionCodeBlock code={q.code_snippet} language={q.code_language || "java"} />
               </ContentSection>
             )}
 
             {/* ── Best Practices ── */}
             {q.best_practices && (
-              <ContentSection icon={<Lightbulb size={16} className="text-[#00FF88]" />} label="Best Practices" accent="text-[#00FF88]">
-                <BlogContent content={q.best_practices} />
+              <ContentSection label="Best Practices" accent="#4ade80" icon={<Lightbulb size={15} />}>
+                <InterviewAnswerContent content={q.best_practices} accent="#4ade80" />
               </ContentSection>
             )}
 
             {/* ── Common Mistakes ── */}
             {q.common_mistakes && (
-              <ContentSection icon={<AlertTriangle size={16} className="text-red-400" />} label="Common Mistakes" accent="text-red-400">
-                <div className="p-5 rounded-xl border border-red-500/12 bg-red-500/[0.03]">
-                  <BlogContent content={q.common_mistakes} />
-                </div>
+              <ContentSection label="Common Mistakes" accent="#f87171" icon={<AlertTriangle size={15} />}>
+                <InterviewAnswerContent content={q.common_mistakes} accent="#f87171" />
               </ContentSection>
             )}
 
@@ -520,18 +550,34 @@ export default async function QuestionDetailPage({ params }: Props) {
 function ContentSection({
   icon, label, accent, children,
 }: { icon: React.ReactNode; label: string; accent: string; children: React.ReactNode }) {
+  const sectionId = `section-${label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
-    <section className="mb-10" aria-labelledby={`section-${label.toLowerCase().replace(/\s+/g, "-")}`}>
-      <div className="flex items-center gap-2.5 mb-5 pb-3 border-b border-white/[0.06]">
-        {icon}
-        <h2
-          id={`section-${label.toLowerCase().replace(/\s+/g, "-")}`}
-          className={`text-lg font-black ${accent}`}
-        >
+    <section className="mb-10" aria-labelledby={sectionId}>
+      {/* Section header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: `${accent}18`, border: `1px solid ${accent}30`, color: accent }}>
+          {icon}
+        </div>
+        <h2 id={sectionId} className="text-lg font-black" style={{ color: accent }}>
           {label}
         </h2>
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${accent}25, transparent)` }} />
       </div>
-      {children}
+
+      {/* Content card */}
+      <div className="rounded-2xl overflow-hidden"
+        style={{
+          border: `1px solid ${accent}18`,
+          background: `linear-gradient(160deg, ${accent}06 0%, #0A0A0A 50%)`,
+          boxShadow: `0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 ${accent}12`,
+        }}>
+        {/* top shimmer */}
+        <div className="h-px" style={{ background: `linear-gradient(90deg, transparent, ${accent}30, transparent)` }} />
+        <div className="px-6 py-6">
+          {children}
+        </div>
+      </div>
     </section>
   );
 }

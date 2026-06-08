@@ -193,7 +193,7 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
               style={{
                 background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)",
                 border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16,
-                placeholder: "#2A2A2A", boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
+                boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
               }}
               onFocus={e => e.currentTarget.style.borderColor = "rgba(0,255,136,0.4)"}
               onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
@@ -441,7 +441,7 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
           </div>
 
           {/* Question text */}
-          <p className="font-bold text-[15px] leading-snug transition-colors duration-200"
+          <p className="font-bold text-[17px] leading-snug transition-colors duration-200"
             style={{ color: expanded ? ac : "#E5E7EB" }}>
             {q.question}
           </p>
