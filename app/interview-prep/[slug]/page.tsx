@@ -76,59 +76,63 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const q = await getQuestion(slug);
   if (!q) return { title: "Question Not Found | AutomateQA" };
 
-  const canonicalUrl = `${SITE}/interview-prep/${slug}`;
-  const tags: string[] = Array.isArray(q.tags) ? q.tags : [];
-  const description =
-    q.short_description ||
-    `${q.technology} interview question for ${q.experience_level} engineers — ${q.difficulty} level. Detailed answer with real-world example and best practices.`;
+  try {
+    const canonicalUrl = `${SITE}/interview-prep/${slug}`;
+    const tags: string[] = Array.isArray(q.tags) ? q.tags : [];
+    const description =
+      q.short_description ||
+      `${q.technology} interview question for ${q.experience_level} engineers — ${q.difficulty} level. Detailed answer with real-world example and best practices.`;
 
-  return {
-    title: `${q.question} | AutomateQA Interview Prep`,
-    description,
-    keywords: [
-      ...tags,
-      q.technology,
-      q.question_type,
-      q.experience_level,
-      "interview question",
-      "QA automation interview",
-      "SDET interview",
-      "automation testing interview",
-      `${q.technology} interview questions`,
-      `${q.difficulty} ${q.technology} questions`,
-    ],
-    authors: [{ name: "Nagendra Meesala", url: `${SITE}/about` }],
-    category: "Interview Preparation",
-    alternates: { canonical: canonicalUrl },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
-    },
-    openGraph: {
-      type: "article",
-      url: canonicalUrl,
-      siteName: "AutomateQA",
-      locale: "en_US",
-      title: `${q.question} | AutomateQA`,
+    return {
+      title: `${q.question} | AutomateQA Interview Prep`,
       description,
-      images: [
-        { url: `${SITE}/og-image.png`, width: 1200, height: 630, alt: `AutomateQA — ${q.question}` },
-      ],
-      publishedTime: q.created_at,
-      modifiedTime: q.updated_at,
-      authors: [`${SITE}/about`],
-      tags: [...tags, q.technology, q.question_type],
-      section: "Interview Preparation",
-    },
-    twitter: {
-      card: "summary_large_image",
-      site: "@automateqa",
-      title: `${q.question} | AutomateQA`,
-      description,
-      images: [`${SITE}/og-image.png`],
-    },
-  };
+      keywords: [
+        ...tags,
+        q.technology,
+        q.question_type,
+        q.experience_level,
+        "interview question",
+        "QA automation interview",
+        "SDET interview",
+        "automation testing interview",
+        `${q.technology} interview questions`,
+        `${q.difficulty} ${q.technology} questions`,
+      ].filter(Boolean) as string[],
+      authors: [{ name: "Nagendra Meesala", url: `${SITE}/about` }],
+      category: "Interview Preparation",
+      alternates: { canonical: canonicalUrl },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+      },
+      openGraph: {
+        type: "article",
+        url: canonicalUrl,
+        siteName: "AutomateQA",
+        locale: "en_US",
+        title: `${q.question} | AutomateQA`,
+        description,
+        images: [
+          { url: `${SITE}/og-image.png`, width: 1200, height: 630, alt: `AutomateQA — ${q.question}` },
+        ],
+        publishedTime: q.created_at,
+        modifiedTime: q.updated_at ?? undefined,
+        authors: [`${SITE}/about`],
+        tags: ([...tags, q.technology, q.question_type].filter(Boolean)) as string[],
+        section: "Interview Preparation",
+      },
+      twitter: {
+        card: "summary_large_image",
+        site: "@automateqa",
+        title: `${q.question} | AutomateQA`,
+        description,
+        images: [`${SITE}/og-image.png`],
+      },
+    };
+  } catch {
+    return { title: `${q.question} | AutomateQA Interview Prep` };
+  }
 }
 
 // ── Schema builder ─────────────────────────────────────────────────────────────
@@ -224,7 +228,8 @@ export default async function QuestionDetailPage({ params }: Props) {
   const related      = await getRelated(q.technology, q.id);
   const tags: string[] = Array.isArray(q.tags) ? q.tags : [];
   const canonicalUrl = `${SITE}/interview-prep/${slug}`;
-  const schemas      = buildSchemas(q, canonicalUrl);
+  let schemas: ReturnType<typeof buildSchemas> = [];
+  try { schemas = buildSchemas(q, canonicalUrl); } catch {}
 
   const youtubeId = q.youtube_url
     ? q.youtube_url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/)?.[1]

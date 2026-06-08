@@ -55,7 +55,14 @@ export default function AdminInterviewPrepPage() {
   const [error,     setError]     = useState("");
   const [search,    setSearch]    = useState("");
   const [deleting,  setDeleting]  = useState<string | null>(null);
+  const [ytMode,    setYtMode]    = useState<"url" | "embed">("url");
+  const [embedRaw,  setEmbedRaw]  = useState("");
   const supabase = useRef(createClient()).current;
+
+  function extractYouTubeId(input: string): string | null {
+    const m = input.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+    return m?.[1] || null;
+  }
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -100,6 +107,8 @@ export default function AdminInterviewPrepPage() {
       published:          item.published,
     });
     setActiveTab("basic");
+    setYtMode("url");
+    setEmbedRaw("");
     setShowForm(true);
   };
 
@@ -109,6 +118,8 @@ export default function AdminInterviewPrepPage() {
     setError("");
     setShowForm(false);
     setActiveTab("basic");
+    setYtMode("url");
+    setEmbedRaw("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -505,15 +516,65 @@ export default function AdminInterviewPrepPage() {
                 {/* ── Tab: Media & Tags ── */}
                 {activeTab === "meta" && (
                   <div className="space-y-5">
-                    <FormField label="YouTube URL">
-                      <input
-                        type="url"
-                        value={form.youtube_url}
-                        onChange={e => setForm(p => ({ ...p, youtube_url: e.target.value }))}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="input-field"
-                      />
-                      <p className="text-[10px] text-[#4B5563] mt-1.5">Optional — embeds a tutorial video on the question page.</p>
+                    <FormField label="YouTube Video">
+                      {/* Mode toggle */}
+                      <div className="flex gap-1 mb-2">
+                        {(["url", "embed"] as const).map(mode => (
+                          <button
+                            key={mode}
+                            type="button"
+                            onClick={() => {
+                              setYtMode(mode);
+                              setEmbedRaw("");
+                              setForm(p => ({ ...p, youtube_url: "" }));
+                            }}
+                            className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all border ${
+                              ytMode === mode
+                                ? "bg-[#00FF88]/15 text-[#00FF88] border-[#00FF88]/30"
+                                : "text-[#6B7280] border-white/8 bg-transparent hover:text-[#9CA3AF]"
+                            }`}
+                          >
+                            {mode === "url" ? "🔗 URL" : "</> Embed Code"}
+                          </button>
+                        ))}
+                      </div>
+
+                      {ytMode === "url" ? (
+                        <input
+                          type="text"
+                          value={form.youtube_url}
+                          onChange={e => setForm(p => ({ ...p, youtube_url: e.target.value }))}
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          className="input-field"
+                        />
+                      ) : (
+                        <textarea
+                          rows={3}
+                          value={embedRaw}
+                          onChange={e => {
+                            const raw = e.target.value;
+                            setEmbedRaw(raw);
+                            const id = extractYouTubeId(raw);
+                            setForm(p => ({
+                              ...p,
+                              youtube_url: id ? `https://www.youtube.com/watch?v=${id}` : "",
+                            }));
+                          }}
+                          placeholder='<iframe src="https://www.youtube.com/embed/VIDEO_ID" ...></iframe>'
+                          className="input-field resize-none font-mono text-[11px]"
+                        />
+                      )}
+
+                      {/* Parsed preview */}
+                      {form.youtube_url && extractYouTubeId(form.youtube_url) ? (
+                        <p className="text-[10px] text-[#00FF88] mt-1.5 flex items-center gap-1">
+                          ✓ Video ID: <span className="font-mono">{extractYouTubeId(form.youtube_url)}</span>
+                        </p>
+                      ) : (ytMode === "embed" && embedRaw && !form.youtube_url) ? (
+                        <p className="text-[10px] text-red-400 mt-1.5">Could not find a YouTube video ID in that embed code.</p>
+                      ) : (
+                        <p className="text-[10px] text-[#4B5563] mt-1.5">Optional — embeds a tutorial video on the question page.</p>
+                      )}
                     </FormField>
                     <FormField label="Tags (comma-separated)">
                       <input
