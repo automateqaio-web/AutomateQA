@@ -26,12 +26,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     const supabase = await createClient();
-    const [blogsRes, learnRes, tipsRes, videosRes, interviewRes] = await Promise.all([
+    const [blogsRes, learnRes, tipsRes, videosRes] = await Promise.all([
       supabase.from("blogs").select("slug, updated_at, created_at").eq("published", true),
       supabase.from("learning_content").select("slug, updated_at, created_at").eq("published", true),
       supabase.from("automation_tips").select("slug, updated_at, created_at").eq("published", true),
       supabase.from("videos").select("id, updated_at, created_at").eq("published", true),
-      supabase.from("interview_questions").select("slug, updated_at, created_at").eq("published", true),
     ]);
 
     const blogRoutes: MetadataRoute.Sitemap = (blogsRes.data || []).map((b) => ({
@@ -62,14 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    const interviewRoutes: MetadataRoute.Sitemap = (interviewRes.data || []).map((q) => ({
-      url: `${baseUrl}/interview-prep/${q.slug}`,
-      lastModified: new Date(q.updated_at || q.created_at),
-      changeFrequency: "weekly" as const,
-      priority: 0.85,
-    }));
-
-    return [...staticRoutes, ...blogRoutes, ...learnRoutes, ...tipRoutes, ...videoRoutes, ...interviewRoutes];
+    return [...staticRoutes, ...blogRoutes, ...learnRoutes, ...tipRoutes, ...videoRoutes];
   } catch {
     return staticRoutes;
   }

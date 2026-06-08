@@ -403,7 +403,7 @@ export default async function QuestionDetailPage({ params }: Props) {
                   </svg>
                 }
                 label="Video Explanation"
-                accent="text-red-400"
+                accent="#ef4444"
               >
                 <div className="rounded-2xl overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.06]">
                   <div className="aspect-video">

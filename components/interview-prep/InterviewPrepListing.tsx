@@ -113,7 +113,10 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
     if (difficulty)      q = q.eq("difficulty",       difficulty);
     if (experienceLevel) q = q.eq("experience_level", experienceLevel);
     if (questionType)    q = q.eq("question_type",    questionType);
-    if (search)          q = q.or(`question.ilike.%${search}%,short_description.ilike.%${search}%`);
+    if (search) {
+      const safe = search.replace(/[%_\\]/g, "\\$&");
+      q = q.or(`question.ilike.%${safe}%,short_description.ilike.%${safe}%`);
+    }
     return q.order("featured", { ascending: false }).order("views", { ascending: false }).order("created_at", { ascending: false });
   }, [technology, difficulty, experienceLevel, questionType, search]);
 

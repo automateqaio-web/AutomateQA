@@ -174,8 +174,9 @@ export default function InterviewAnswerContent({ content, accent = "#00FF88" }: 
           ),
 
           pre: ({ children }: any) => <CodeBlock accent={accent}>{children}</CodeBlock>,
-          code: ({ inline, className, children }: any) => {
-            if (inline) {
+          code: ({ className, children }: any) => {
+            const isBlock = !!className?.includes("language-");
+            if (!isBlock) {
               return (
                 <code className="px-1.5 py-0.5 rounded text-[0.85em] font-mono align-baseline"
                   style={{ background: `${accent}14`, color: accent, border: `1px solid ${accent}25` }}>
@@ -219,14 +220,14 @@ export default function InterviewAnswerContent({ content, accent = "#00FF88" }: 
             </figure>
           ),
 
-          div: ({ className, children, ...rest }: any) =>
+          div: ({ className, children }: any) =>
             className === "yt-wrap" ? (
               <div className="my-8 rounded-xl overflow-hidden relative"
                 style={{ paddingTop: "56.25%", border: "1px solid rgba(255,255,255,0.07)", background: "#000" }}>
                 {children}
               </div>
             ) : (
-              <div className={className} {...rest}>{children}</div>
+              <div className={className}>{children}</div>
             ),
           iframe: ({ src, title, allow }: any) => {
             const isYT = typeof src === "string" && /youtube\.com\/embed\//.test(src);
