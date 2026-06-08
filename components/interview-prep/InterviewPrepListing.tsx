@@ -80,7 +80,7 @@ const DIFFICULTIES      = ["Beginner", "Intermediate", "Advanced"];
 const EXPERIENCE_LEVELS = ["Fresher", "1-2 Years", "3-5 Years", "5+ Years", "Senior SDET"];
 const QUESTION_TYPES    = ["Technical", "Scenario-Based", "Coding", "Managerial", "HR", "Framework Design", "API Testing", "Real-Time Issues", "CI/CD", "Debugging"];
 const PAGE_SIZE         = 12;
-const SELECT_FIELDS     = "id,question,slug,short_description,answer,technology,question_type,experience_level,difficulty,tags,featured,views,created_at";
+const SELECT_FIELDS     = "id,question,slug,short_description,answer,technology,question_type,experience_level,difficulty,tags,featured,views,created_at,real_world_example,code_snippet,youtube_url";
 
 interface Props { initialQuestions: InterviewQuestion[] }
 
@@ -517,6 +517,37 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
                 )}
               </div>
 
+              {/* "What's inside the full guide" strip — only when extras exist */}
+              {(q.real_world_example || q.code_snippet || q.youtube_url) && (
+                <div className="mx-5 mb-4 px-4 py-3 rounded-xl flex flex-wrap items-center gap-x-3 gap-y-2"
+                  style={{ background: `${ac}08`, border: `1px dashed ${ac}25` }}>
+                  <span className="text-[10px] font-bold uppercase tracking-widest flex-shrink-0"
+                    style={{ color: `${ac}80` }}>
+                    Full guide also includes:
+                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {q.real_world_example && (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-md"
+                        style={{ color: "#fbbf24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                        ★ Real-World Example
+                      </span>
+                    )}
+                    {q.code_snippet && (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-md"
+                        style={{ color: "#38bdf8", background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)" }}>
+                        {"</>"} Code Snippet
+                      </span>
+                    )}
+                    {q.youtube_url && (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-md"
+                        style={{ color: "#f87171", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)" }}>
+                        ▶ Video Explanation
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Footer */}
               <div className="flex items-center justify-between px-5 py-3.5"
                 style={{ borderTop: `1px solid ${ac}12`, background: `${ac}05` }}>
@@ -529,11 +560,8 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
                   ))}
                 </div>
                 <Link href={`/interview-prep/${q.slug}`} onClick={e => e.stopPropagation()}
-                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
-                  style={{
-                    color: ac, border: `1px solid ${ac}30`,
-                    background: `${ac}10`,
-                  }}>
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ml-2"
+                  style={{ color: ac, border: `1px solid ${ac}30`, background: `${ac}10` }}>
                   Full Guide <ArrowRight size={10} />
                 </Link>
               </div>

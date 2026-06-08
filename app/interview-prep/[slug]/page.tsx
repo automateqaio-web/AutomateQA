@@ -6,7 +6,7 @@ import {
   ArrowLeft, Eye, Tag, Calendar, BookOpen, Code2,
   AlertTriangle, Lightbulb, ChevronRight, Star,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { InterviewQuestion } from "@/types";
 import { formatDate } from "@/lib/utils";
 import ReadingProgress from "@/components/blog/ReadingProgress";
@@ -22,14 +22,21 @@ interface Props { params: Promise<{ slug: string }> }
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SITE    = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
 
+// Cookie-free client — safe to call in static/ISR pages (no dynamic API usage)
+function getDb() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-key"
+  );
+}
+
 // ── Data helpers ───────────────────────────────────────────────────────────────
 
 async function getQuestion(slug: string): Promise<InterviewQuestion | null> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) return null;
   if (!SLUG_RE.test(slug)) return null;
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await getDb()
       .from("interview_questions")
       .select("*")
       .eq("slug", slug)
@@ -42,8 +49,7 @@ async function getQuestion(slug: string): Promise<InterviewQuestion | null> {
 async function getRelated(technology: string, excludeId: string) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) return [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await getDb()
       .from("interview_questions")
       .select("id,question,slug,difficulty,experience_level,technology")
       .eq("technology", technology)
@@ -60,8 +66,7 @@ async function getRelated(technology: string, excludeId: string) {
 export async function generateStaticParams() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) return [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await getDb()
       .from("interview_questions")
       .select("slug")
       .eq("published", true);
