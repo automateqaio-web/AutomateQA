@@ -414,28 +414,27 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
           {/* Badge row */}
           <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
             {featured && (
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest"
-                style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold"
+                style={{ background: "rgba(251,191,36,0.1)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.2)" }}>
                 ★ Featured
               </span>
             )}
             {/* Tech */}
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
-              style={{ background: `${ac}16`, color: ac, border: `1px solid ${ac}35`,
-                boxShadow: expanded ? `0 0 8px ${ac}20` : undefined }}>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold"
+              style={{ background: `${ac}14`, color: ac, border: `1px solid ${ac}30` }}>
               {q.technology}
             </span>
             {/* Difficulty */}
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-              style={{ background: diff.glow, color: diff.color, border: `1px solid ${diff.color}30` }}>
+            <span className="px-2 py-0.5 rounded text-[10px] font-semibold"
+              style={{ background: diff.glow, color: diff.color, border: `1px solid ${diff.color}25` }}>
               {diff.label}
             </span>
             {/* Experience */}
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold"
-              style={{ background: "rgba(255,255,255,0.03)", color: "#4B5563", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium"
+              style={{ background: "rgba(255,255,255,0.03)", color: "#4B5563", border: "1px solid rgba(255,255,255,0.05)" }}>
               {q.experience_level}
             </span>
-            <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-semibold"
+            <span className="hidden sm:inline-flex px-2 py-0.5 rounded text-[10px] font-medium"
               style={{ background: "rgba(255,255,255,0.02)", color: "#374151", border: "1px solid rgba(255,255,255,0.04)" }}>
               {q.question_type}
             </span>
