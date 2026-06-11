@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { BookOpen, GraduationCap, Zap, Users } from "lucide-react";
 import LearnListing from "@/components/learn/LearnListing";
-import PageViewTracker from "@/components/analytics/PageViewTracker";
 import LearnWaitlist from "@/components/learn/LearnWaitlist";
 import { createClient } from "@/lib/supabase/server";
 
@@ -84,7 +83,6 @@ export default async function LearnPage() {
           </div>
         </div>
       </div>
-      <PageViewTracker section="learn" />
       <LearnListing />
     </div>
   );

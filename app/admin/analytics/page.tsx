@@ -40,6 +40,7 @@ const DATE_RANGES = [
 
 const SECTION_TABS = [
   { key: "all",              label: "All",           color: "#00FF88" },
+  { key: "home",             label: "Homepage",      color: "#00FF88" },
   { key: "interview-prep",   label: "Interview Prep",color: "#F59E0B" },
   { key: "videos",           label: "Videos",        color: "#EF4444" },
   { key: "learn",            label: "Tutorials",     color: "#00FF88" },
@@ -49,12 +50,15 @@ const SECTION_TABS = [
 ];
 
 const SECTION_META: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
+  "home":            { label: "Homepage",       color: "#00FF88", bg: "rgba(0,255,136,0.12)",   icon: Zap },
   "interview-prep":  { label: "Interview Prep", color: "#F59E0B", bg: "rgba(245,158,11,0.12)",  icon: BrainCircuit },
   "videos":          { label: "Videos",         color: "#EF4444", bg: "rgba(239,68,68,0.12)",   icon: Play },
   "learn":           { label: "Tutorials",      color: "#00FF88", bg: "rgba(0,255,136,0.12)",   icon: BookOpen },
   "blog":            { label: "Blog",           color: "#8B5CF6", bg: "rgba(139,92,246,0.12)",  icon: FileText },
   "automation-tips": { label: "Tips",           color: "#06B6D4", bg: "rgba(6,182,212,0.12)",   icon: Lightbulb },
   "memes":           { label: "Memes",          color: "#EC4899", bg: "rgba(236,72,153,0.12)",  icon: Laugh },
+  "about":           { label: "About",          color: "#94a3b8", bg: "rgba(148,163,184,0.12)", icon: Users },
+  "other":           { label: "Other",          color: "#374151", bg: "rgba(55,65,81,0.12)",    icon: ExternalLink },
 };
 
 const SQL_SETUP = `-- Run this once in your Supabase SQL editor
@@ -367,6 +371,50 @@ export default function AdminAnalyticsPage() {
           </AnimatePresence>
         </motion.div>
       )}
+
+      {/* ── Hero total visitors banner ── */}
+      <div className="rounded-2xl p-6 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0a1a0f 0%, #080808 60%)", border: "1px solid rgba(0,255,136,0.2)" }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at top left, rgba(0,255,136,0.08), transparent 60%)" }} />
+        <div className="relative flex flex-wrap items-center justify-between gap-6">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[#00FF88]/60 mb-1">Total Website Visitors</p>
+            {loading ? (
+              <div className="h-14 w-40 rounded-xl animate-pulse" style={{ background: "#1a1a1a" }} />
+            ) : hasTracking ? (
+              <div className="flex items-end gap-4">
+                <span className="text-5xl font-black text-white leading-none">{num(totalVisitors)}</span>
+                <span className="text-base font-semibold text-[#4B5563] mb-1">
+                  in the last {DATE_RANGES.find(r => r.days === dateRange)?.label.toLowerCase()}
+                </span>
+              </div>
+            ) : (
+              <div className="text-2xl font-black text-[#4B5563]">Set up tracking to see visitors</div>
+            )}
+            {hasTracking && (
+              <p className="text-sm text-[#6B7280] mt-2">
+                <span className="text-white font-bold">{num(todayVisitors)}</span> visitors today
+              </p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {(["home","interview-prep","videos","learn"] as const).map(key => {
+              const meta = SECTION_META[key];
+              const Icon = meta.icon;
+              const count = events.filter(e => e.section === key).length;
+              return (
+                <div key={key} className="text-center px-4 py-3 rounded-xl"
+                  style={{ background: `${meta.color}08`, border: `1px solid ${meta.color}15` }}>
+                  <Icon size={14} style={{ color: meta.color }} className="mx-auto mb-1" />
+                  <div className="text-lg font-black text-white">{hasTracking ? num(count) : "—"}</div>
+                  <div className="text-[9px] text-[#4B5563] font-semibold">{meta.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* ── Metric Cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">

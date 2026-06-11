@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Laugh } from "lucide-react";
 import MemeFeed from "@/components/memes/MemeFeed";
-import PageViewTracker from "@/components/analytics/PageViewTracker";
 import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 60;
@@ -69,7 +68,6 @@ export default async function MemesPage() {
         </div>
       </div>
 
-      <PageViewTracker section="memes" />
       <MemeFeed initialMemes={initialMemes} />
     </div>
   );

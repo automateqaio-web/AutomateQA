@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { BookOpen } from "lucide-react";
 import BlogListing from "@/components/blog/BlogListing";
-import PageViewTracker from "@/components/analytics/PageViewTracker";
 import ComingSoon from "@/components/shared/ComingSoon";
 import { createClient } from "@/lib/supabase/server";
 
@@ -93,7 +92,6 @@ export default async function BlogPage() {
           </p>
         </div>
       </div>
-      <PageViewTracker section="blog" />
       <BlogListing initialBlogs={initialBlogs} />
     </div>
   );

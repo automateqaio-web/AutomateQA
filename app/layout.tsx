@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "@/components/shared/SiteChrome";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
+import SiteViewTracker from "@/components/analytics/SiteViewTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -84,6 +85,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen bg-[#0B0B0B] text-white font-sans antialiased">
+        <SiteViewTracker />
         <SiteChrome>{children}</SiteChrome>
         <PWAInstallPrompt />
       </body>
