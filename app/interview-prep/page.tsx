@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { InterviewQuestion } from "@/types";
 import InterviewPrepListing from "@/components/interview-prep/InterviewPrepListing";
+import PageViewTracker from "@/components/analytics/PageViewTracker";
 
 export const revalidate = 60;
 
@@ -174,6 +175,7 @@ export default async function InterviewPrepPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
+      <PageViewTracker section="interview-prep" />
       <InterviewPrepListing initialQuestions={initialQuestions} />
     </>
   );

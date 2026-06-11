@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Play } from "lucide-react";
 import VideoGrid from "@/components/videos/VideoGrid";
+import PageViewTracker from "@/components/analytics/PageViewTracker";
 import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 60;
@@ -65,6 +66,7 @@ export default async function VideosPage() {
           </p>
         </div>
       </div>
+      <PageViewTracker section="videos" />
       <VideoGrid initialVideos={initialVideos} />
     </div>
   );
