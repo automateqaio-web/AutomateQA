@@ -414,35 +414,6 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
         </div>
 
         <div className="flex-1 min-w-0">
-          {/* Badge row */}
-          <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-            {featured && (
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold"
-                style={{ background: "rgba(251,191,36,0.1)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.2)" }}>
-                ★ Featured
-              </span>
-            )}
-            {/* Tech */}
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold"
-              style={{ background: `${ac}14`, color: ac, border: `1px solid ${ac}30` }}>
-              {q.technology}
-            </span>
-            {/* Difficulty */}
-            <span className="px-2 py-0.5 rounded text-[10px] font-semibold"
-              style={{ background: diff.glow, color: diff.color, border: `1px solid ${diff.color}25` }}>
-              {diff.label}
-            </span>
-            {/* Experience */}
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium"
-              style={{ background: "rgba(255,255,255,0.03)", color: "#4B5563", border: "1px solid rgba(255,255,255,0.05)" }}>
-              {q.experience_level}
-            </span>
-            <span className="hidden sm:inline-flex px-2 py-0.5 rounded text-[10px] font-medium"
-              style={{ background: "rgba(255,255,255,0.02)", color: "#374151", border: "1px solid rgba(255,255,255,0.04)" }}>
-              {q.question_type}
-            </span>
-          </div>
-
           {/* Question text */}
           <p className="font-bold text-[17px] leading-snug transition-colors duration-200"
             style={{ color: expanded ? ac : "#E5E7EB" }}>
@@ -549,20 +520,12 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between px-5 py-3.5"
+              <div className="flex items-center justify-end px-5 py-3.5"
                 style={{ borderTop: `1px solid ${ac}12`, background: `${ac}05` }}>
-                <div className="flex flex-wrap gap-1.5">
-                  {tags.slice(0, 5).map(tag => (
-                    <span key={tag} className="px-2 py-0.5 rounded-md text-[10px] font-medium"
-                      style={{ background: "rgba(255,255,255,0.02)", color: "#374151", border: "1px solid rgba(255,255,255,0.05)" }}>
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
                 <Link href={`/interview-prep/${q.slug}`} onClick={e => e.stopPropagation()}
-                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ml-2"
+                  className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all"
                   style={{ color: ac, border: `1px solid ${ac}30`, background: `${ac}10` }}>
-                  Full Guide <ArrowRight size={10} />
+                  View Full Guide <ArrowRight size={11} />
                 </Link>
               </div>
             </div>

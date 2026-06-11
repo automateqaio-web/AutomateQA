@@ -294,56 +294,96 @@ export default async function QuestionDetailPage({ params }: Props) {
 
             {/* Header */}
             <header className="mb-10">
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className="px-2.5 py-1 rounded text-[11px] font-bold"
-                  style={{ background: `${techAccent}15`, color: techAccent, border: `1px solid ${techAccent}35` }}>
-                  {q.technology}
-                </span>
-                <span className="px-2.5 py-1 rounded text-[11px] font-semibold"
-                  style={{ background: diffStyle.bg, color: diffStyle.color, border: `1px solid ${diffStyle.color}30` }}>
-                  {q.difficulty}
-                </span>
-                <span className="px-2.5 py-1 rounded text-[11px] font-medium"
-                  style={{ background: "rgba(255,255,255,0.04)", color: "#6B7280", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  {q.question_type}
-                </span>
-                <span className="px-2.5 py-1 rounded text-[11px] font-medium"
-                  style={{ background: "rgba(255,255,255,0.03)", color: "#4B5563", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  {q.experience_level}
-                </span>
-                {q.featured && (
-                  <span className="px-2.5 py-1 rounded text-[11px] font-bold"
-                    style={{ background: "rgba(251,191,36,0.1)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)" }}>
-                    ★ Featured
-                  </span>
-                )}
-              </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 py-5 border-t border-b border-white/[0.07]">
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-                  <div className="flex items-center gap-3" itemScope itemType="https://schema.org/Person" itemProp="author">
-                    <div className="relative w-9 h-9 flex-shrink-0 ring-[1.5px] ring-[#00FF88]/30 ring-offset-1 ring-offset-[#0B0B0B] rounded-full">
+              {/* ── Premium metadata strip ── */}
+              <div className="mb-7 rounded-2xl overflow-hidden"
+                style={{ border: `1px solid ${techAccent}18`, background: `linear-gradient(135deg, ${techAccent}06 0%, #0a0a0a 60%)` }}>
+
+                {/* Top row — technology + difficulty + type */}
+                <div className="flex flex-wrap items-center gap-0 divide-x"
+                  style={{ borderBottom: `1px solid ${techAccent}12`, divideColor: `${techAccent}12` }}>
+
+                  {/* Technology pill — most prominent */}
+                  <div className="flex items-center gap-2.5 px-5 py-3.5 flex-1 min-w-0">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: `${techAccent}18`, border: `1px solid ${techAccent}30` }}>
+                      <span className="text-[10px] font-black" style={{ color: techAccent }}>{"</>"}</span>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#374151]">Technology</p>
+                      <p className="text-sm font-black" style={{ color: techAccent }}>{q.technology}</p>
+                    </div>
+                  </div>
+
+                  <div className="w-px self-stretch" style={{ background: `${techAccent}12` }} />
+
+                  {/* Difficulty */}
+                  <div className="flex items-center gap-2.5 px-5 py-3.5">
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: diffStyle.color, boxShadow: `0 0 6px ${diffStyle.color}60` }} />
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#374151]">Difficulty</p>
+                      <p className="text-sm font-black" style={{ color: diffStyle.color }}>{q.difficulty}</p>
+                    </div>
+                  </div>
+
+                  <div className="w-px self-stretch" style={{ background: `${techAccent}12` }} />
+
+                  {/* Experience */}
+                  <div className="hidden sm:flex items-center gap-2.5 px-5 py-3.5">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#374151]">Experience</p>
+                      <p className="text-sm font-semibold text-[#9CA3AF]">{q.experience_level}</p>
+                    </div>
+                  </div>
+
+                  <div className="hidden sm:block w-px self-stretch" style={{ background: `${techAccent}12` }} />
+
+                  {/* Type */}
+                  <div className="hidden md:flex items-center gap-2.5 px-5 py-3.5">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#374151]">Type</p>
+                      <p className="text-sm font-semibold text-[#9CA3AF]">{q.question_type}</p>
+                    </div>
+                  </div>
+
+                  {q.featured && (
+                    <>
+                      <div className="w-px self-stretch" style={{ background: `${techAccent}12` }} />
+                      <div className="flex items-center gap-1.5 px-5 py-3.5">
+                        <span className="text-sm">★</span>
+                        <p className="text-sm font-black text-[#fbbf24]">Featured</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Bottom row — author + date + views */}
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3"
+                  style={{ background: "rgba(0,0,0,0.2)" }}>
+                  <div className="flex items-center gap-2.5" itemScope itemType="https://schema.org/Person" itemProp="author">
+                    <div className="relative w-7 h-7 flex-shrink-0 ring-[1.5px] rounded-full"
+                      style={{ ringColor: `${techAccent}40` }}>
                       <Image src="/logo.png" alt="AutomateQA" fill className="object-contain rounded-full" />
                     </div>
                     <div className="leading-none">
-                      <p className="text-sm font-semibold text-white" itemProp="name">Nagendra Meesala</p>
-                      <p className="text-xs text-[#4B5563] mt-0.5" itemProp="jobTitle">QA Automation Engineer</p>
+                      <p className="text-xs font-semibold text-white" itemProp="name">Nagendra Meesala</p>
+                      <p className="text-[10px] text-[#4B5563] mt-0.5" itemProp="jobTitle">QA Automation Engineer</p>
                     </div>
                   </div>
-                  <span className="hidden sm:block w-px h-7 bg-white/8" />
-                  <time
-                    dateTime={q.created_at}
-                    itemProp="datePublished"
-                    className="flex items-center gap-1.5 text-[#6B7280] text-sm"
-                  >
-                    <Calendar size={13} className="text-[#4B5563]" />
+                  <span className="w-px h-5 bg-white/[0.06]" />
+                  <time dateTime={q.created_at} itemProp="datePublished"
+                    className="flex items-center gap-1.5 text-[#4B5563] text-xs">
+                    <Calendar size={11} />
                     {formatDate(q.created_at)}
                   </time>
                   {q.views >= 5 && (
-                    <div className="flex items-center gap-1.5 text-[#6B7280] text-sm">
-                      <Eye size={13} className="text-[#4B5563]" />
-                      {q.views.toLocaleString()} views
-                    </div>
+                    <>
+                      <span className="w-px h-5 bg-white/[0.06]" />
+                      <div className="flex items-center gap-1.5 text-[#4B5563] text-xs">
+                        <Eye size={11} />
+                        {q.views.toLocaleString()} views
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -451,20 +491,28 @@ export default async function QuestionDetailPage({ params }: Props) {
 
             {/* ── Tags ── */}
             {tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mt-8 pt-8 border-t border-white/[0.07]">
-                <span className="flex items-center gap-1.5 text-xs text-[#4B5563] font-semibold uppercase tracking-widest mr-1">
-                  <Tag size={11} /> Tags
-                </span>
+              <div className="mt-8 pt-8 border-t border-white/[0.07]">
+                <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#374151] mb-3">
+                  <Tag size={10} /> Related Topics
+                </p>
+                <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <Link
                     key={tag}
                     href={`/interview-prep?search=${encodeURIComponent(tag)}`}
                     rel="tag"
-                    className="px-3 py-1.5 text-xs rounded-lg border border-white/8 bg-white/[0.03] text-[#9CA3AF] hover:border-[#00FF88]/30 hover:text-[#00FF88] hover:bg-[#00FF88]/5 transition-all font-medium"
+                    className="px-3 py-1.5 text-[11px] rounded-lg font-semibold transition-all"
+                    style={{
+                      background: `${techAccent}08`, color: `${techAccent}90`,
+                      border: `1px solid ${techAccent}20`,
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = `${techAccent}18`; (e.currentTarget as HTMLElement).style.color = techAccent; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = `${techAccent}08`; (e.currentTarget as HTMLElement).style.color = `${techAccent}90`; }}
                   >
-                    {tag}
+                    # {tag}
                   </Link>
                 ))}
+                </div>
               </div>
             )}
 
