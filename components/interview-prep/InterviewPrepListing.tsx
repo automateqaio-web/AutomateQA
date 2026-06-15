@@ -481,6 +481,12 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
 
               {/* Answer body */}
               <div className="px-5 py-5">
+                {q.short_description && (
+                  <p className="text-[13px] leading-relaxed mb-4 pb-4 italic"
+                    style={{ color: "#6B7280", borderBottom: `1px solid ${ac}12` }}>
+                    {q.short_description}
+                  </p>
+                )}
                 {q.answer ? (
                   <AnswerContent content={q.answer} accent={ac} />
                 ) : (
