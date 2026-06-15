@@ -300,8 +300,8 @@ export default async function QuestionDetailPage({ params }: Props) {
                 style={{ border: `1px solid ${techAccent}18`, background: `linear-gradient(135deg, ${techAccent}06 0%, #0a0a0a 60%)` }}>
 
                 {/* Top row — technology + difficulty + type */}
-                <div className="flex flex-wrap items-center gap-0 divide-x"
-                  style={{ borderBottom: `1px solid ${techAccent}12`, divideColor: `${techAccent}12` }}>
+                <div className="flex flex-wrap items-center gap-0"
+                  style={{ borderBottom: `1px solid ${techAccent}12` }}>
 
                   {/* Technology pill — most prominent */}
                   <div className="flex items-center gap-2.5 px-5 py-3.5 flex-1 min-w-0">
