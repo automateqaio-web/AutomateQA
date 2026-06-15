@@ -361,8 +361,8 @@ export default async function QuestionDetailPage({ params }: Props) {
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3"
                   style={{ background: "rgba(0,0,0,0.2)" }}>
                   <div className="flex items-center gap-2.5" itemScope itemType="https://schema.org/Person" itemProp="author">
-                    <div className="relative w-7 h-7 flex-shrink-0 ring-[1.5px] rounded-full"
-                      style={{ ringColor: `${techAccent}40` }}>
+                    <div className="relative w-7 h-7 flex-shrink-0 rounded-full"
+                      style={{ outline: `1.5px solid ${techAccent}40` }}>
                       <Image src="/logo.png" alt="AutomateQA" fill className="object-contain rounded-full" />
                     </div>
                     <div className="leading-none">
