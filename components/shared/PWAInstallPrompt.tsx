@@ -18,6 +18,10 @@ export default function PWAInstallPrompt() {
   useEffect(() => {
     // Don't show if already installed (standalone mode)
     if (window.matchMedia("(display-mode: standalone)").matches) return;
+    // Only show on mobile devices
+    const isMobile = /android|iphone|ipad|ipod|mobile|tablet/i.test(navigator.userAgent)
+      || (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+    if (!isMobile) return;
     // Don't show if dismissed recently
     const dismissed = localStorage.getItem("pwa_prompt_dismissed");
     if (dismissed && Date.now() - parseInt(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
