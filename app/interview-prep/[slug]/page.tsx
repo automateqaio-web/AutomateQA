@@ -276,7 +276,7 @@ export default async function QuestionDetailPage({ params }: Props) {
             <meta itemProp="headline"       content={q.question} />
             <meta itemProp="datePublished"  content={q.created_at} />
             <meta itemProp="dateModified"   content={q.updated_at || q.created_at} />
-            <meta itemProp="author"         content="Nagendra Meesala" />
+            <meta itemProp="author"         content="AutomateQA Team" />
             <meta itemProp="publisher"      content="AutomateQA" />
             <meta itemProp="inLanguage"     content="en-US" />
             <meta itemProp="url"            content={canonicalUrl} />
@@ -366,8 +366,8 @@ export default async function QuestionDetailPage({ params }: Props) {
                       <Image src="/logo.png" alt="AutomateQA" fill className="object-contain rounded-full" />
                     </div>
                     <div className="leading-none">
-                      <p className="text-xs font-semibold text-white" itemProp="name">Nagendra Meesala</p>
-                      <p className="text-[10px] text-[#4B5563] mt-0.5" itemProp="jobTitle">QA Automation Engineer</p>
+                      <p className="text-xs font-semibold text-white" itemProp="name">AutomateQA Team</p>
+                      <p className="text-[10px] text-[#4B5563] mt-0.5" itemProp="jobTitle">QA Automation Engineers</p>
                     </div>
                   </div>
                   <span className="w-px h-5 bg-white/[0.06]" />
