@@ -492,26 +492,25 @@ export default async function QuestionDetailPage({ params }: Props) {
             {/* ── Tags ── */}
             {tags.length > 0 && (
               <div className="mt-8 pt-8 border-t border-white/[0.07]">
+                <style dangerouslySetInnerHTML={{ __html: `.tag-pill:hover { filter: brightness(1.6); opacity: 1; }` }} />
                 <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#374151] mb-3">
                   <Tag size={10} /> Related Topics
                 </p>
                 <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/interview-prep?search=${encodeURIComponent(tag)}`}
-                    rel="tag"
-                    className="px-3 py-1.5 text-[11px] rounded-lg font-semibold transition-all"
-                    style={{
-                      background: `${techAccent}08`, color: `${techAccent}90`,
-                      border: `1px solid ${techAccent}20`,
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = `${techAccent}18`; (e.currentTarget as HTMLElement).style.color = techAccent; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = `${techAccent}08`; (e.currentTarget as HTMLElement).style.color = `${techAccent}90`; }}
-                  >
-                    # {tag}
-                  </Link>
-                ))}
+                  {tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/interview-prep?search=${encodeURIComponent(tag)}`}
+                      rel="tag"
+                      className="tag-pill px-3 py-1.5 text-[11px] rounded-lg font-semibold transition-all"
+                      style={{
+                        background: `${techAccent}08`, color: `${techAccent}80`,
+                        border: `1px solid ${techAccent}20`,
+                      }}
+                    >
+                      # {tag}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
