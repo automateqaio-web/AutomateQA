@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -581,6 +581,50 @@ const CODE_LANG_LABELS: Record<string, string> = {
   gherkin: "Gherkin", groovy: "Groovy", yaml: "YAML",
 };
 
+function ListingCodeBlock({ children, accent }: { children: React.ReactNode; accent: string }) {
+  const [copied, setCopied] = useState(false);
+  const preRef = useRef<HTMLPreElement>(null);
+  const child = Array.isArray(children) ? children[0] : children;
+  const cls   = (child as any)?.props?.className || "";
+  const lang  = cls.match(/language-([^\s]+)/)?.[1] || "code";
+  const label = CODE_LANG_LABELS[lang] || lang.toUpperCase();
+
+  const handleCopy = async () => {
+    const text = preRef.current?.textContent || "";
+    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+  };
+
+  return (
+    <div className="my-4 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="flex items-center justify-between px-4 py-2.5"
+        style={{ background: "rgba(0,0,0,0.7)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FFBD2E" }} />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#28CA42" }} />
+          <span className="text-[10px] font-mono font-semibold tracking-widest ml-1" style={{ color: "#6B7280" }}>
+            {label}
+          </span>
+        </div>
+        <button onClick={handleCopy}
+          className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all active:scale-95"
+          style={copied
+            ? { color: accent, borderColor: `${accent}50`, background: `${accent}15`, boxShadow: `0 0 8px ${accent}20` }
+            : { color: "#9CA3AF", borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)" }}>
+          {copied ? (
+            <><span>✓</span><span className="hidden sm:inline">Copied!</span></>
+          ) : (
+            <><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span className="hidden sm:inline">Copy</span></>
+          )}
+        </button>
+      </div>
+      <pre ref={preRef} style={{ background: "#050505", padding: "16px", overflowX: "auto", margin: 0 }}>
+        {children}
+      </pre>
+    </div>
+  );
+}
+
 function AnswerContent({ content, accent: ac }: { content: string; accent: string }) {
   return (
     <div className="iq-answer">
@@ -670,28 +714,7 @@ function AnswerContent({ content, accent: ac }: { content: string; accent: strin
               {children}
             </h3>
           ),
-          pre: ({ children }) => {
-            const child = Array.isArray(children) ? children[0] : children;
-            const cls = (child as any)?.props?.className || "";
-            const lang = cls.match(/language-([^\s]+)/)?.[1] || "code";
-            const label = CODE_LANG_LABELS[lang] || lang.toUpperCase();
-            return (
-              <div className="my-4 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div className="flex items-center gap-2 px-4 py-2.5"
-                  style={{ background: "rgba(0,0,0,0.7)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FFBD2E" }} />
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#28CA42" }} />
-                  <span className="text-[10px] font-mono ml-2 font-semibold tracking-widest" style={{ color: "#4B5563" }}>
-                    {label}
-                  </span>
-                </div>
-                <pre style={{ background: "#050505", padding: "16px", overflowX: "auto", margin: 0 }}>
-                  {children}
-                </pre>
-              </div>
-            );
-          },
+          pre: ({ children }) => <ListingCodeBlock accent={ac}>{children}</ListingCodeBlock>,
           code: ({ className, children }) => {
             const isBlock = !!className?.includes("language-");
             if (!isBlock) {

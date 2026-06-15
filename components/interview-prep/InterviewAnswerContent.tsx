@@ -50,14 +50,18 @@ function CodeBlock({ children, accent }: { children: React.ReactNode; accent: st
               <span key={c} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
             ))}
           </span>
-          <span className="text-[10px] font-mono tracking-widest ml-1" style={{ color: "#3A3A3A" }}>{label}</span>
+          <span className="text-[10px] font-mono font-semibold tracking-widest ml-1" style={{ color: "#6B7280" }}>{label}</span>
         </div>
         <button onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border transition-all"
+          className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all active:scale-95"
           style={copied
-            ? { color: accent, borderColor: `${accent}40`, background: `${accent}10` }
-            : { color: "#4B5563", borderColor: "rgba(255,255,255,0.08)", background: "transparent" }}>
-          {copied ? "✓ Copied" : "Copy"}
+            ? { color: accent, borderColor: `${accent}50`, background: `${accent}15`, boxShadow: `0 0 8px ${accent}20` }
+            : { color: "#9CA3AF", borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)" }}>
+          {copied ? (
+            <><span>✓</span><span className="hidden sm:inline">Copied!</span></>
+          ) : (
+            <><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span className="hidden sm:inline">Copy</span></>
+          )}
         </button>
       </div>
       <pre ref={preRef} className="bg-[#050505] px-5 py-5 overflow-x-auto text-[0.82rem] leading-[1.75] m-0">
