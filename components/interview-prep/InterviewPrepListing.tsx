@@ -261,7 +261,11 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
               {featuredQs.map((q, i) => (
                 <QuestionCard key={q.id} question={q} index={i} featured
                   expanded={expandedId === q.id}
-                  onToggle={() => setExpandedId(expandedId === q.id ? null : q.id)} />
+                  onToggle={() => {
+                    const opening = expandedId !== q.id;
+                    setExpandedId(expandedId === q.id ? null : q.id);
+                    if (opening) supabase.rpc("increment_interview_views", { question_id_param: q.id }).then(() => {});
+                  }} />
               ))}
             </div>
           </section>
@@ -317,7 +321,8 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
             <SectionHeading accent="#00FF88">
               {hasFilters ? "Filtered Results" : technology ? `${technology} Questions` : "All Questions"}
             </SectionHeading>
-            <span className="text-xs font-mono" style={{ color: "#2A2A2A" }}>
+            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg"
+              style={{ color: "#4B5563", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
               {loading ? "..." : `${questions.length} Q`}
             </span>
           </div>
@@ -339,7 +344,11 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
                   transition={{ delay: Math.min(i * 0.04, 0.3), duration: 0.3 }}>
                   <QuestionCard question={q} index={i}
                     expanded={expandedId === q.id}
-                    onToggle={() => setExpandedId(expandedId === q.id ? null : q.id)} />
+                    onToggle={() => {
+                      const opening = expandedId !== q.id;
+                      setExpandedId(expandedId === q.id ? null : q.id);
+                      if (opening) supabase.rpc("increment_interview_views", { question_id_param: q.id }).then(() => {});
+                    }} />
                 </motion.div>
               ))}
             </div>
@@ -404,12 +413,12 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
         {/* Number badge */}
         <div className="flex-shrink-0 mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
           style={{
-            background:  expanded ? `${ac}20` : "rgba(255,255,255,0.03)",
-            border:      `1px solid ${expanded ? `${ac}45` : "rgba(255,255,255,0.06)"}`,
-            boxShadow:   expanded ? `0 0 12px ${ac}25` : undefined,
+            background: expanded ? `${ac}22` : `${ac}10`,
+            border:     `1px solid ${expanded ? `${ac}50` : `${ac}28`}`,
+            boxShadow:  expanded ? `0 0 14px ${ac}30` : `0 0 0 1px ${ac}10`,
           }}>
           <span className="text-[11px] font-black font-mono transition-colors"
-            style={{ color: expanded ? ac : "#3A3A3A" }}>
+            style={{ color: expanded ? ac : `${ac}CC` }}>
             {num}
           </span>
         </div>
@@ -421,30 +430,50 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
             {q.question}
           </p>
 
-          {/* Short desc when collapsed */}
-          {!expanded && q.short_description && (
-            <p className="text-xs leading-relaxed mt-1.5 line-clamp-1" style={{ color: "#3A3A3A" }}>
-              {q.short_description}
-            </p>
-          )}
+          {/* Meta row — always visible */}
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            {/* Difficulty dot + label */}
+            <span className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md"
+              style={{ color: diff.color, background: `${diff.color}14`, border: `1px solid ${diff.color}28` }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: diff.color }} />
+              {diff.label}
+            </span>
+
+            {/* Type badge */}
+            {q.question_type && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                style={{ color: "#94a3b8", background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.14)" }}>
+                {q.question_type}
+              </span>
+            )}
+
+            {/* Short desc — only on wider screens */}
+            {q.short_description && (
+              <span className="hidden md:inline text-[11px] line-clamp-1" style={{ color: "#4B5563" }}>
+                {q.short_description}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Right meta */}
         <div className="flex-shrink-0 flex items-center gap-2.5 mt-1">
-          {q.views > 0 && (
-            <span className="hidden sm:flex items-center gap-1 font-mono text-[10px]" style={{ color: "#2A2A2A" }}>
-              <Eye size={9} />{q.views}
-            </span>
-          )}
+          {/* Views */}
+          <span className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono font-semibold px-2 py-1 rounded-lg"
+            style={{ color: "#6B7280", background: "rgba(107,114,128,0.08)", border: "1px solid rgba(107,114,128,0.12)" }}>
+            <Eye size={9} style={{ color: "#4B5563" }} />
+            {q.views > 0 ? q.views : "—"}
+          </span>
+          {/* Chevron */}
           <div className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200"
             style={{
-              background:  expanded ? `${ac}20` : "rgba(255,255,255,0.03)",
-              border:      `1px solid ${expanded ? `${ac}40` : "rgba(255,255,255,0.06)"}`,
-              boxShadow:   expanded ? `0 0 8px ${ac}20` : undefined,
+              background: expanded ? `${ac}20` : "rgba(255,255,255,0.05)",
+              border:     `1px solid ${expanded ? `${ac}40` : "rgba(255,255,255,0.10)"}`,
+              boxShadow:  expanded ? `0 0 8px ${ac}20` : undefined,
             }}>
             <ChevronDown size={12}
               className={`transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
-              style={{ color: expanded ? ac : "#3A3A3A" }} />
+              style={{ color: expanded ? ac : "#6B7280" }} />
           </div>
         </div>
       </button>
