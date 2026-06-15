@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 import { createClient } from "@supabase/supabase-js";
 import {
   Search, X, Eye, ChevronDown, Zap, Code2, Users, TrendingUp,
@@ -109,7 +110,7 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
 
   const buildQuery = useCallback(() => {
     let q = supabase.from("interview_questions").select(SELECT_FIELDS).eq("published", true);
-    if (technology)      q = q.eq("technology",       technology);
+    if (technology)      q = q.or(`technology.eq.${technology},tags.cs.{"${technology}"}`);
     if (difficulty)      q = q.eq("difficulty",       difficulty);
     if (experienceLevel) q = q.eq("experience_level", experienceLevel);
     if (questionType)    q = q.eq("question_type",    questionType);
@@ -544,108 +545,167 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
 
 /* ── Answer content renderer ──────────────────────────────────────────── */
 
+const CODE_LANG_LABELS: Record<string, string> = {
+  java: "Java", javascript: "JavaScript", typescript: "TypeScript",
+  xml: "XML", python: "Python", bash: "Bash", shell: "Shell",
+  sql: "SQL", json: "JSON", html: "HTML", css: "CSS",
+  gherkin: "Gherkin", groovy: "Groovy", yaml: "YAML",
+};
+
 function AnswerContent({ content, accent: ac }: { content: string; accent: string }) {
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        p: ({ children }) => {
-          // Detect short list-item-like lines (no terminal punctuation, short length)
-          const text = typeof children === "string" ? children
-            : Array.isArray(children) ? children.map(c => typeof c === "string" ? c : "").join("") : "";
-          const isItem = text.trim().length > 0 && text.trim().length < 80
-            && !text.trim().endsWith(".") && !text.trim().endsWith(":")
-            && !text.trim().endsWith("?") && !text.trim().includes("\n");
-          if (isItem) {
+    <div className="iq-answer">
+      <style>{`
+        .iq-answer .hljs { background: transparent !important; padding: 0 !important; }
+        .iq-answer .hljs-keyword,
+        .iq-answer .hljs-selector-tag       { color: #c084fc; font-weight: 600; }
+        .iq-answer .hljs-string,
+        .iq-answer .hljs-template-string    { color: #86efac; }
+        .iq-answer .hljs-comment,
+        .iq-answer .hljs-quote              { color: #4b5563; font-style: italic; }
+        .iq-answer .hljs-number,
+        .iq-answer .hljs-literal            { color: #fb923c; }
+        .iq-answer .hljs-title,
+        .iq-answer .hljs-title.class_,
+        .iq-answer .hljs-class .hljs-title  { color: #67e8f9; }
+        .iq-answer .hljs-title.function_,
+        .iq-answer .hljs-function .hljs-title { color: #60a5fa; }
+        .iq-answer .hljs-meta,
+        .iq-answer .hljs-doctag             { color: #f472b6; }
+        .iq-answer .hljs-built_in,
+        .iq-answer .hljs-type               { color: #34d399; }
+        .iq-answer .hljs-params             { color: #fbbf24; }
+        .iq-answer .hljs-operator,
+        .iq-answer .hljs-punctuation        { color: #94a3b8; }
+        .iq-answer .hljs-variable,
+        .iq-answer .hljs-subst              { color: #e5e7eb; }
+        .iq-answer .hljs-attr,
+        .iq-answer .hljs-attribute          { color: #60a5fa; }
+        .iq-answer .hljs-tag .hljs-name     { color: #67e8f9; }
+        .iq-answer .hljs-symbol,
+        .iq-answer .hljs-link               { color: #f472b6; }
+        .iq-answer .hljs-regexp             { color: #fbbf24; }
+        .iq-answer .hljs-section            { color: #60a5fa; font-weight: bold; }
+        .iq-answer .hljs-bullet             { color: #fbbf24; }
+        .iq-answer .hljs-addition           { color: #86efac; background: rgba(134,239,172,0.08); }
+        .iq-answer .hljs-deletion           { color: #f87171; background: rgba(248,113,113,0.08); }
+        .iq-answer .hljs-emphasis           { font-style: italic; }
+        .iq-answer .hljs-strong             { font-weight: bold; }
+        .iq-answer .hljs-selector-id        { color: #fb923c; }
+        .iq-answer .hljs-selector-class     { color: #c084fc; }
+        .iq-answer .hljs-template-variable  { color: #fb923c; }
+        .iq-answer .hljs-formula            { color: #c084fc; }
+        .iq-answer .hljs-name               { color: #67e8f9; }
+      `}</style>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeHighlight]}
+        components={{
+          p: ({ children }) => {
+            const text = typeof children === "string" ? children
+              : Array.isArray(children) ? children.map(c => typeof c === "string" ? c : "").join("") : "";
+            const isItem = text.trim().length > 0 && text.trim().length < 80
+              && !text.trim().endsWith(".") && !text.trim().endsWith(":")
+              && !text.trim().endsWith("?") && !text.trim().includes("\n");
+            if (isItem) {
+              return (
+                <div className="flex items-start gap-3 py-1.5">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-[9px] font-black"
+                    style={{ background: `${ac}18`, color: ac, border: `1px solid ${ac}30` }}>▸</span>
+                  <span className="text-[14px] leading-relaxed" style={{ color: "#C9D1D9" }}>{children}</span>
+                </div>
+              );
+            }
+            return <p className="text-[14px] leading-[1.85] mb-3 last:mb-0" style={{ color: "#9CA3AF" }}>{children}</p>;
+          },
+          strong: ({ children }) => <strong className="font-bold" style={{ color: "#E5E7EB" }}>{children}</strong>,
+          em: ({ children }) => <em style={{ color: "#9CA3AF", fontStyle: "italic" }}>{children}</em>,
+          ul: ({ children }) => <ul className="space-y-1.5 my-3 ml-1">{children}</ul>,
+          ol: ({ children }) => <ol className="space-y-1.5 my-3 ml-1">{children}</ol>,
+          li: ({ children }) => (
+            <li className="flex items-start gap-3 text-[14px] leading-relaxed" style={{ color: "#C9D1D9" }}>
+              <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-[9px] font-black"
+                style={{ background: `${ac}18`, color: ac, border: `1px solid ${ac}30` }}>✓</span>
+              <span className="flex-1">{children}</span>
+            </li>
+          ),
+          h2: ({ children }) => (
+            <div className="flex items-center gap-2.5 mt-6 mb-3 pb-2" style={{ borderBottom: `1px solid ${ac}20` }}>
+              <span className="w-1 h-5 rounded-full flex-shrink-0" style={{ background: ac }} />
+              <h2 className="text-[15px] font-black" style={{ color: "#F3F4F6" }}>{children}</h2>
+            </div>
+          ),
+          h3: ({ children }) => (
+            <h3 className="text-[13px] font-bold mt-4 mb-2 flex items-center gap-2" style={{ color: "#D1D5DB" }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: ac }} />
+              {children}
+            </h3>
+          ),
+          pre: ({ children }) => {
+            const child = Array.isArray(children) ? children[0] : children;
+            const cls = (child as any)?.props?.className || "";
+            const lang = cls.match(/language-([^\s]+)/)?.[1] || "code";
+            const label = CODE_LANG_LABELS[lang] || lang.toUpperCase();
             return (
-              <div className="flex items-start gap-3 py-1.5">
-                <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-[9px] font-black"
-                  style={{ background: `${ac}18`, color: ac, border: `1px solid ${ac}30` }}>
-                  ▸
-                </span>
-                <span className="text-[14px] leading-relaxed" style={{ color: "#C9D1D9" }}>{children}</span>
+              <div className="my-4 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div className="flex items-center gap-2 px-4 py-2.5"
+                  style={{ background: "rgba(0,0,0,0.7)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FFBD2E" }} />
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#28CA42" }} />
+                  <span className="text-[10px] font-mono ml-2 font-semibold tracking-widest" style={{ color: "#4B5563" }}>
+                    {label}
+                  </span>
+                </div>
+                <pre style={{ background: "#050505", padding: "16px", overflowX: "auto", margin: 0 }}>
+                  {children}
+                </pre>
               </div>
             );
-          }
-          return <p className="text-[14px] leading-[1.85] mb-3 last:mb-0" style={{ color: "#9CA3AF" }}>{children}</p>;
-        },
-        strong: ({ children }) => (
-          <strong className="font-bold" style={{ color: "#E5E7EB" }}>{children}</strong>
-        ),
-        em: ({ children }) => (
-          <em style={{ color: "#9CA3AF", fontStyle: "italic" }}>{children}</em>
-        ),
-        ul: ({ children }) => <ul className="space-y-1.5 my-3 ml-1">{children}</ul>,
-        ol: ({ children }) => <ol className="space-y-1.5 my-3 ml-1">{children}</ol>,
-        li: ({ children }) => (
-          <li className="flex items-start gap-3 text-[14px] leading-relaxed" style={{ color: "#C9D1D9" }}>
-            <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-[9px] font-black"
-              style={{ background: `${ac}18`, color: ac, border: `1px solid ${ac}30` }}>
-              ✓
-            </span>
-            <span className="flex-1">{children}</span>
-          </li>
-        ),
-        h2: ({ children }) => (
-          <div className="flex items-center gap-2.5 mt-6 mb-3 pb-2"
-            style={{ borderBottom: `1px solid ${ac}20` }}>
-            <span className="w-1 h-5 rounded-full flex-shrink-0" style={{ background: ac }} />
-            <h2 className="text-[15px] font-black" style={{ color: "#F3F4F6" }}>{children}</h2>
-          </div>
-        ),
-        h3: ({ children }) => (
-          <h3 className="text-[13px] font-bold mt-4 mb-2 flex items-center gap-2" style={{ color: "#D1D5DB" }}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: ac }} />
-            {children}
-          </h3>
-        ),
-        code: ({ children, className }) => {
-          const isBlock = className?.includes("language-");
-          const lang = (className || "").replace("language-", "") || "code";
-          return isBlock ? (
-            <div className="my-4 rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-              <div className="flex items-center gap-2 px-4 py-2" style={{ background: "rgba(0,0,0,0.6)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-                <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                <span className="text-[10px] font-mono ml-2" style={{ color: "#3A3A3A" }}>{lang}</span>
-              </div>
-              <pre style={{ background: "#050505", padding: "16px", overflowX: "auto", margin: 0 }}>
-                <code className="text-[12px] font-mono leading-relaxed" style={{ color: "#C9D1D9" }}>{children}</code>
-              </pre>
-            </div>
-          ) : (
-            <code className="px-1.5 py-0.5 rounded text-[12px] font-mono"
-              style={{ background: `${ac}14`, color: ac, border: `1px solid ${ac}25` }}>
+          },
+          code: ({ className, children }) => {
+            const isBlock = !!className?.includes("language-");
+            if (!isBlock) {
+              return (
+                <code className="px-1.5 py-0.5 rounded text-[12px] font-mono"
+                  style={{ background: `${ac}14`, color: ac, border: `1px solid ${ac}25` }}>
+                  {children}
+                </code>
+              );
+            }
+            return (
+              <code className={className}
+                style={{ fontSize: "12px", lineHeight: "1.75", fontFamily: "ui-monospace, SFMono-Regular, 'Fira Code', monospace" }}>
+                {children}
+              </code>
+            );
+          },
+          blockquote: ({ children }) => (
+            <blockquote className="my-4 pl-4 py-2 rounded-r-lg italic text-[13px]"
+              style={{ borderLeft: `3px solid ${ac}50`, background: `${ac}07`, color: "#9CA3AF" }}>
               {children}
-            </code>
-          );
-        },
-        blockquote: ({ children }) => (
-          <blockquote className="my-4 pl-4 py-2 rounded-r-lg italic text-[13px]"
-            style={{ borderLeft: `3px solid ${ac}50`, background: `${ac}07`, color: "#9CA3AF" }}>
-            {children}
-          </blockquote>
-        ),
-        hr: () => (
-          <div className="my-4 h-px" style={{ background: `linear-gradient(90deg, ${ac}25, transparent)` }} />
-        ),
-        table: ({ children }) => (
-          <div className="overflow-x-auto my-4 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-            <table className="w-full text-[13px]">{children}</table>
-          </div>
-        ),
-        th: ({ children }) => (
-          <th className="text-left px-4 py-2.5 font-bold text-xs uppercase tracking-wider"
-            style={{ background: `${ac}12`, color: ac, borderBottom: `1px solid ${ac}20` }}>{children}</th>
-        ),
-        td: ({ children }) => (
-          <td className="px-4 py-2.5 border-b" style={{ color: "#9CA3AF", borderColor: "rgba(255,255,255,0.04)" }}>{children}</td>
-        ),
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+            </blockquote>
+          ),
+          hr: () => (
+            <div className="my-4 h-px" style={{ background: `linear-gradient(90deg, ${ac}25, transparent)` }} />
+          ),
+          table: ({ children }) => (
+            <div className="overflow-x-auto my-4 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+              <table className="w-full text-[13px]">{children}</table>
+            </div>
+          ),
+          th: ({ children }) => (
+            <th className="text-left px-4 py-2.5 font-bold text-xs uppercase tracking-wider"
+              style={{ background: `${ac}12`, color: ac, borderBottom: `1px solid ${ac}20` }}>{children}</th>
+          ),
+          td: ({ children }) => (
+            <td className="px-4 py-2.5 border-b" style={{ color: "#9CA3AF", borderColor: "rgba(255,255,255,0.04)" }}>{children}</td>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }
 
