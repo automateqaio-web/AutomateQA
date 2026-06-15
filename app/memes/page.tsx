@@ -6,21 +6,35 @@ import { createClient } from "@/lib/supabase/server";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "QA Memes — Laugh Through the Pain",
-  description: "Browse hundreds of QA memes covering Playwright, Selenium, Agile, Jira, production bugs, and corporate madness.",
-  keywords: ["QA memes", "software testing memes", "Playwright memes", "Selenium humor", "Agile memes", "developer memes", "automation testing humor", "QA engineer"],
+  title: "QA & Software Testing Memes 2025 — Automation Testing Humor | AutomateQA",
+  description: "Funny QA and software testing memes for automation engineers — Selenium fails, Playwright quirks, Agile ceremonies, Jira tickets, production bugs, and corporate QA life. Relatable humor for every tester.",
+  keywords: [
+    "QA memes 2025",
+    "software testing memes",
+    "automation testing humor",
+    "Selenium memes",
+    "Playwright memes",
+    "Agile memes for testers",
+    "Jira memes",
+    "developer memes",
+    "QA engineer humor",
+    "software testing funny",
+    "programming memes",
+    "SDET memes",
+  ],
   alternates: { canonical: "https://automateqa.online/memes" },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
   openGraph: {
     type: "website",
     url: "https://automateqa.online/memes",
-    title: "QA Memes — Laugh Through the Pain | AutomateQA",
-    description: "Browse hundreds of QA memes covering Playwright, Selenium, Agile, Jira, production bugs, and corporate madness.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "QA Memes — AutomateQA" }],
+    title: "QA & Software Testing Memes 2025 — Automation Testing Humor | AutomateQA",
+    description: "Funny QA memes for automation engineers — Selenium, Playwright, Agile, Jira, production bugs, and corporate QA life.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "QA & Software Testing Memes — AutomateQA" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QA Memes — Laugh Through the Pain | AutomateQA",
-    description: "Browse hundreds of QA memes covering Playwright, Selenium, Agile, Jira, production bugs, and corporate madness.",
+    title: "QA & Software Testing Memes 2025 — Automation Testing Humor | AutomateQA",
+    description: "Funny QA memes for automation engineers — Selenium, Playwright, Agile, Jira, production bugs, and corporate QA life.",
     images: ["/og-image.png"],
   },
 };
@@ -44,7 +58,18 @@ async function getInitialMemes() {
 
 export default async function MemesPage() {
   const initialMemes = await getInitialMemes();
+  const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "QA & Software Testing Memes",
+    description: "Funny QA memes for automation engineers — Selenium, Playwright, Agile, Jira, production bugs, and corporate QA life.",
+    url: `${SITE}/memes`,
+    publisher: { "@type": "Organization", name: "AutomateQA", url: SITE },
+  };
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
     <div className="min-h-screen pt-16">
       {/* Page header */}
       <div className="relative overflow-hidden py-16 sm:py-20">
@@ -70,5 +95,6 @@ export default async function MemesPage() {
 
       <MemeFeed initialMemes={initialMemes} />
     </div>
+    </>
   );
 }

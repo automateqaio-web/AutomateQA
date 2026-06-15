@@ -5,6 +5,7 @@ import { Shield, ArrowLeft } from "lucide-react";
 export const metadata: Metadata = {
   title: "Privacy Policy | AutomateQA",
   description: "Privacy Policy for AutomateQA — learn how we collect, use, and protect your information.",
+  alternates: { canonical: "https://automateqa.online/privacy" },
   robots: { index: true, follow: true },
 };
 

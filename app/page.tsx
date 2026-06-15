@@ -10,6 +10,12 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "AutomateQA — Automation Testing Meets Corporate Chaos",
   description: "QA memes, Playwright tutorials, Selenium tips, and real corporate pain. The home for QA engineers and automation testers.",
+  alternates: { canonical: "https://automateqa.online" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
 };
 
 export const revalidate = 60;

@@ -8,26 +8,25 @@ export const revalidate = 60;
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
 
 export const metadata: Metadata = {
-  title: "QA Automation Interview Questions & Answers | AutomateQA Interview Prep",
+  title: "QA Automation Interview Questions & Answers 2025 — Selenium, Playwright, Java | AutomateQA",
   description:
-    "Master QA automation interviews with 100+ real-world questions, structured answers, scenario-based challenges, coding problems, and framework discussions for Selenium, Playwright, Cypress, Core Java, API Testing, TestNG, Cucumber and more.",
+    "100+ QA automation interview questions with detailed answers for Selenium WebDriver, Playwright, Cypress, Core Java, API Testing (Rest Assured), TestNG, Cucumber BDD, Page Object Model, and CI/CD. Covering Fresher to Senior SDET levels.",
   keywords: [
-    "QA automation interview questions",
+    "QA automation interview questions 2025",
     "SDET interview questions and answers",
-    "Selenium interview questions",
-    "Playwright interview questions",
-    "Cypress interview preparation",
-    "QA engineer interview prep",
-    "Core Java interview for QA",
-    "API testing interview questions",
+    "Selenium WebDriver interview questions",
+    "Playwright interview questions and answers",
+    "Cypress interview questions",
+    "Core Java interview questions for QA",
+    "Rest Assured API testing interview",
     "TestNG interview questions",
-    "Cucumber BDD interview",
+    "Cucumber BDD interview questions",
     "Page Object Model interview",
-    "automation framework design interview",
-    "software testing interview",
-    "CI/CD interview questions",
-    "Jenkins interview for QA",
-    "interview questions for automation testers",
+    "automation testing interview for freshers",
+    "senior SDET interview questions",
+    "Jenkins CI/CD interview questions",
+    "software testing interview preparation",
+    "QA engineer interview questions with answers",
   ],
   authors: [{ name: "AutomateQA", url: SITE }],
   category: "Education",
@@ -38,9 +37,9 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   openGraph: {
-    title: "QA Automation Interview Questions & Answers | AutomateQA",
+    title: "QA Automation Interview Questions & Answers 2025 — Selenium, Playwright, Java | AutomateQA",
     description:
-      "100+ real-world QA interview questions with structured answers for Selenium, Playwright, Java, API Testing, CI/CD and more. Ace your next SDET interview.",
+      "100+ QA automation interview questions with answers — Selenium WebDriver, Playwright, Core Java, Rest Assured, TestNG, Cucumber BDD, Page Object Model. Fresher to Senior SDET levels.",
     url: `${SITE}/interview-prep`,
     siteName: "AutomateQA",
     type: "website",
@@ -57,9 +56,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@automateqa",
-    title: "QA Automation Interview Questions & Answers | AutomateQA",
+    title: "QA Automation Interview Questions 2025 — Selenium, Playwright, Java | AutomateQA",
     description:
-      "Master QA automation interviews — Selenium, Playwright, Java, API Testing, CI/CD and more.",
+      "100+ QA automation interview Q&A — Selenium, Playwright, Core Java, Rest Assured, TestNG, Cucumber BDD. Fresher to Senior SDET.",
     images: [`${SITE}/og-image.png`],
   },
 };
@@ -144,15 +143,17 @@ function buildSchemas(questions: InterviewQuestion[]) {
         "@type": "FAQPage",
         mainEntity: questions
           .filter((q) => q.answer || q.short_description)
-          .slice(0, 5)
+          .slice(0, 10)
           .map((q) => ({
             "@type": "Question",
             name: q.question,
             acceptedAnswer: {
               "@type": "Answer",
               text: (q.answer || q.short_description || "")
-                .replace(/[#*`[\]>_~]/g, "")
-                .slice(0, 500),
+                .replace(/[#*`[\]>_~|]/g, "")
+                .replace(/\n+/g, " ")
+                .trim()
+                .slice(0, 800),
             },
           })),
       }

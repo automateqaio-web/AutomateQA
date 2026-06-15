@@ -5,6 +5,7 @@ import { FileText, ArrowLeft } from "lucide-react";
 export const metadata: Metadata = {
   title: "Terms of Service | AutomateQA",
   description: "Terms of Service for AutomateQA — rules and guidelines for using our platform.",
+  alternates: { canonical: "https://automateqa.online/terms" },
   robots: { index: true, follow: true },
 };
 

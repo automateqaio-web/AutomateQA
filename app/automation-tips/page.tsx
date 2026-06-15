@@ -7,21 +7,35 @@ import { createClient } from "@/lib/supabase/server";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Automation Tips & Tricks | AutomateQA",
-  description: "Short-form technical tips for QA automation engineers. Selenium, Playwright, API testing, Jenkins, CI/CD, and more.",
-  keywords: ["automation tips", "QA tips", "Playwright tips", "Selenium tips", "API testing tips", "CI/CD tips", "Jenkins automation", "test automation tricks", "software testing best practices"],
+  title: "QA Automation Tips & Tricks 2025 — Selenium, Playwright, CI/CD, API Testing | AutomateQA",
+  description: "Practical QA automation tips and tricks for engineers — Selenium WebDriver, Playwright, Rest Assured API testing, Jenkins CI/CD pipelines, GitHub Actions, and debugging. Real solutions from real projects.",
+  keywords: [
+    "QA automation tips 2025",
+    "Selenium WebDriver tips and tricks",
+    "Playwright automation tips",
+    "Rest Assured API testing tips",
+    "Jenkins CI/CD automation tips",
+    "GitHub Actions QA tips",
+    "test automation best practices",
+    "QA engineer tips",
+    "automation testing tricks",
+    "software testing tips",
+    "Cypress tips and tricks",
+    "Java automation tips",
+  ],
   alternates: { canonical: "https://automateqa.online/automation-tips" },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1 } },
   openGraph: {
     type: "website",
     url: "https://automateqa.online/automation-tips",
-    title: "Automation Tips & Tricks | AutomateQA",
-    description: "Short-form technical tips for QA automation engineers. Selenium, Playwright, API testing, Jenkins, CI/CD, and more.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Automation Tips — AutomateQA" }],
+    title: "QA Automation Tips & Tricks 2025 — Selenium, Playwright, CI/CD | AutomateQA",
+    description: "Practical QA automation tips for engineers — Selenium, Playwright, API testing, Jenkins, CI/CD, and debugging patterns from real projects.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "QA Automation Tips & Tricks — AutomateQA" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Automation Tips & Tricks | AutomateQA",
-    description: "Short-form technical tips for QA automation engineers. Selenium, Playwright, API testing, Jenkins, CI/CD, and more.",
+    title: "QA Automation Tips & Tricks 2025 — Selenium, Playwright, CI/CD | AutomateQA",
+    description: "Practical QA automation tips for engineers — Selenium, Playwright, API testing, Jenkins, CI/CD, and debugging patterns from real projects.",
     images: ["/og-image.png"],
   },
 };
@@ -80,7 +94,28 @@ export default async function AutomationTipsPage() {
     );
   }
 
+  const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "QA Automation Tips & Tricks",
+    description: "Practical QA automation tips for Selenium, Playwright, API testing, CI/CD and more.",
+    url: `${SITE}/automation-tips`,
+    publisher: { "@type": "Organization", name: "AutomateQA", url: SITE, logo: { "@type": "ImageObject", url: `${SITE}/logo.png` } },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: initialItems.length,
+      itemListElement: initialItems.slice(0, 10).map((t: { title: string; slug: string; excerpt?: string }, i: number) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: { "@type": "TechArticle", name: t.title, description: t.excerpt || "", url: `${SITE}/automation-tips/${t.slug}` },
+      })),
+    },
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
     <div className="min-h-screen pt-20">
       {/* Hero */}
       <div className="relative overflow-hidden border-b border-white/5">
@@ -113,5 +148,6 @@ export default async function AutomationTipsPage() {
 
       <TipsListing initialItems={initialItems} />
     </div>
+    </>
   );
 }

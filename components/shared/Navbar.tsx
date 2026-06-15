@@ -16,15 +16,15 @@ interface NavItem {
 }
 
 const DEFAULT_NAV: NavItem[] = [
-  { key: "home",    label: "Home",          href: "/",               enabled: true, sort_order: 1 },
-  { key: "memes",   label: "Memes",         href: "/memes",          enabled: true, sort_order: 2 },
-  { key: "videos",  label: "Videos",        href: "/videos",         enabled: true, sort_order: 3 },
-  { key: "learn",   label: "Learn",         href: "/learn",          enabled: true, sort_order: 4 },
-  { key: "tips",    label: "Tips & Tricks", href: "/automation-tips",enabled: true, sort_order: 5 },
-  { key: "blog",    label: "Blog",          href: "/blog",           enabled: true, sort_order: 6 },
-  { key: "interview-prep", label: "Interview Prep", href: "/interview-prep", enabled: true, sort_order: 7 },
-  { key: "socials", label: "Socials",        href: "/creator-stats",  enabled: true, sort_order: 8 },
-  { key: "about",   label: "About",         href: "/about",          enabled: true, sort_order: 9 },
+  { key: "home",           label: "Home",          href: "/",                enabled: true, sort_order: 1 },
+  { key: "interview-prep", label: "Interview Prep",href: "/interview-prep",  enabled: true, sort_order: 2 },
+  { key: "learn",          label: "Learn",         href: "/learn",           enabled: true, sort_order: 3 },
+  { key: "blog",           label: "QA Articles",   href: "/blog",            enabled: true, sort_order: 4 },
+  { key: "tips",           label: "Tips & Tricks", href: "/automation-tips", enabled: true, sort_order: 5 },
+  { key: "videos",         label: "Videos",        href: "/videos",          enabled: true, sort_order: 6 },
+  { key: "memes",          label: "Memes",         href: "/memes",           enabled: true, sort_order: 7 },
+  { key: "socials",        label: "Socials",       href: "/creator-stats",   enabled: true, sort_order: 8 },
+  { key: "about",          label: "About",         href: "/about",           enabled: true, sort_order: 9 },
 ];
 
 export default function Navbar() {
