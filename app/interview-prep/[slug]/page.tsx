@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowLeft, Eye, Tag, Calendar, BookOpen, Code2,
-  AlertTriangle, Lightbulb, ChevronRight, Star,
+  AlertTriangle, Lightbulb, ChevronRight, ChevronLeft, Star,
 } from "lucide-react";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { InterviewQuestion } from "@/types";
@@ -44,6 +44,36 @@ async function getQuestion(slug: string): Promise<InterviewQuestion | null> {
       .single();
     return data;
   } catch { return null; }
+}
+
+async function getAdjacentQuestions(technology: string, currentId: string, currentCreatedAt: string) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))
+    return { prev: null, next: null };
+  try {
+    const db = getDb();
+    const [prevRes, nextRes] = await Promise.all([
+      db.from("interview_questions")
+        .select("id,question,slug,difficulty")
+        .eq("technology", technology)
+        .eq("published", true)
+        .neq("id", currentId)
+        .lt("created_at", currentCreatedAt)
+        .order("created_at", { ascending: false })
+        .limit(1),
+      db.from("interview_questions")
+        .select("id,question,slug,difficulty")
+        .eq("technology", technology)
+        .eq("published", true)
+        .neq("id", currentId)
+        .gt("created_at", currentCreatedAt)
+        .order("created_at", { ascending: true })
+        .limit(1),
+    ]);
+    return {
+      prev: (prevRes.data?.[0] as { id: string; question: string; slug: string; difficulty: string } | undefined) ?? null,
+      next: (nextRes.data?.[0] as { id: string; question: string; slug: string; difficulty: string } | undefined) ?? null,
+    };
+  } catch { return { prev: null, next: null }; }
 }
 
 async function getRelated(technology: string, excludeId: string) {
@@ -230,7 +260,10 @@ export default async function QuestionDetailPage({ params }: Props) {
   const q = await getQuestion(slug);
   if (!q) notFound();
 
-  const related      = await getRelated(q.technology, q.id);
+  const [related, { prev, next }] = await Promise.all([
+    getRelated(q.technology, q.id),
+    getAdjacentQuestions(q.technology, q.id, q.created_at),
+  ]);
   const tags: string[] = Array.isArray(q.tags) ? q.tags : [];
   const canonicalUrl = `${SITE}/interview-prep/${slug}`;
   let schemas: ReturnType<typeof buildSchemas> = [];
@@ -466,6 +499,79 @@ export default async function QuestionDetailPage({ params }: Props) {
                   </div>
                 </div>
               </ContentSection>
+            )}
+
+            {/* ── Prev / Next navigation ── */}
+            {(prev || next) && (
+              <div className="mt-10 pt-8 border-t border-white/[0.07]">
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-4"
+                  style={{ color: techAccent + "80" }}>
+                  More {q.technology} Questions
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                  {/* Previous */}
+                  {prev ? (
+                    <Link href={`/interview-prep/${prev.slug}`}
+                      className="group flex items-start gap-3 p-4 rounded-2xl transition-all duration-200 hover:brightness-125"
+                      style={{
+                        border: `1px solid ${techAccent}20`,
+                        background: `${techAccent}06`,
+                      }}>
+                      <div className="flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center mt-0.5 transition-all"
+                        style={{ background: `${techAccent}15`, border: `1px solid ${techAccent}30` }}>
+                        <ChevronLeft size={14} style={{ color: techAccent }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: techAccent + "70" }}>
+                          ← Previous
+                        </p>
+                        <p className="text-[13px] font-semibold leading-snug line-clamp-2 text-[#C9D1D9] group-hover:text-white transition-colors">
+                          {prev.question}
+                        </p>
+                        <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded"
+                          style={{
+                            color: prev.difficulty === "Beginner" ? "#4ade80" : prev.difficulty === "Intermediate" ? "#fbbf24" : "#f87171",
+                            background: prev.difficulty === "Beginner" ? "rgba(74,222,128,0.1)" : prev.difficulty === "Intermediate" ? "rgba(251,191,36,0.1)" : "rgba(248,113,113,0.1)",
+                          }}>
+                          {prev.difficulty}
+                        </span>
+                      </div>
+                    </Link>
+                  ) : <div />}
+
+                  {/* Next */}
+                  {next ? (
+                    <Link href={`/interview-prep/${next.slug}`}
+                      className="group flex items-start gap-3 p-4 rounded-2xl transition-all duration-200 sm:flex-row-reverse sm:text-right hover:brightness-125"
+                      style={{
+                        border: `1px solid ${techAccent}20`,
+                        background: `${techAccent}06`,
+                      }}>
+                      <div className="flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center mt-0.5 transition-all"
+                        style={{ background: `${techAccent}15`, border: `1px solid ${techAccent}30` }}>
+                        <ChevronRight size={14} style={{ color: techAccent }} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: techAccent + "70" }}>
+                          Next →
+                        </p>
+                        <p className="text-[13px] font-semibold leading-snug line-clamp-2 text-[#C9D1D9] group-hover:text-white transition-colors">
+                          {next.question}
+                        </p>
+                        <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded"
+                          style={{
+                            color: next.difficulty === "Beginner" ? "#4ade80" : next.difficulty === "Intermediate" ? "#fbbf24" : "#f87171",
+                            background: next.difficulty === "Beginner" ? "rgba(74,222,128,0.1)" : next.difficulty === "Intermediate" ? "rgba(251,191,36,0.1)" : "rgba(248,113,113,0.1)",
+                          }}>
+                          {next.difficulty}
+                        </span>
+                      </div>
+                    </Link>
+                  ) : <div />}
+
+                </div>
+              </div>
             )}
 
             {/* ── Follow CTA ── */}
