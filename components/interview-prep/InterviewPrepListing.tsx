@@ -51,6 +51,7 @@ const TECH_ACCENT: Record<string, string> = {
   "Streams":               "#86efac",
   "Exception Handling":    "#fca5a5",
   "Keyword-Driven Framework": "#a5f3fc",
+  "Java Programs":            "#f97316",
 };
 
 const DIFF_CONFIG: Record<string, { color: string; glow: string; label: string }> = {
@@ -73,6 +74,7 @@ const TECH_CATEGORIES = [
   { name: "GitHub Actions",    icon: "⚙️" },
   { name: "SQL",               icon: "🗄️" },
   { name: "Scenario-Based",    icon: "🎯" },
+  { name: "Java Programs",     icon: "💻" },
   { name: "Managerial",        icon: "💼" },
   { name: "HR",                icon: "🤝" },
 ];
