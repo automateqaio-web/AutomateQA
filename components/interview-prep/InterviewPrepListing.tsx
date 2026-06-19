@@ -66,6 +66,7 @@ const TECH_CATEGORIES = [
   { name: "Cypress",           icon: "🌲" },
   { name: "Core Java",         icon: "☕" },
   { name: "Rest Assured",      icon: "🔌" },
+  { name: "Postman",           icon: "📮" },
   { name: "API Automation",    icon: "⚡" },
   { name: "Page Object Model", icon: "📐" },
   { name: "Cucumber",          icon: "🥒" },
@@ -75,8 +76,6 @@ const TECH_CATEGORIES = [
   { name: "SQL",               icon: "🗄️" },
   { name: "Scenario-Based",    icon: "🎯" },
   { name: "Java Programs",     icon: "💻" },
-  { name: "Managerial",        icon: "💼" },
-  { name: "HR",                icon: "🤝" },
 ];
 
 const DIFFICULTIES      = ["Beginner", "Intermediate", "Advanced"];
@@ -249,6 +248,33 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
                   <span className="text-[9px] font-bold leading-tight" style={{ color: isActive ? ac : "#4B5563" }}>
                     {cat.name}
                   </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── Difficulty quick-filter row ── */}
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            <span className="text-[9px] font-black uppercase tracking-[0.18em] shrink-0" style={{ color: "#2A2A2A" }}>
+              Level
+            </span>
+            {[
+              { label: "Beginner",     color: "#4ade80", icon: "🟢" },
+              { label: "Intermediate", color: "#fbbf24", icon: "🟡" },
+              { label: "Advanced",     color: "#f87171", icon: "🔴" },
+            ].map(({ label, color, icon }) => {
+              const isActive = difficulty === label;
+              return (
+                <button key={label} onClick={() => setDifficulty(isActive ? null : label)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200"
+                  style={{
+                    border:     `1px solid ${isActive ? `${color}50` : "rgba(255,255,255,0.06)"}`,
+                    background: isActive ? `${color}15` : "rgba(255,255,255,0.02)",
+                    color:      isActive ? color : "#4B5563",
+                    boxShadow:  isActive ? `0 0 12px ${color}20` : undefined,
+                  }}>
+                  <span className="text-[10px]">{icon}</span>
+                  {label}
                 </button>
               );
             })}
