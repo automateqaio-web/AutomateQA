@@ -111,7 +111,7 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
 
   const buildQuery = useCallback(() => {
     let q = supabase.from("interview_questions").select(SELECT_FIELDS).eq("published", true);
-    if (technology)      q = q.or(`technology.eq.${technology},tags.cs.{"${technology}"}`);
+    if (technology)      q = q.eq("technology", technology);
     if (difficulty)      q = q.eq("difficulty",       difficulty);
     if (experienceLevel) q = q.eq("experience_level", experienceLevel);
     if (questionType)    q = q.eq("question_type",    questionType);
