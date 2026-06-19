@@ -232,20 +232,20 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
         {/* ── Category grid ─────────────────────────────────── */}
         <section>
           <SectionHeading accent="#00FF88">Browse by Topic</SectionHeading>
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 mt-5">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 mt-5">
             {TECH_CATEGORIES.map(cat => {
               const ac = TECH_ACCENT[cat.name] || "#6b7280";
               const isActive = technology === cat.name;
               return (
                 <button key={cat.name} onClick={() => setTechnology(isActive ? null : cat.name)}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center transition-all duration-200"
+                  className="flex flex-col items-center gap-2 px-2 py-4 rounded-xl text-center transition-all duration-200 hover:scale-105"
                   style={{
-                    border:     `1px solid ${isActive ? `${ac}50` : "rgba(255,255,255,0.05)"}`,
-                    background: isActive ? `${ac}12` : "rgba(255,255,255,0.015)",
-                    boxShadow:  isActive ? `0 0 20px ${ac}15, inset 0 1px 0 ${ac}20` : undefined,
+                    border:     `1px solid ${isActive ? `${ac}60` : "rgba(255,255,255,0.07)"}`,
+                    background: isActive ? `${ac}15` : "rgba(255,255,255,0.02)",
+                    boxShadow:  isActive ? `0 0 20px ${ac}20, inset 0 1px 0 ${ac}20` : "0 1px 3px rgba(0,0,0,0.3)",
                   }}>
-                  <span className="text-xl">{cat.icon}</span>
-                  <span className="text-[9px] font-bold leading-tight" style={{ color: isActive ? ac : "#4B5563" }}>
+                  <span className="text-2xl">{cat.icon}</span>
+                  <span className="text-[10px] font-bold leading-tight text-center" style={{ color: isActive ? ac : "#9CA3AF" }}>
                     {cat.name}
                   </span>
                 </button>
@@ -254,8 +254,8 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
           </div>
 
           {/* ── Difficulty quick-filter row ── */}
-          <div className="flex flex-wrap items-center gap-2 mt-4">
-            <span className="text-[9px] font-black uppercase tracking-[0.18em] shrink-0" style={{ color: "#2A2A2A" }}>
+          <div className="flex flex-wrap items-center gap-3 mt-5">
+            <span className="text-[10px] font-black uppercase tracking-[0.18em] shrink-0" style={{ color: "#6B7280" }}>
               Level
             </span>
             {[
@@ -266,14 +266,14 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
               const isActive = difficulty === label;
               return (
                 <button key={label} onClick={() => setDifficulty(isActive ? null : label)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-105"
                   style={{
-                    border:     `1px solid ${isActive ? `${color}50` : "rgba(255,255,255,0.06)"}`,
-                    background: isActive ? `${color}15` : "rgba(255,255,255,0.02)",
-                    color:      isActive ? color : "#4B5563",
-                    boxShadow:  isActive ? `0 0 12px ${color}20` : undefined,
+                    border:     `1px solid ${isActive ? `${color}60` : "rgba(255,255,255,0.08)"}`,
+                    background: isActive ? `${color}18` : "rgba(255,255,255,0.03)",
+                    color:      isActive ? color : "#9CA3AF",
+                    boxShadow:  isActive ? `0 0 14px ${color}25` : "0 1px 3px rgba(0,0,0,0.3)",
                   }}>
-                  <span className="text-[10px]">{icon}</span>
+                  <span className="text-[11px]">{icon}</span>
                   {label}
                 </button>
               );
@@ -349,9 +349,9 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
             <SectionHeading accent="#00FF88">
               {hasFilters ? "Filtered Results" : technology ? `${technology} Questions` : "All Questions"}
             </SectionHeading>
-            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg"
-              style={{ color: "#4B5563", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              {loading ? "..." : `${questions.length} Q`}
+            <span className="text-xs font-mono font-bold px-3 py-1.5 rounded-lg"
+              style={{ color: "#9CA3AF", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
+              {loading ? "..." : `${questions.length} questions`}
             </span>
           </div>
 
@@ -361,7 +361,7 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
             </div>
           ) : questions.length === 0 ? (
             <div className="text-center py-20 rounded-2xl" style={{ border: "1px dashed rgba(255,255,255,0.06)" }}>
-              <BookOpen size={40} className="mx-auto mb-4" style={{ color: "#1A1A1A" }} />
+              <BookOpen size={40} className="mx-auto mb-4" style={{ color: "#374151" }} />
               <p className="text-sm" style={{ color: "#4B5563" }}>No questions found.</p>
               <button onClick={clearFilters} className="mt-4 text-sm hover:underline" style={{ color: "#00FF88" }}>Clear filters</button>
             </div>
@@ -385,8 +385,8 @@ export default function InterviewPrepListing({ initialQuestions }: Props) {
           {hasMore && !loading && (
             <div className="flex justify-center mt-10">
               <button onClick={loadMore} disabled={loadingMore}
-                className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
-                style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", color: "#6B7280" }}>
+                className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 hover:scale-105"
+                style={{ border: "1px solid rgba(0,255,136,0.25)", background: "rgba(0,255,136,0.06)", color: "#00FF88" }}>
                 {loadingMore && <Loader2 size={13} className="animate-spin" />}
                 {loadingMore ? "Loading..." : "Load More Questions"}
               </button>
@@ -453,13 +453,21 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
 
         <div className="flex-1 min-w-0">
           {/* Question text */}
-          <p className="font-bold text-[17px] leading-snug transition-colors duration-200"
-            style={{ color: expanded ? ac : "#E5E7EB" }}>
+          <p className="font-bold text-[16px] sm:text-[17px] leading-snug transition-colors duration-200"
+            style={{ color: expanded ? ac : "#F3F4F6" }}>
             {q.question}
           </p>
 
           {/* Meta row — always visible */}
           <div className="flex flex-wrap items-center gap-2 mt-2">
+            {/* Technology badge */}
+            {q.technology && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md"
+                style={{ color: ac, background: `${ac}14`, border: `1px solid ${ac}30` }}>
+                {q.technology}
+              </span>
+            )}
+
             {/* Difficulty dot + label */}
             <span className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md"
               style={{ color: diff.color, background: `${diff.color}14`, border: `1px solid ${diff.color}28` }}>
@@ -475,9 +483,9 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
               </span>
             )}
 
-            {/* Short desc — only on wider screens */}
+            {/* Short desc — visible on all screens */}
             {q.short_description && (
-              <span className="hidden md:inline text-[11px] line-clamp-1" style={{ color: "#4B5563" }}>
+              <span className="text-[11px] line-clamp-1 flex-1" style={{ color: "#6B7280" }}>
                 {q.short_description}
               </span>
             )}
@@ -805,7 +813,7 @@ function FilterRow({ label, options, value, onChange }: {
 }) {
   return (
     <div className="flex flex-wrap items-start gap-2">
-      <span className="text-[9px] font-black uppercase tracking-[0.15em] w-24 pt-1.5 shrink-0" style={{ color: "#3A3A3A" }}>
+      <span className="text-[10px] font-black uppercase tracking-[0.15em] w-24 pt-1.5 shrink-0" style={{ color: "#6B7280" }}>
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">
