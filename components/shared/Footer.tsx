@@ -26,7 +26,7 @@ export default function Footer() {
 
   const socialLinks = [
     { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", color: "hover:text-red-500" },
-    { icon: Camera, href: "https://www.instagram.com/automateqa.io", label: "Instagram", color: "hover:text-pink-500" },
+    { icon: Camera, href: "https://www.instagram.com/automateqa.memes", label: "Instagram", color: "hover:text-pink-500" },
   ];
 
   return (

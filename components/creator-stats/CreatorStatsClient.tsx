@@ -178,7 +178,7 @@ function InstagramChannelCard() {
 
             <div className="sm:ml-auto flex items-center gap-3 flex-wrap">
               <a
-                href="https://www.instagram.com/automateqa.online"
+                href="https://www.instagram.com/automateqa.memes"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm font-black transition-all duration-200 hover:shadow-[0_0_28px_rgba(236,72,153,0.5)] active:scale-95"
@@ -187,7 +187,7 @@ function InstagramChannelCard() {
                 Follow
               </a>
               <a
-                href="https://www.instagram.com/automateqa.online"
+                href="https://www.instagram.com/automateqa.memes"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/25 text-[#9CA3AF] hover:text-white text-sm font-semibold transition-all duration-200"

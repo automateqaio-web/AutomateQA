@@ -14,7 +14,7 @@ function FacebookIcon({ size = 16 }: { size?: number }) {
 
 const socialLinks = [
   { icon: Play, href: "https://youtube.com/@automateqa", label: "YouTube", desc: "Tutorials & Meme Compilations", color: "text-red-400 bg-red-500/10 border-red-500/20" },
-  { icon: Camera, href: "https://www.instagram.com/automateqa.online", label: "Instagram", desc: "Daily QA Memes", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
+  { icon: Camera, href: "https://www.instagram.com/automateqa.memes", label: "Instagram", desc: "Daily QA Memes", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
   { icon: FacebookIcon, href: "https://www.facebook.com/people/Automate-QA/61590680690708/?mibextid=wwXIfr&rdid=g6rV6XD2Nx4Q1vHf&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1D9b4HsLFm%2F%3Fmibextid%3DwwXIfr", label: "Facebook", desc: "Community & Announcements", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
 ];
 

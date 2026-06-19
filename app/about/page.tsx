@@ -260,7 +260,7 @@ export default function AboutPage() {
 
           {/* Instagram */}
           <motion.a
-            href="https://www.instagram.com/automateqa.online"
+            href="https://www.instagram.com/automateqa.memes"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, y: 20 }}
