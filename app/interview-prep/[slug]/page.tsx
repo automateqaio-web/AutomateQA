@@ -14,6 +14,7 @@ import QuestionViewTracker from "@/components/interview-prep/QuestionViewTracker
 import QuestionCodeBlock from "@/components/interview-prep/QuestionCodeBlock";
 import QuestionShareBar from "@/components/interview-prep/QuestionShareBar";
 import InterviewAnswerContent from "@/components/interview-prep/InterviewAnswerContent";
+import FullGuideToggle from "@/components/interview-prep/FullGuideToggle";
 
 export const revalidate = 3600;
 
@@ -423,30 +424,43 @@ export default async function QuestionDetailPage({ params }: Props) {
             </header>
 
             {/* ── Question Box ── */}
-            <div className="mb-10 p-6 sm:p-8 rounded-2xl border border-[#00FF88]/15 bg-[#00FF88]/[0.03] relative overflow-hidden">
+            <div className="mb-8 p-6 sm:p-8 rounded-2xl border border-[#00FF88]/15 bg-[#00FF88]/[0.03] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-[#00FF88]/5 rounded-full blur-3xl pointer-events-none" />
               <p className="text-[10px] font-bold text-[#00FF88] uppercase tracking-[0.15em] mb-3">Interview Question</p>
               <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight" itemProp="headline">
                 {q.question}
               </h1>
-              {q.short_description && (
-                <p className="mt-4 text-[#9CA3AF] leading-relaxed text-base" itemProp="description">
-                  {q.short_description}
-                </p>
-              )}
             </div>
 
-            {/* ── Answer ── */}
-            {q.answer && (
-              <ContentSection
-                label="Answer"
-                accent={techAccent}
-                icon={<BookOpen size={15} />}
-              >
-                <div itemProp="articleBody">
-                  <InterviewAnswerContent content={q.answer} accent={techAccent} />
+            {/* ── Quick Answer (what to say in the interview) ── */}
+            {q.short_description && (
+              <div className="mb-8 rounded-2xl overflow-hidden"
+                style={{
+                  border: `1px solid ${techAccent}28`,
+                  background: `linear-gradient(135deg, ${techAccent}08 0%, #0A0A0A 70%)`,
+                  boxShadow: `0 0 40px ${techAccent}08`,
+                }}>
+                {/* shimmer */}
+                <div className="h-px" style={{ background: `linear-gradient(90deg, transparent, ${techAccent}40, transparent)` }} />
+                <div className="px-6 py-5">
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <span className="text-base">🎯</span>
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: techAccent }}>
+                      Quick Answer — What to Say in the Interview
+                    </p>
+                  </div>
+                  <p className="text-[#E5E7EB] text-base leading-relaxed font-medium" itemProp="description">
+                    {q.short_description}
+                  </p>
                 </div>
-              </ContentSection>
+              </div>
+            )}
+
+            {/* ── Full Guide (collapsible) ── */}
+            {q.answer && (
+              <div itemProp="articleBody">
+                <FullGuideToggle content={q.answer} accent={techAccent} />
+              </div>
             )}
 
             {/* ── Real-World Example ── */}
