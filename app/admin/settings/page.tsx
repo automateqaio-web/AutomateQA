@@ -75,6 +75,8 @@ export default function AdminSettingsPage() {
     setSaving(`nav-${key}`);
     await supabase.from("nav_settings").update({ enabled }).eq("key", key);
     setNavItems((prev) => prev.map((n) => n.key === key ? { ...n, enabled } : n));
+    // Bust the Navbar's sessionStorage cache so the next page load gets fresh data
+    try { sessionStorage.removeItem("aq_nav_settings_v2"); } catch { /* skip */ }
     setSaving(null);
     setSaved(`nav-${key}`);
     setTimeout(() => setSaved(null), 2000);

@@ -45,7 +45,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const CACHE_KEY = "aq_nav_settings_v2";
-    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+    const CACHE_TTL = 60 * 1000; // 1 minute
 
     const applyNav = (data: { nav: NavItem[] }) => {
       if (data?.nav?.length) {

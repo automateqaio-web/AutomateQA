@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export const revalidate = 30;
+export const revalidate = 10;
 
 const DEFAULT_NAV = [
   { key: "home",    label: "Home",          href: "/",               enabled: true, sort_order: 1 },
@@ -23,7 +23,7 @@ const DEFAULT_PAGES = [
 ];
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+  "Cache-Control": "public, s-maxage=10, stale-while-revalidate=20",
 };
 
 export async function GET() {
