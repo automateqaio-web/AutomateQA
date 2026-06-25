@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "highlight.js/styles/atom-one-dark.css";
 import SiteChrome from "@/components/shared/SiteChrome";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 import SiteViewTracker from "@/components/analytics/SiteViewTracker";

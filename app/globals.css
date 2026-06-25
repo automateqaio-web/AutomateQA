@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+/* Override highlight.js token colors to match our dark theme */
+.hljs { background: transparent !important; color: #E2E8F0; }
+.hljs-keyword,
+.hljs-operator       { color: #C792EA; font-weight: 600; }   /* purple — const, let, return */
+.hljs-string,
+.hljs-template-variable,
+.hljs-template-tag   { color: #C3E88D; }                     /* lime green — strings */
+.hljs-number         { color: #F78C6C; }                     /* orange — numbers */
+.hljs-comment        { color: #637777; font-style: italic; } /* muted gray — comments */
+.hljs-title,
+.hljs-title.function_{ color: #82AAFF; }                     /* blue — function names */
+.hljs-params         { color: #FFCB6B; }                     /* yellow — parameters */
+.hljs-built_in       { color: #80CBC4; }                     /* teal — console, Math */
+.hljs-literal        { color: #FF5874; }                     /* red — true, false, null */
+.hljs-variable       { color: #E2E8F0; }
+.hljs-attr           { color: #FFCB6B; }                     /* yellow — object keys */
+.hljs-property       { color: #80CBC4; }
+
 @layer base {
   :root {
     --background: #0B0B0B;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { BookOpen, GraduationCap, Zap, Users } from "lucide-react";
+import { BookOpen, GraduationCap, Zap, Users, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import LearnListing from "@/components/learn/LearnListing";
 import LearnWaitlist from "@/components/learn/LearnWaitlist";
 import { createClient } from "@/lib/supabase/server";
@@ -83,6 +84,36 @@ export default async function LearnPage() {
           </div>
         </div>
       </div>
+      {/* ── Playwright Course spotlight ─────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <p className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest mb-4 flex items-center gap-2">
+          <Zap size={12} className="text-[#00FF88]" /> Featured Course
+        </p>
+        <Link
+          href="/course/playwright/what-is-software-testing"
+          className="group flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 rounded-2xl border border-[#00FF88]/20 bg-[#00FF88]/5 hover:bg-[#00FF88]/10 hover:border-[#00FF88]/40 transition-all mb-2"
+        >
+          <div className="w-12 h-12 rounded-xl bg-[#00FF88]/15 border border-[#00FF88]/30 flex items-center justify-center flex-shrink-0 text-2xl">
+            🎭
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="text-base font-black text-white group-hover:text-[#00FF88] transition-colors">
+                Zero to Automation Hero — Playwright Course
+              </span>
+              <span className="text-[10px] font-bold text-[#00FF88] border border-[#00FF88]/30 rounded px-1.5 py-0.5">FREE</span>
+              <span className="text-[10px] font-bold text-yellow-400">★ NEW</span>
+            </div>
+            <p className="text-sm text-[#9CA3AF]">
+              24 lessons · No coding background needed · From zero to your first working automation
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#00FF88] flex-shrink-0">
+            Start learning <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+      </div>
+
       <LearnListing />
     </div>
   );
