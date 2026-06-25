@@ -6,11 +6,12 @@ import {
   BarChart3, Eye, Play, Laugh, FileText, BookOpen, Lightbulb,
   Users, TrendingUp, Loader2, RefreshCw, BrainCircuit, Calendar,
   Database, ExternalLink, ChevronDown, ArrowUpRight, Zap,
+  ArrowUp, ArrowDown, Clock, Activity, Minus, Hash,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Cell,
+  Tooltip, ResponsiveContainer, Cell, LineChart, Line, Legend,
 } from "recharts";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -87,9 +88,8 @@ function getDateRange(days: number): { start: string; dates: string[] } {
 }
 
 function fmtLabel(dateStr: string, days: number) {
-  const d = new Date(dateStr);
+  const d = new Date(dateStr + "T12:00:00");
   if (days <= 7) return d.toLocaleDateString("en-US", { weekday: "short" });
-  if (days <= 31) return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
@@ -99,13 +99,33 @@ function num(n: number) {
   return n.toLocaleString();
 }
 
+function deltaColor(d: number | null) {
+  if (d === null) return "#4B5563";
+  return d > 0 ? "#00FF88" : d < 0 ? "#EF4444" : "#6B7280";
+}
+
+function DeltaBadge({ current, previous }: { current: number; previous: number }) {
+  if (previous === 0 && current === 0) return <span className="text-[10px] text-[#4B5563]">no data</span>;
+  if (previous === 0) return <span className="text-[10px] text-[#00FF88]">new</span>;
+  const pct = Math.round(((current - previous) / previous) * 100);
+  const color = deltaColor(pct);
+  const Icon = pct > 0 ? ArrowUp : pct < 0 ? ArrowDown : Minus;
+  return (
+    <span className="flex items-center gap-0.5 text-[10px] font-bold" style={{ color }}>
+      <Icon size={10} />
+      {Math.abs(pct)}%
+    </span>
+  );
+}
+
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 function MetricCard({
-  label, value, sub, color, bg, icon: Icon, loading,
+  label, value, sub, color, bg, icon: Icon, loading, current, previous,
 }: {
   label: string; value: number | string; sub?: string;
   color: string; bg: string; icon: React.ElementType; loading: boolean;
+  current?: number; previous?: number;
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl p-5"
@@ -117,7 +137,9 @@ function MetricCard({
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: bg }}>
             <Icon size={16} style={{ color }} />
           </div>
-          <ArrowUpRight size={14} style={{ color: `${color}50` }} />
+          {current !== undefined && previous !== undefined && !loading && (
+            <DeltaBadge current={current} previous={previous} />
+          )}
         </div>
         {loading ? (
           <div className="h-8 w-20 rounded-lg animate-pulse" style={{ background: "#1a1a1a" }} />
@@ -141,8 +163,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <p className="text-[11px] font-semibold text-[#9CA3AF] mb-2">{label}</p>
       {payload.map((p: any) => (
         <div key={p.dataKey} className="flex items-center gap-2 text-[12px]">
-          <span className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-white font-bold">{p.value.toLocaleString()}</span>
+          <span className="w-2 h-2 rounded-full" style={{ background: p.color || p.stroke }} />
+          <span className="text-white font-bold">{p.value?.toLocaleString()}</span>
           <span className="text-[#6B7280]">{p.name || "visits"}</span>
         </div>
       ))}
@@ -161,8 +183,9 @@ export default function AdminAnalyticsPage() {
   const [copiedSQL, setCopiedSQL]       = useState(false);
   const [sortBy, setSortBy]             = useState<"views" | "date">("views");
   const [filterSection, setFilterSection] = useState("all");
+  const [lastRefresh, setLastRefresh]   = useState<Date>(new Date());
 
-  // Raw data
+  // Raw data — always fetch double the range for period comparison
   const [events,  setEvents]  = useState<{ section: string; created_at: string }[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
   const [totals,  setTotals]  = useState({
@@ -173,13 +196,14 @@ export default function AdminAnalyticsPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { start } = getDateRange(dateRange);
+    // Fetch double the date range so we can compare current vs previous period
+    const fetchDays = Math.max(dateRange * 2, 2);
+    const { start: fetchStart } = getDateRange(fetchDays);
 
-    // ── 1. Page events (daily visitors) ──────────────────────────────────────
     const eventsRes = await supabase
       .from("page_events")
       .select("section, created_at")
-      .gte("created_at", `${start}T00:00:00.000Z`)
+      .gte("created_at", `${fetchStart}T00:00:00.000Z`)
       .order("created_at", { ascending: true });
 
     if (eventsRes.error?.message?.includes("does not exist")) {
@@ -189,7 +213,6 @@ export default function AdminAnalyticsPage() {
       setEvents(eventsRes.data || []);
     }
 
-    // ── 2. Views from all content tables ─────────────────────────────────────
     const [iqRes, videosRes, learnRes, tipsRes, blogsRes, memesRes, subsRes] = await Promise.all([
       supabase.from("interview_questions").select("id,question,slug,views,technology,created_at").eq("published", true).order("views", { ascending: false }).limit(30),
       supabase.from("videos").select("id,title,views,created_at").order("views", { ascending: false }).limit(30),
@@ -200,7 +223,6 @@ export default function AdminAnalyticsPage() {
       supabase.from("subscribers").select("id", { count: "exact" }).limit(1),
     ]);
 
-    // Build unified content list
     const items: ContentItem[] = [
       ...(iqRes.data || []).map(r => ({
         id: r.id, title: r.question, section: "interview-prep",
@@ -245,14 +267,66 @@ export default function AdminAnalyticsPage() {
       subscribers: subsRes.count || 0,
     });
 
+    setLastRefresh(new Date());
     setLoading(false);
   }, [supabase, dateRange]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // ── Derived chart data ──────────────────────────────────────────────────────
+  // ── Date strings ────────────────────────────────────────────────────────────
+  const todayStr     = new Date().toISOString().split("T")[0];
+  const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+  const { start: currentStart, dates } = useMemo(() => getDateRange(dateRange), [dateRange]);
 
-  const { dates } = useMemo(() => getDateRange(dateRange), [dateRange]);
+  // ── Split events into current vs previous period ────────────────────────────
+  const currentEvents = useMemo(
+    () => events.filter(e => e.created_at >= `${currentStart}T00:00:00`),
+    [events, currentStart]
+  );
+  const previousEvents = useMemo(
+    () => events.filter(e => e.created_at < `${currentStart}T00:00:00`),
+    [events, currentStart]
+  );
+
+  // ── Today vs Yesterday ──────────────────────────────────────────────────────
+  const todayEvents     = useMemo(() => events.filter(e => e.created_at.startsWith(todayStr)), [events, todayStr]);
+  const yesterdayEvents = useMemo(() => events.filter(e => e.created_at.startsWith(yesterdayStr)), [events, yesterdayStr]);
+
+  const todayVisitors     = todayEvents.length;
+  const yesterdayVisitors = yesterdayEvents.length;
+  const totalVisitors     = currentEvents.length;
+  const prevTotalVisitors = previousEvents.length;
+
+  // ── Hourly chart (for Today view) ──────────────────────────────────────────
+  const hourlyData = useMemo(() => {
+    return Array.from({ length: 24 }, (_, h) => {
+      const hourLabel = `${h.toString().padStart(2, "0")}:00`;
+      return {
+        hour: hourLabel,
+        Today:     todayEvents.filter(e => new Date(e.created_at).getHours() === h).length,
+        Yesterday: yesterdayEvents.filter(e => new Date(e.created_at).getHours() === h).length,
+      };
+    });
+  }, [todayEvents, yesterdayEvents]);
+
+  // Peak hour
+  const peakHour = useMemo(() => {
+    const max = hourlyData.reduce((a, b) => (b.Today > a.Today ? b : a), hourlyData[0]);
+    return max.Today > 0 ? max.hour : null;
+  }, [hourlyData]);
+
+  // ── Per-section today vs yesterday ─────────────────────────────────────────
+  const sectionComparison = useMemo(() => {
+    return Object.entries(SECTION_META).slice(0, 6).map(([key, meta]) => ({
+      key, ...meta,
+      today:     todayEvents.filter(e => e.section === key).length,
+      yesterday: yesterdayEvents.filter(e => e.section === key).length,
+    }));
+  }, [todayEvents, yesterdayEvents]);
+
+  // ── Daily chart data ────────────────────────────────────────────────────────
+  const activeSectionColor = SECTION_TABS.find(s => s.key === sectionTab)?.color || "#00FF88";
+  const activeDataKey = sectionTab === "all" ? "total" : sectionTab;
 
   const dailyChartData = useMemo((): DailyPoint[] => {
     return dates.map(date => {
@@ -266,24 +340,45 @@ export default function AdminAnalyticsPage() {
     });
   }, [events, dates, dateRange]);
 
-  const activeSectionColor = SECTION_TABS.find(s => s.key === sectionTab)?.color || "#00FF88";
-  const activeDataKey = sectionTab === "all" ? "total" : sectionTab;
+  // ── Last 14 days table ──────────────────────────────────────────────────────
+  const recentDailyTable = useMemo(() => {
+    const days = Math.min(14, dateRange === 1 ? 14 : dateRange);
+    const { dates: recentDates } = getDateRange(days);
+    return recentDates.reverse().map(date => {
+      const count = events.filter(e => e.created_at.startsWith(date)).length;
+      const d = new Date(date + "T12:00:00");
+      return {
+        date,
+        label: d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }),
+        count,
+        isToday:     date === todayStr,
+        isYesterday: date === yesterdayStr,
+      };
+    });
+  }, [events, dateRange, todayStr, yesterdayStr]);
 
-  const todayVisitors = useMemo(() => {
-    const today = new Date().toISOString().split("T")[0];
-    return events.filter(e => e.created_at.startsWith(today)).length;
-  }, [events]);
+  const maxDayCount = Math.max(...recentDailyTable.map(d => d.count), 1);
 
-  const totalVisitors = events.length;
+  // ── Streak (consecutive days with >= 1 visitor) ────────────────────────────
+  const streak = useMemo(() => {
+    let count = 0;
+    const checkDates = [...recentDailyTable].reverse(); // oldest first
+    for (const d of checkDates) {
+      if (d.count > 0) count++;
+      else count = 0;
+    }
+    return count;
+  }, [recentDailyTable]);
 
+  // ── Section breakdown ───────────────────────────────────────────────────────
   const sectionBreakdown = useMemo(() => {
     return Object.entries(SECTION_META).map(([key, meta]) => ({
       key, ...meta,
-      visits:     events.filter(e => e.section === key).length,
+      visits:     currentEvents.filter(e => e.section === key).length,
       totalViews: content.filter(c => c.section === key).reduce((s, c) => s + c.views, 0),
       count:      content.filter(c => c.section === key).length,
     }));
-  }, [events, content]);
+  }, [currentEvents, content]);
 
   const filteredContent = useMemo(() => {
     let list = filterSection === "all" ? content : content.filter(c => c.section === filterSection);
@@ -292,8 +387,6 @@ export default function AdminAnalyticsPage() {
       : new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     ).slice(0, 25);
   }, [content, filterSection, sortBy]);
-
-  const totalContentViews = totals.iq + totals.videos + totals.learn + totals.tips;
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -309,10 +402,16 @@ export default function AdminAnalyticsPage() {
             </div>
             Analytics
           </h1>
-          <p className="text-[#6B7280] text-sm mt-0.5">Daily visitors · content views · section performance</p>
+          <p className="text-[#6B7280] text-sm mt-0.5 flex items-center gap-2">
+            Daily visitors · content views · section performance
+            {!loading && (
+              <span className="text-[10px] text-[#374151]">
+                Updated {lastRefresh.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Date range selector */}
           <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "#111", border: "1px solid rgba(255,255,255,0.07)" }}>
             {DATE_RANGES.map(r => (
               <button key={r.days} onClick={() => setDateRange(r.days)}
@@ -346,12 +445,10 @@ export default function AdminAnalyticsPage() {
                 <p className="text-xs text-[#9CA3AF] mt-0.5">Run the SQL below in your Supabase SQL editor to enable daily visitor charts.</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowSQL(v => !v)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 border border-amber-500/30 hover:bg-amber-500/10 transition-all">
-                {showSQL ? "Hide" : "Show"} SQL <ChevronDown size={12} className={showSQL ? "rotate-180" : ""} style={{ transition: "transform 0.2s" }} />
-              </button>
-            </div>
+            <button onClick={() => setShowSQL(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 border border-amber-500/30 hover:bg-amber-500/10 transition-all">
+              {showSQL ? "Hide" : "Show"} SQL <ChevronDown size={12} className={showSQL ? "rotate-180" : ""} style={{ transition: "transform 0.2s" }} />
+            </button>
           </div>
           <AnimatePresence>
             {showSQL && (
@@ -372,6 +469,71 @@ export default function AdminAnalyticsPage() {
         </motion.div>
       )}
 
+      {/* ── TODAY vs YESTERDAY comparison ── */}
+      {hasTracking && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl overflow-hidden"
+          style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="px-6 py-4 flex items-center justify-between"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            <h2 className="text-sm font-black text-white flex items-center gap-2">
+              <Calendar size={14} className="text-[#00FF88]" />
+              Today vs Yesterday
+            </h2>
+            {peakHour && (
+              <span className="flex items-center gap-1.5 text-[10px] text-[#6B7280]">
+                <Clock size={11} className="text-[#F59E0B]" />
+                Peak today: <span className="text-[#F59E0B] font-bold">{peakHour}</span>
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 divide-x divide-white/5">
+            {/* Total */}
+            <div className="px-5 py-4">
+              <div className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Total</div>
+              <div className="flex items-end gap-3">
+                <div>
+                  <div className="text-2xl font-black text-white">{num(todayVisitors)}</div>
+                  <div className="text-[10px] text-[#4B5563]">Today</div>
+                </div>
+                <div className="mb-1">
+                  <div className="text-base font-bold text-[#4B5563]">{num(yesterdayVisitors)}</div>
+                  <div className="text-[9px] text-[#374151]">Yesterday</div>
+                </div>
+              </div>
+              <div className="mt-2">
+                <DeltaBadge current={todayVisitors} previous={yesterdayVisitors} />
+              </div>
+            </div>
+            {/* Per section */}
+            {sectionComparison.map(s => {
+              const Icon = s.icon;
+              return (
+                <div key={s.key} className="px-5 py-4">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Icon size={11} style={{ color: s.color }} />
+                    <div className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">{s.label}</div>
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <div>
+                      <div className="text-xl font-black text-white">{num(s.today)}</div>
+                      <div className="text-[10px] text-[#4B5563]">Today</div>
+                    </div>
+                    <div className="mb-0.5">
+                      <div className="text-sm font-bold text-[#4B5563]">{num(s.yesterday)}</div>
+                      <div className="text-[9px] text-[#374151]">Yest.</div>
+                    </div>
+                  </div>
+                  <div className="mt-1.5">
+                    <DeltaBadge current={s.today} previous={s.yesterday} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
       {/* ── Hero total visitors banner ── */}
       <div className="rounded-2xl p-6 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, #0a1a0f 0%, #080808 60%)", border: "1px solid rgba(0,255,136,0.2)" }}>
@@ -379,36 +541,58 @@ export default function AdminAnalyticsPage() {
           style={{ background: "radial-gradient(ellipse at top left, rgba(0,255,136,0.08), transparent 60%)" }} />
         <div className="relative flex flex-wrap items-center justify-between gap-6">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-[#00FF88]/60 mb-1">Total Website Visitors</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[#00FF88]/60 mb-1">
+              Total Website Visitors · {DATE_RANGES.find(r => r.days === dateRange)?.label}
+            </p>
             {loading ? (
               <div className="h-14 w-40 rounded-xl animate-pulse" style={{ background: "#1a1a1a" }} />
             ) : hasTracking ? (
               <div className="flex items-end gap-4">
                 <span className="text-5xl font-black text-white leading-none">{num(totalVisitors)}</span>
-                <span className="text-base font-semibold text-[#4B5563] mb-1">
-                  in the last {DATE_RANGES.find(r => r.days === dateRange)?.label.toLowerCase()}
-                </span>
+                {!loading && (
+                  <div className="mb-2 flex flex-col gap-0.5">
+                    <DeltaBadge current={totalVisitors} previous={prevTotalVisitors} />
+                    <span className="text-[10px] text-[#4B5563]">vs prev period</span>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-2xl font-black text-[#4B5563]">Set up tracking to see visitors</div>
             )}
             {hasTracking && (
-              <p className="text-sm text-[#6B7280] mt-2">
-                <span className="text-white font-bold">{num(todayVisitors)}</span> visitors today
-              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="text-sm text-[#6B7280]">
+                  <span className="text-white font-bold">{num(todayVisitors)}</span> today
+                </p>
+                <p className="text-sm text-[#6B7280]">
+                  <span className="text-white font-bold">{num(yesterdayVisitors)}</span> yesterday
+                </p>
+                {streak > 1 && (
+                  <p className="text-sm text-[#6B7280] flex items-center gap-1">
+                    <Activity size={12} className="text-[#00FF88]" />
+                    <span className="text-[#00FF88] font-bold">{streak}</span> day streak
+                  </p>
+                )}
+              </div>
             )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {(["home","interview-prep","videos","learn"] as const).map(key => {
               const meta = SECTION_META[key];
               const Icon = meta.icon;
-              const count = events.filter(e => e.section === key).length;
+              const cur  = currentEvents.filter(e => e.section === key).length;
+              const prev = previousEvents.filter(e => e.section === key).length;
               return (
                 <div key={key} className="text-center px-4 py-3 rounded-xl"
                   style={{ background: `${meta.color}08`, border: `1px solid ${meta.color}15` }}>
                   <Icon size={14} style={{ color: meta.color }} className="mx-auto mb-1" />
-                  <div className="text-lg font-black text-white">{hasTracking ? num(count) : "—"}</div>
+                  <div className="text-lg font-black text-white">{hasTracking ? num(cur) : "—"}</div>
                   <div className="text-[9px] text-[#4B5563] font-semibold">{meta.label}</div>
+                  {hasTracking && cur + prev > 0 && (
+                    <div className="flex justify-center mt-1">
+                      <DeltaBadge current={cur} previous={prev} />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -418,73 +602,163 @@ export default function AdminAnalyticsPage() {
 
       {/* ── Metric Cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
-        <MetricCard icon={Zap}         label="Today's Visitors"   value={hasTracking ? todayVisitors : "—"} color="#00FF88" bg="rgba(0,255,136,0.12)"  loading={loading} />
-        <MetricCard icon={TrendingUp}  label={`Visitors (${DATE_RANGES.find(r=>r.days===dateRange)?.label})`} value={hasTracking ? totalVisitors : "—"} color="#38bdf8" bg="rgba(56,189,248,0.12)" loading={loading} />
-        <MetricCard icon={BrainCircuit}label="Interview Prep Views" value={totals.iq}    color="#F59E0B" bg="rgba(245,158,11,0.12)"  loading={loading} />
-        <MetricCard icon={Play}        label="Video Views"         value={totals.videos} color="#EF4444" bg="rgba(239,68,68,0.12)"   loading={loading} />
-        <MetricCard icon={BookOpen}    label="Tutorial Views"      value={totals.learn}  color="#00FF88" bg="rgba(0,255,136,0.12)"   loading={loading} />
-        <MetricCard icon={Users}       label="Subscribers"         value={totals.subscribers} color="#8B5CF6" bg="rgba(139,92,246,0.12)" loading={loading} />
+        <MetricCard icon={Zap}         label="Today's Visitors"   value={hasTracking ? todayVisitors : "—"}
+          current={todayVisitors} previous={yesterdayVisitors}
+          color="#00FF88" bg="rgba(0,255,136,0.12)"  loading={loading} />
+        <MetricCard icon={TrendingUp}  label={`${DATE_RANGES.find(r=>r.days===dateRange)?.label} Visitors`}
+          value={hasTracking ? totalVisitors : "—"}
+          current={totalVisitors} previous={prevTotalVisitors}
+          color="#38bdf8" bg="rgba(56,189,248,0.12)" loading={loading} />
+        <MetricCard icon={BrainCircuit}label="Interview Prep Views" value={totals.iq}
+          color="#F59E0B" bg="rgba(245,158,11,0.12)"  loading={loading} />
+        <MetricCard icon={Play}        label="Video Views"         value={totals.videos}
+          color="#EF4444" bg="rgba(239,68,68,0.12)"   loading={loading} />
+        <MetricCard icon={BookOpen}    label="Tutorial Views"      value={totals.learn}
+          color="#00FF88" bg="rgba(0,255,136,0.12)"   loading={loading} />
+        <MetricCard icon={Users}       label="Subscribers"         value={totals.subscribers}
+          color="#8B5CF6" bg="rgba(139,92,246,0.12)" loading={loading} />
       </div>
 
-      {/* ── Daily Visitors Chart ── */}
-      <div className="rounded-2xl p-6" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
-          <div>
-            <h2 className="text-base font-black text-white flex items-center gap-2">
-              <TrendingUp size={15} className="text-[#00FF88]" />
-              Daily Visitors
-            </h2>
-            {!hasTracking && <p className="text-[10px] text-[#4B5563] mt-0.5">Run the SQL above to see real visitor data</p>}
+      {/* ── Hourly Chart: Today vs Yesterday ── */}
+      {hasTracking && (
+        <div className="rounded-2xl p-6" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <h2 className="text-base font-black text-white flex items-center gap-2">
+                <Clock size={15} className="text-[#F59E0B]" />
+                Hourly Breakdown — Today vs Yesterday
+              </h2>
+              <p className="text-[10px] text-[#4B5563] mt-0.5">Visitor count per hour (your local timezone)</p>
+            </div>
+            <div className="flex items-center gap-4 text-[11px]">
+              <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded bg-[#00FF88] inline-block" />Today</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 rounded bg-[#374151] inline-block border-dashed border-t border-[#6B7280]" />Yesterday</span>
+            </div>
           </div>
-          {/* Section filter tabs */}
-          <div className="flex flex-wrap gap-1">
-            {SECTION_TABS.map(s => (
-              <button key={s.key} onClick={() => setSectionTab(s.key)}
-                className="px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all"
-                style={sectionTab === s.key
-                  ? { background: `${s.color}20`, color: s.color, border: `1px solid ${s.color}40` }
-                  : { color: "#6B7280", border: "1px solid transparent" }}>
-                {s.label}
-              </button>
+          {loading ? (
+            <div className="h-48 flex items-center justify-center"><Loader2 size={18} className="animate-spin text-[#00FF88]" /></div>
+          ) : (
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={hourlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                  <XAxis dataKey="hour" tick={{ fill: "#4B5563", fontSize: 9 }} axisLine={false} tickLine={false}
+                    interval={2} />
+                  <YAxis tick={{ fill: "#4B5563", fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Line type="monotone" dataKey="Today" stroke="#00FF88" strokeWidth={2}
+                    dot={false} activeDot={{ r: 4, fill: "#00FF88", strokeWidth: 0 }} />
+                  <Line type="monotone" dataKey="Yesterday" stroke="#374151" strokeWidth={1.5}
+                    strokeDasharray="4 3" dot={false} activeDot={{ r: 3, fill: "#6B7280", strokeWidth: 0 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Daily Visitors Chart + Daily Table ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        {/* Area chart */}
+        <div className="xl:col-span-2 rounded-2xl p-6" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <h2 className="text-base font-black text-white flex items-center gap-2">
+                <TrendingUp size={15} className="text-[#00FF88]" />
+                Daily Visitors
+              </h2>
+              {!hasTracking && <p className="text-[10px] text-[#4B5563] mt-0.5">Run the SQL above to see real visitor data</p>}
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {SECTION_TABS.map(s => (
+                <button key={s.key} onClick={() => setSectionTab(s.key)}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all"
+                  style={sectionTab === s.key
+                    ? { background: `${s.color}20`, color: s.color, border: `1px solid ${s.color}40` }
+                    : { color: "#6B7280", border: "1px solid transparent" }}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {loading ? (
+            <div className="h-52 flex items-center justify-center"><Loader2 size={20} className="animate-spin text-[#00FF88]" /></div>
+          ) : (
+            <div className="h-52">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dailyChartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor={activeSectionColor} stopOpacity={0.25} />
+                      <stop offset="95%" stopColor={activeSectionColor} stopOpacity={0}    />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                  <XAxis dataKey="label" tick={{ fill: "#4B5563", fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "#4B5563", fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey={activeDataKey}
+                    stroke={activeSectionColor} strokeWidth={2}
+                    fill="url(#areaGrad)"
+                    dot={false} activeDot={{ r: 4, fill: activeSectionColor, strokeWidth: 0 }}
+                    name={SECTION_TABS.find(s => s.key === sectionTab)?.label}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+
+        {/* Daily breakdown table */}
+        <div className="rounded-2xl overflow-hidden" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="px-5 py-4 flex items-center gap-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            <Hash size={14} className="text-[#00FF88]" />
+            <h2 className="text-sm font-black text-white">Daily Visitor Count</h2>
+          </div>
+          <div className="divide-y divide-white/[0.04] overflow-y-auto max-h-[260px]">
+            {loading ? (
+              <div className="p-6 flex items-center justify-center">
+                <Loader2 size={16} className="animate-spin text-[#00FF88]" />
+              </div>
+            ) : !hasTracking ? (
+              <div className="p-6 text-center text-[11px] text-[#4B5563]">No tracking data</div>
+            ) : recentDailyTable.map(day => (
+              <div key={day.date} className={`flex items-center gap-3 px-5 py-2.5 transition-colors ${
+                day.isToday ? "bg-[#00FF88]/5" : "hover:bg-white/[0.02]"
+              }`}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-[#9CA3AF] font-medium">{day.label}</span>
+                    {day.isToday && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: "rgba(0,255,136,0.15)", color: "#00FF88" }}>TODAY</span>
+                    )}
+                    {day.isYesterday && (
+                      <span className="text-[9px] font-bold text-[#4B5563]">YEST</span>
+                    )}
+                  </div>
+                  <div className="mt-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                    <div className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${(day.count / maxDayCount) * 100}%`,
+                        background: day.isToday ? "#00FF88" : day.count > 0 ? "#374151" : "transparent",
+                      }} />
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <span className={`text-sm font-black ${day.isToday ? "text-[#00FF88]" : day.count > 0 ? "text-white" : "text-[#374151]"}`}>
+                    {day.count}
+                  </span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
-
-        {loading ? (
-          <div className="h-52 flex items-center justify-center">
-            <Loader2 size={20} className="animate-spin text-[#00FF88]" />
-          </div>
-        ) : (
-          <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyChartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor={activeSectionColor} stopOpacity={0.25} />
-                    <stop offset="95%" stopColor={activeSectionColor} stopOpacity={0}    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="label" tick={{ fill: "#4B5563", fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#4B5563", fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone" dataKey={activeDataKey}
-                  stroke={activeSectionColor} strokeWidth={2}
-                  fill="url(#areaGrad)"
-                  dot={false} activeDot={{ r: 4, fill: activeSectionColor, strokeWidth: 0 }}
-                  name={SECTION_TABS.find(s => s.key === sectionTab)?.label}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
       </div>
 
       {/* ── Section Breakdown ── */}
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-
-        {/* Section bar chart */}
         <div className="xl:col-span-2 rounded-2xl p-6" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
           <h2 className="text-base font-black text-white mb-5 flex items-center gap-2">
             <BarChart3 size={15} className="text-[#00FF88]" />
@@ -511,10 +785,10 @@ export default function AdminAnalyticsPage() {
           )}
         </div>
 
-        {/* Section cards */}
         <div className="xl:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
           {Object.entries(SECTION_META).map(([key, meta]) => {
-            const s = sectionBreakdown.find(b => b.key === key);
+            const s  = sectionBreakdown.find(b => b.key === key);
+            const sc = sectionComparison.find(b => b.key === key);
             const Icon = meta.icon;
             return (
               <motion.div key={key} whileHover={{ scale: 1.02 }} transition={{ duration: 0.15 }}
@@ -522,8 +796,13 @@ export default function AdminAnalyticsPage() {
                 style={{ background: "#0d0d0d", border: `1px solid ${meta.color}18` }}>
                 <div className="absolute top-0 right-0 w-16 h-16 rounded-full pointer-events-none"
                   style={{ background: `radial-gradient(circle, ${meta.color}12, transparent)`, transform: "translate(4px, -4px)" }} />
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3" style={{ background: meta.bg }}>
-                  <Icon size={14} style={{ color: meta.color }} />
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: meta.bg }}>
+                    <Icon size={14} style={{ color: meta.color }} />
+                  </div>
+                  {sc && hasTracking && (
+                    <DeltaBadge current={sc.today} previous={sc.yesterday} />
+                  )}
                 </div>
                 <div className="text-lg font-black text-white leading-none mb-0.5">
                   {loading ? "—" : num(s?.totalViews || 0)}
@@ -540,8 +819,6 @@ export default function AdminAnalyticsPage() {
 
       {/* ── Top Content Table ── */}
       <div className="rounded-2xl overflow-hidden" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
-
-        {/* Table header */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4"
           style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <h2 className="text-base font-black text-white flex items-center gap-2">
@@ -549,7 +826,6 @@ export default function AdminAnalyticsPage() {
             Top Content
           </h2>
           <div className="flex items-center gap-2">
-            {/* Section filter */}
             <div className="relative">
               <select value={filterSection} onChange={e => setFilterSection(e.target.value)}
                 className="appearance-none pl-3 pr-8 py-1.5 rounded-lg text-xs font-semibold text-[#9CA3AF] outline-none cursor-pointer"
@@ -561,7 +837,6 @@ export default function AdminAnalyticsPage() {
               </select>
               <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#4B5563] pointer-events-none" />
             </div>
-            {/* Sort */}
             <div className="flex items-center gap-1 p-0.5 rounded-lg" style={{ background: "#161616", border: "1px solid rgba(255,255,255,0.07)" }}>
               {(["views", "date"] as const).map(s => (
                 <button key={s} onClick={() => setSortBy(s)}
@@ -574,7 +849,6 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
 
-        {/* Table body */}
         {loading ? (
           <div className="p-8 flex items-center justify-center">
             <Loader2 size={20} className="animate-spin text-[#00FF88]" />
@@ -596,10 +870,10 @@ export default function AdminAnalyticsPage() {
                 {filteredContent.map((item, i) => {
                   const meta = SECTION_META[item.section];
                   const href = item.section === "interview-prep" ? `/interview-prep/${item.slug}`
-                    : item.section === "learn"            ? `/learn/${item.slug}`
-                    : item.section === "blog"             ? `/blog/${item.slug}`
-                    : item.section === "automation-tips"  ? `/automation-tips/${item.slug}`
-                    : item.section === "videos"           ? `/videos/${item.id}`
+                    : item.section === "learn"           ? `/learn/${item.slug}`
+                    : item.section === "blog"            ? `/blog/${item.slug}`
+                    : item.section === "automation-tips" ? `/automation-tips/${item.slug}`
+                    : item.section === "videos"          ? `/videos/${item.id}`
                     : null;
                   return (
                     <motion.tr key={item.id}
