@@ -49,10 +49,10 @@ export default function FullGuideToggle({ content, accent, label = "Answer" }: P
           </div>
           <div>
             <p className="text-sm font-black text-white">
-              {open ? "Full Guide" : "View Full Guide"}
+              {open ? "Detailed Explanation" : "View Detailed Explanation"}
             </p>
             <p className="text-[11px] mt-0.5" style={{ color: accent + "80" }}>
-              {open ? "Detailed explanation with code examples" : "Deep dive — code, examples & best practices"}
+              {open ? "Full answer with code examples & best practices" : "Deep dive — code, examples & best practices"}
             </p>
           </div>
         </div>

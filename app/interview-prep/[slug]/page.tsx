@@ -432,31 +432,7 @@ export default async function QuestionDetailPage({ params }: Props) {
               </h1>
             </div>
 
-            {/* ── Quick Answer (what to say in the interview) ── */}
-            {q.short_description && (
-              <div className="mb-8 rounded-2xl overflow-hidden"
-                style={{
-                  border: `1px solid ${techAccent}28`,
-                  background: `linear-gradient(135deg, ${techAccent}08 0%, #0A0A0A 70%)`,
-                  boxShadow: `0 0 40px ${techAccent}08`,
-                }}>
-                {/* shimmer */}
-                <div className="h-px" style={{ background: `linear-gradient(90deg, transparent, ${techAccent}40, transparent)` }} />
-                <div className="px-6 py-5">
-                  <div className="flex items-center gap-2.5 mb-3">
-                    <span className="text-base">🎯</span>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: techAccent }}>
-                      Quick Answer — What to Say in the Interview
-                    </p>
-                  </div>
-                  <p className="text-[#E5E7EB] text-base leading-relaxed font-medium" itemProp="description">
-                    {q.short_description}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* ── Full Guide (collapsible) ── */}
+            {/* ── Detailed Explanation (collapsible) ── */}
             {q.answer && (
               <div itemProp="articleBody">
                 <FullGuideToggle content={q.answer} accent={techAccent} />
