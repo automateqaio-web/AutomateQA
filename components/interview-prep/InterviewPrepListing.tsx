@@ -411,7 +411,6 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
   const diff = DIFF_CONFIG[q.difficulty] || { color: "#6b7280", glow: "rgba(107,114,128,0.12)", label: q.difficulty };
   const tags: string[] = Array.isArray(q.tags) ? q.tags : [];
   const num  = String(index + 1).padStart(2, "0");
-  const [showDetail, setShowDetail] = useState(false);
 
   return (
     <div
@@ -569,98 +568,13 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
                 ) : null}
               </div>
 
-              {/* ── View Detailed Explanation toggle ── */}
-              {q.answer && (
-                <div className="px-5 pb-4">
-                  <button
-                    onClick={e => { e.stopPropagation(); setShowDetail(v => !v); }}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-200 text-left group"
-                    style={{
-                      border: `1px solid ${showDetail ? ac + "40" : ac + "18"}`,
-                      background: showDetail
-                        ? `linear-gradient(135deg, ${ac}10 0%, rgba(0,0,0,0) 60%)`
-                        : `linear-gradient(135deg, ${ac}05 0%, rgba(0,0,0,0) 60%)`,
-                    }}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ background: `${ac}15`, border: `1px solid ${ac}25` }}>
-                        <span className="text-xs">📖</span>
-                      </div>
-                      <div>
-                        <p className="text-[12px] font-black text-white">
-                          {showDetail ? "Detailed Explanation" : "View Detailed Explanation"}
-                        </p>
-                        <p className="text-[10px]" style={{ color: `${ac}70` }}>
-                          {showDetail ? "Full answer with code examples" : "Deep dive — code, examples & best practices"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center"
-                      style={{ background: `${ac}15`, border: `1px solid ${ac}25` }}>
-                      <ChevronDown size={12} style={{ color: ac }}
-                        className={`transition-transform duration-300 ${showDetail ? "rotate-180" : ""}`} />
-                    </div>
-                  </button>
-
-                  <AnimatePresence>
-                    {showDetail && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-3 rounded-xl overflow-hidden"
-                          style={{ border: `1px solid ${ac}15`, background: "rgba(0,0,0,0.3)" }}>
-                          <div className="px-5 py-5">
-                            <AnswerContent content={q.answer} accent={ac} />
-                          </div>
-                          {/* "Also includes" chips */}
-                          {(q.real_world_example || q.code_snippet || q.youtube_url) && (
-                            <div className="mx-5 mb-4 px-4 py-2.5 rounded-xl flex flex-wrap items-center gap-x-3 gap-y-2"
-                              style={{ background: `${ac}06`, border: `1px dashed ${ac}20` }}>
-                              <span className="text-[10px] font-bold uppercase tracking-widest flex-shrink-0"
-                                style={{ color: `${ac}70` }}>
-                                Full guide includes:
-                              </span>
-                              <div className="flex flex-wrap gap-1.5">
-                                {q.real_world_example && (
-                                  <span className="text-[10px] font-semibold px-2 py-1 rounded-md"
-                                    style={{ color: "#fbbf24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)" }}>
-                                    ★ Real-World Example
-                                  </span>
-                                )}
-                                {q.code_snippet && (
-                                  <span className="text-[10px] font-semibold px-2 py-1 rounded-md"
-                                    style={{ color: "#38bdf8", background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)" }}>
-                                    {"</>"} Code Snippet
-                                  </span>
-                                )}
-                                {q.youtube_url && (
-                                  <span className="text-[10px] font-semibold px-2 py-1 rounded-md"
-                                    style={{ color: "#f87171", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)" }}>
-                                    ▶ Video
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-
               {/* Footer */}
               <div className="flex items-center justify-end px-5 py-3.5"
                 style={{ borderTop: `1px solid ${ac}10`, background: `${ac}04` }}>
                 <Link href={`/interview-prep/${q.slug}`} onClick={e => e.stopPropagation()}
                   className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all"
                   style={{ color: ac, border: `1px solid ${ac}30`, background: `${ac}10` }}>
-                  Read Complete Guide <ArrowRight size={11} />
+                  View Detailed Explanation <ArrowRight size={11} />
                 </Link>
               </div>
             </div>
