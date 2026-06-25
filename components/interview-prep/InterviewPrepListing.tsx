@@ -569,10 +569,31 @@ function QuestionCard({ question: q, index, expanded, onToggle, featured = false
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end px-5 py-3.5"
+              <div className="flex items-center justify-between gap-3 px-5 py-3.5"
                 style={{ borderTop: `1px solid ${ac}10`, background: `${ac}04` }}>
+                {/* What's inside hint */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider flex-shrink-0" style={{ color: `${ac}60` }}>
+                    Inside:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { label: "📝 Full Answer", always: true },
+                      { label: "💡 Best Practices", show: !!q.real_world_example || true },
+                      { label: "</> Code Examples", show: !!q.code_snippet || true },
+                      { label: "⚠️ Common Mistakes", always: true },
+                      ...(q.youtube_url ? [{ label: "▶ Video", always: true }] : []),
+                    ].map(item => (
+                      <span key={item.label}
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-md whitespace-nowrap"
+                        style={{ color: `${ac}80`, background: `${ac}08`, border: `1px solid ${ac}15` }}>
+                        {item.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
                 <Link href={`/interview-prep/${q.slug}`} onClick={e => e.stopPropagation()}
-                  className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all flex-shrink-0"
                   style={{ color: ac, border: `1px solid ${ac}30`, background: `${ac}10` }}>
                   View Detailed Explanation <ArrowRight size={11} />
                 </Link>
