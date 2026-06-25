@@ -47,32 +47,25 @@ async function getQuestion(slug: string): Promise<InterviewQuestion | null> {
   } catch { return null; }
 }
 
-async function getAdjacentQuestions(technology: string, currentId: string, currentCreatedAt: string) {
+async function getAdjacentQuestions(technology: string, currentId: string) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))
     return { prev: null, next: null };
   try {
-    const db = getDb();
-    const [prevRes, nextRes] = await Promise.all([
-      db.from("interview_questions")
-        .select("id,question,slug,difficulty")
-        .eq("technology", technology)
-        .eq("published", true)
-        .neq("id", currentId)
-        .lt("created_at", currentCreatedAt)
-        .order("created_at", { ascending: false })
-        .limit(1),
-      db.from("interview_questions")
-        .select("id,question,slug,difficulty")
-        .eq("technology", technology)
-        .eq("published", true)
-        .neq("id", currentId)
-        .gt("created_at", currentCreatedAt)
-        .order("created_at", { ascending: true })
-        .limit(1),
-    ]);
+    // Fetch ALL questions for this technology in stable order so bulk-inserted
+    // questions sharing the same created_at still get correct prev/next neighbours
+    const { data } = await getDb()
+      .from("interview_questions")
+      .select("id,question,slug,difficulty")
+      .eq("technology", technology)
+      .eq("published", true)
+      .order("created_at", { ascending: true });
+
+    const list = (data || []) as { id: string; question: string; slug: string; difficulty: string }[];
+    const idx  = list.findIndex(q => q.id === currentId);
+    if (idx === -1) return { prev: null, next: null };
     return {
-      prev: (prevRes.data?.[0] as { id: string; question: string; slug: string; difficulty: string } | undefined) ?? null,
-      next: (nextRes.data?.[0] as { id: string; question: string; slug: string; difficulty: string } | undefined) ?? null,
+      prev: idx > 0              ? list[idx - 1] : null,
+      next: idx < list.length - 1 ? list[idx + 1] : null,
     };
   } catch { return { prev: null, next: null }; }
 }
@@ -263,7 +256,7 @@ export default async function QuestionDetailPage({ params }: Props) {
 
   const [related, { prev, next }] = await Promise.all([
     getRelated(q.technology, q.id),
-    getAdjacentQuestions(q.technology, q.id, q.created_at),
+    getAdjacentQuestions(q.technology, q.id),
   ]);
   const tags: string[] = Array.isArray(q.tags) ? q.tags : [];
   const canonicalUrl = `${SITE}/interview-prep/${slug}`;
