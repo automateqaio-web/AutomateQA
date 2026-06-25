@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function FullGuideToggle({ content, accent, label = "Answer" }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   return (
     <div className="mb-10">
