@@ -11,7 +11,8 @@ const DEFAULT_NAV = [
   { key: "tips",    label: "Tips & Tricks", href: "/automation-tips",enabled: true, sort_order: 5 },
   { key: "blog",    label: "Blog",          href: "/blog",           enabled: true, sort_order: 6 },
   { key: "youtube", label: "YouTube",       href: "/creator-stats",  enabled: true, sort_order: 7 },
-  { key: "about",   label: "About",         href: "/about",          enabled: true, sort_order: 8 },
+  { key: "jobs",    label: "Jobs",          href: "/jobs",           enabled: true, sort_order: 9 },
+  { key: "about",   label: "About",         href: "/about",          enabled: true, sort_order: 10 },
 ];
 
 const DEFAULT_PAGES = [

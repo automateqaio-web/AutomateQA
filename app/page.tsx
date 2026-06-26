@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import HeroSection from "@/components/home/HeroSection";
+import JobsBoardBanner from "@/components/home/JobsBoardBanner";
+import HomeFeatureCards from "@/components/home/HomeFeatureCards";
 import FeaturedVideos from "@/components/home/FeaturedVideos";
 import TrendingMemes from "@/components/home/TrendingMemes";
-import PlaywrightDays from "@/components/home/PlaywrightDays";
 import LatestBlogs from "@/components/home/LatestBlogs";
 import FeaturedTips from "@/components/home/FeaturedTips";
 import { createClient } from "@/lib/supabase/server";
@@ -85,10 +86,11 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection />
+      <JobsBoardBanner />
+      <HomeFeatureCards />
       <FeaturedVideos videos={videos} />
       <TrendingMemes memes={memes} />
       <FeaturedTips tips={tips} />
-      <PlaywrightDays />
       <LatestBlogs blogs={blogs} />
     </>
   );

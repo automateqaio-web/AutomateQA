@@ -9,6 +9,11 @@ const footerLinks = {
     { label: "Blog", href: "/blog" },
     { label: "100 Days of Playwright", href: "/#playwright" },
   ],
+  Careers: [
+    { label: "Jobs Board", href: "/jobs" },
+    { label: "Interview Prep", href: "/interview-prep" },
+    { label: "Learn Automation", href: "/learn" },
+  ],
   Company: [
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },

@@ -24,7 +24,8 @@ const DEFAULT_NAV: NavItem[] = [
   { key: "videos",         label: "Videos",        href: "/videos",          enabled: true, sort_order: 6 },
   { key: "memes",          label: "Memes",         href: "/memes",           enabled: true, sort_order: 7 },
   { key: "socials",        label: "Socials",       href: "/creator-stats",   enabled: true, sort_order: 8 },
-  { key: "about",          label: "About",         href: "/about",           enabled: true, sort_order: 9 },
+  { key: "jobs",            label: "Jobs",           href: "/jobs",            enabled: true, sort_order: 9 },
+  { key: "about",          label: "About",         href: "/about",           enabled: true, sort_order: 10 },
 ];
 
 export default function Navbar() {

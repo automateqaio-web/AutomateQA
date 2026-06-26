@@ -300,6 +300,32 @@ export const INTERVIEW_EXPERIENCE_LEVELS: InterviewExperienceLevel[] = [
 
 export const INTERVIEW_CODE_LANGUAGES = ["java", "javascript", "typescript", "python", "sql", "json", "xml", "bash", "gherkin"];
 
+// ── Jobs ─────────────────────────────────────────────────────────────────────
+
+export type JobSource = "adzuna" | "manual" | "referral";
+export type JobType = "regular" | "referral";
+
+export interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  apply_url: string | null;
+  source: JobSource;
+  job_type: JobType;
+  is_remote: boolean;
+  experience_level: string | null;
+  salary: string | null;
+  referral_contact: string | null;
+  referral_note: string | null;
+  is_active: boolean;
+  posted_at: string | null;
+  fetched_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export const CATEGORY_COLORS: Record<string, string> = {
   "QA vs Dev": "bg-red-500/20 text-red-400 border-red-500/30",
   Corporate: "bg-blue-500/20 text-blue-400 border-blue-500/30",
