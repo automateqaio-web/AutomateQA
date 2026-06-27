@@ -10,6 +10,7 @@ function sectionFromPath(path: string): string {
   if (path.startsWith("/blog"))            return "blog";
   if (path.startsWith("/automation-tips")) return "automation-tips";
   if (path.startsWith("/memes"))           return "memes";
+  if (path.startsWith("/jobs"))            return "jobs";
   if (path.startsWith("/about"))           return "about";
   if (path.startsWith("/admin"))           return null as any; // don't track admin
   return "other";

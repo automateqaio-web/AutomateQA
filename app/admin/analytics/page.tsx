@@ -6,7 +6,7 @@ import {
   BarChart3, Eye, Play, Laugh, FileText, BookOpen, Lightbulb,
   Users, TrendingUp, Loader2, RefreshCw, BrainCircuit, Calendar,
   Database, ExternalLink, ChevronDown, ArrowUpRight, Zap,
-  ArrowUp, ArrowDown, Clock, Activity, Minus, Hash,
+  ArrowUp, ArrowDown, Clock, Activity, Minus, Hash, Briefcase,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -48,6 +48,7 @@ const SECTION_TABS = [
   { key: "blog",             label: "Blog",          color: "#8B5CF6" },
   { key: "automation-tips",  label: "Tips",          color: "#06B6D4" },
   { key: "memes",            label: "Memes",         color: "#EC4899" },
+  { key: "jobs",             label: "Jobs",          color: "#F97316" },
 ];
 
 const SECTION_META: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
@@ -58,6 +59,7 @@ const SECTION_META: Record<string, { label: string; color: string; bg: string; i
   "blog":            { label: "Blog",           color: "#8B5CF6", bg: "rgba(139,92,246,0.12)",  icon: FileText },
   "automation-tips": { label: "Tips",           color: "#06B6D4", bg: "rgba(6,182,212,0.12)",   icon: Lightbulb },
   "memes":           { label: "Memes",          color: "#EC4899", bg: "rgba(236,72,153,0.12)",  icon: Laugh },
+  "jobs":            { label: "Jobs Board",      color: "#F97316", bg: "rgba(249,115,22,0.12)",  icon: Briefcase },
   "about":           { label: "About",          color: "#94a3b8", bg: "rgba(148,163,184,0.12)", icon: Users },
   "other":           { label: "Other",          color: "#374151", bg: "rgba(55,65,81,0.12)",    icon: ExternalLink },
 };
@@ -189,7 +191,7 @@ export default function AdminAnalyticsPage() {
   const [events,  setEvents]  = useState<{ section: string; created_at: string }[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
   const [totals,  setTotals]  = useState({
-    iq: 0, videos: 0, learn: 0, tips: 0, blogs: 0, memes: 0, subscribers: 0,
+    iq: 0, videos: 0, learn: 0, tips: 0, blogs: 0, memes: 0, subscribers: 0, jobs: 0,
   });
 
   const supabase = useMemo(() => createClient(), []);
@@ -213,7 +215,7 @@ export default function AdminAnalyticsPage() {
       setEvents(eventsRes.data || []);
     }
 
-    const [iqRes, videosRes, learnRes, tipsRes, blogsRes, memesRes, subsRes] = await Promise.all([
+    const [iqRes, videosRes, learnRes, tipsRes, blogsRes, memesRes, subsRes, jobsRes] = await Promise.all([
       supabase.from("interview_questions").select("id,question,slug,views,technology,created_at").eq("published", true).order("views", { ascending: false }).limit(30),
       supabase.from("videos").select("id,title,views,created_at").order("views", { ascending: false }).limit(30),
       supabase.from("learning_content").select("id,title,slug,views,created_at").eq("published", true).order("views", { ascending: false }).limit(30),
@@ -221,6 +223,7 @@ export default function AdminAnalyticsPage() {
       supabase.from("blogs").select("id,title,slug,created_at").eq("published", true).order("created_at", { ascending: false }).limit(30),
       supabase.from("memes").select("id,title,created_at").order("created_at", { ascending: false }).limit(30),
       supabase.from("subscribers").select("id", { count: "exact" }).limit(1),
+      supabase.from("jobs").select("id,title,company,location,created_at,posted_at").eq("is_active", true).order("posted_at", { ascending: false }).limit(50),
     ]);
 
     const items: ContentItem[] = [
@@ -252,6 +255,11 @@ export default function AdminAnalyticsPage() {
         id: r.id, title: r.title || "Meme", section: "memes",
         sectionLabel: "Memes", views: 0, created_at: r.created_at, color: "#EC4899",
       })),
+      ...(jobsRes.data || []).map(r => ({
+        id: r.id, title: r.title, section: "jobs",
+        sectionLabel: "Jobs Board", views: 0, created_at: r.posted_at || r.created_at,
+        extra: r.company, color: "#F97316",
+      })),
     ];
 
     setContent(items);
@@ -265,6 +273,7 @@ export default function AdminAnalyticsPage() {
       blogs:       (blogsRes.data || []).length,
       memes:       (memesRes.data || []).length,
       subscribers: subsRes.count || 0,
+      jobs:        (jobsRes.data || []).length,
     });
 
     setLastRefresh(new Date());
@@ -316,12 +325,14 @@ export default function AdminAnalyticsPage() {
   }, [hourlyData]);
 
   // ── Per-section today vs yesterday ─────────────────────────────────────────
+  const COMPARISON_SECTIONS = ["home","interview-prep","videos","learn","blog","automation-tips","jobs"];
   const sectionComparison = useMemo(() => {
-    return Object.entries(SECTION_META).slice(0, 6).map(([key, meta]) => ({
-      key, ...meta,
+    return COMPARISON_SECTIONS.map(key => ({
+      key, ...SECTION_META[key],
       today:     todayEvents.filter(e => e.section === key).length,
       yesterday: yesterdayEvents.filter(e => e.section === key).length,
     }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todayEvents, yesterdayEvents]);
 
   // ── Daily chart data ────────────────────────────────────────────────────────
@@ -487,7 +498,7 @@ export default function AdminAnalyticsPage() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 divide-x divide-white/5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 divide-x divide-white/5">
             {/* Total */}
             <div className="px-5 py-4">
               <div className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-2">Total</div>
@@ -576,8 +587,8 @@ export default function AdminAnalyticsPage() {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {(["home","interview-prep","videos","learn"] as const).map(key => {
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {(["home","interview-prep","videos","learn","jobs"] as const).map(key => {
               const meta = SECTION_META[key];
               const Icon = meta.icon;
               const cur  = currentEvents.filter(e => e.section === key).length;
@@ -601,7 +612,7 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* ── Metric Cards ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-4">
         <MetricCard icon={Zap}         label="Today's Visitors"   value={hasTracking ? todayVisitors : "—"}
           current={todayVisitors} previous={yesterdayVisitors}
           color="#00FF88" bg="rgba(0,255,136,0.12)"  loading={loading} />
@@ -615,6 +626,8 @@ export default function AdminAnalyticsPage() {
           color="#EF4444" bg="rgba(239,68,68,0.12)"   loading={loading} />
         <MetricCard icon={BookOpen}    label="Tutorial Views"      value={totals.learn}
           color="#00FF88" bg="rgba(0,255,136,0.12)"   loading={loading} />
+        <MetricCard icon={Briefcase}   label="Active Jobs"         value={totals.jobs}
+          color="#F97316" bg="rgba(249,115,22,0.12)"  loading={loading} />
         <MetricCard icon={Users}       label="Subscribers"         value={totals.subscribers}
           color="#8B5CF6" bg="rgba(139,92,246,0.12)" loading={loading} />
       </div>
@@ -874,6 +887,7 @@ export default function AdminAnalyticsPage() {
                     : item.section === "blog"            ? `/blog/${item.slug}`
                     : item.section === "automation-tips" ? `/automation-tips/${item.slug}`
                     : item.section === "videos"          ? `/videos/${item.id}`
+                    : item.section === "jobs"            ? `/jobs/${item.id}`
                     : null;
                   return (
                     <motion.tr key={item.id}
