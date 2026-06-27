@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { MapPin, Clock, Wifi, DollarSign, ExternalLink, Mail, Link2, Briefcase, Building2, ChevronDown, ChevronUp, Share2, Check } from "lucide-react";
 import { Job } from "@/types";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatExactDateTime } from "@/lib/utils";
 
 // ── Deterministic gradient per company name ───────────────────────────────────
 const GRADIENTS: [string, string][] = [
@@ -172,7 +172,11 @@ function renderDescription(text: string) {
       const nextIdx = i + 1 < hits.length ? hits[i + 1].index : text.length;
       if (index > last) {
         const before = text.slice(last, index).trim();
-        if (before) parts.push(<span key={`t${i}`}>{before} </span>);
+        const wordCount = before.split(/\s+/).filter(Boolean).length;
+        // Skip ≤2-word orphans before the first label (Adzuna prefixes like "Job")
+        if (before && (i > 0 || wordCount > 2)) {
+          parts.push(<span key={`t${i}`}>{before} </span>);
+        }
       }
       parts.push(
         <span key={`l${i}`}>
@@ -377,7 +381,7 @@ export default function JobCard({ job }: { job: Job }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-[11px] text-[#4B5563]">
             <Clock size={11} />
-            <span>{formatRelativeDate(postedDate)}</span>
+            <span>{formatExactDateTime(postedDate)}</span>
           </div>
 
           <button

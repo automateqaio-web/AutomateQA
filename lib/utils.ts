@@ -31,9 +31,10 @@ export function formatDate(dateString: string): string {
 
 export function formatExactDateTime(dateString: string): string {
   const d = new Date(dateString);
-  const date = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "UTC" });
-  return `${date} · ${time} UTC`;
+  const tz = "Asia/Kolkata";
+  const date = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: tz });
+  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: tz });
+  return `${date} · ${time} IST`;
 }
 
 export function formatRelativeDate(dateString: string): string {
