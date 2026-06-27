@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   ArrowLeft, MapPin, Clock, Wifi, DollarSign, ExternalLink,
   Mail, Link2, Briefcase, Building2, Star, Calendar, Globe,
-  CheckCircle2, Users, Zap,
+  CheckCircle2, Users, Zap, BrainCircuit, BookOpen, ChevronRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Job } from "@/types";
@@ -463,6 +463,77 @@ export default async function JobDetailPage(
                   </Link>
                 </div>
               </div>
+
+              {/* ── Promo: Interview Prep ── */}
+              <div className="rounded-2xl overflow-hidden border border-[#F59E0B]/20 relative"
+                style={{ background: "linear-gradient(135deg,#0f0a00,#111)" }}>
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: "radial-gradient(ellipse at top right,rgba(245,158,11,0.10),transparent 65%)" }} />
+                <div className="relative p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)" }}>
+                      <BrainCircuit size={15} className="text-[#F59E0B]" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#F59E0B]">AutomateQA</span>
+                  </div>
+                  <h3 className="text-white font-black text-base leading-snug mb-1">
+                    Ace Your Next QA Interview
+                  </h3>
+                  <p className="text-[#9CA3AF] text-xs leading-relaxed mb-3">
+                    Practice 200+ real interview questions on Selenium, Playwright, API Testing &amp; more. Land the role you&apos;re applying for.
+                  </p>
+                  <ul className="space-y-1.5 mb-4">
+                    {["Categorized by tool & topic", "Detailed answers included", "Free — no sign-up needed"].map(pt => (
+                      <li key={pt} className="flex items-center gap-2 text-[11px] text-[#C9D1D9]">
+                        <CheckCircle2 size={11} className="text-[#F59E0B] flex-shrink-0" />
+                        {pt}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/interview-prep"
+                    className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-bold text-[#0B0B0B] hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all"
+                    style={{ background: "linear-gradient(135deg,#F59E0B,#F97316)" }}>
+                    Start Practicing <ChevronRight size={13} />
+                  </Link>
+                </div>
+              </div>
+
+              {/* ── Promo: Learn / Tutorials ── */}
+              <div className="rounded-2xl overflow-hidden border border-[#00D4FF]/20 relative"
+                style={{ background: "linear-gradient(135deg,#00050f,#111)" }}>
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: "radial-gradient(ellipse at top right,rgba(0,212,255,0.09),transparent 65%)" }} />
+                <div className="relative p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: "rgba(0,212,255,0.12)", border: "1px solid rgba(0,212,255,0.25)" }}>
+                      <BookOpen size={15} className="text-[#00D4FF]" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#00D4FF]">AutomateQA</span>
+                  </div>
+                  <h3 className="text-white font-black text-base leading-snug mb-1">
+                    Learn Automation From Scratch
+                  </h3>
+                  <p className="text-[#9CA3AF] text-xs leading-relaxed mb-3">
+                    Free tutorials on Playwright, Selenium, Cypress &amp; CI/CD pipelines. Build the skills companies are hiring for right now.
+                  </p>
+                  <ul className="space-y-1.5 mb-4">
+                    {["Beginner to advanced tracks", "Hands-on code examples", "Updated for 2026"].map(pt => (
+                      <li key={pt} className="flex items-center gap-2 text-[11px] text-[#C9D1D9]">
+                        <CheckCircle2 size={11} className="text-[#00D4FF] flex-shrink-0" />
+                        {pt}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/learn"
+                    className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-bold text-[#0B0B0B] hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(0,212,255,0.30)] transition-all"
+                    style={{ background: "linear-gradient(135deg,#00D4FF,#00FF88)" }}>
+                    Start Learning <ChevronRight size={13} />
+                  </Link>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
