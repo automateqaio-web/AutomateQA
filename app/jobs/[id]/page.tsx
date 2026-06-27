@@ -380,6 +380,23 @@ export default async function JobDetailPage(
                   <h2 className="font-bold text-white text-base">Full Job Description</h2>
                 </div>
                 <FullDescription text={job.description} accent={c1} />
+                {job.source === "adzuna" && job.apply_url && (
+                  <div className="px-6 py-4 border-t border-white/6 flex items-center gap-3"
+                    style={{ background: "linear-gradient(135deg,rgba(0,255,136,0.04),rgba(0,212,255,0.02))" }}>
+                    <ExternalLink size={14} style={{ color: c1, flexShrink: 0 }} />
+                    <p className="text-[#9CA3AF] text-xs leading-relaxed">
+                      This is a preview snippet. For the{" "}
+                      <span className="font-semibold text-white">complete job description</span>
+                      {" "}including full responsibilities, requirements, and benefits —{" "}
+                      <a href={job.apply_url} target="_blank" rel="noopener noreferrer"
+                        className="font-bold underline underline-offset-2 hover:opacity-80 transition-opacity"
+                        style={{ color: c1 }}>
+                        click Apply for this Role
+                      </a>
+                      .
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Referral note block (if any) */}
