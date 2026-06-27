@@ -51,12 +51,20 @@ function normalize(job: AdzunaJob) {
     title: (job.title || "Untitled").trim().slice(0, 255),
     company: (job.company?.display_name || "Unknown Company").trim().slice(0, 255),
     location: (locationStr || "Not specified").trim().slice(0, 255),
-    // Strip HTML tags, cap at 500 chars
+    // Preserve paragraph/line structure, then strip remaining HTML
     description: (job.description || "")
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 500),
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<\/li>/gi, "\n")
+      .replace(/<\/div>/gi, "\n")
+      .replace(/<\/h[1-6]>/gi, "\n")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+      .replace(/&nbsp;/g, " ").replace(/&#?\w+;/g, " ")
+      .split("\n").map(l => l.trim())
+      .filter((l, i, a) => l || (i > 0 && a[i - 1] !== ""))
+      .join("\n").trim()
+      .slice(0, 6000),
     apply_url: job.redirect_url || null,
     source: "adzuna" as const,
     job_type: "regular" as const,

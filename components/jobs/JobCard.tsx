@@ -152,14 +152,17 @@ function getReferralHref(contact: string) {
 function renderDescription(text: string) {
   const LINE_LABEL_RE = /^([A-Za-z][a-zA-Z]*(?:\s[A-Za-z][a-zA-Z]*){0,3}):\s*(.*)$/;
 
-  // Single-blob (no newlines): use greedy exec to find inline labels.
-  // Greedy {0,3} ensures "Job Title:" is captured as 2 words, not "Title:" leaving orphan "Job ".
+  // Single-blob (no newlines): match only single title-case words ≥3 chars.
+  // Avoids greedy false positives like "Assurance Engineer Availability Required:"
   if (!text.includes("\n")) {
-    const INLINE = /([A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*){0,3}):\s*/g;
     const hits: Array<{ index: number; label: string; end: number }> = [];
+    const SIMPLE = /([A-Z][a-zA-Z]{2,}):\s+/g;
     let m: RegExpExecArray | null;
-    while ((m = INLINE.exec(text)) !== null) {
-      if (m[1].split(" ").length <= 4) hits.push({ index: m.index, label: m[1], end: m.index + m[0].length });
+    while ((m = SIMPLE.exec(text)) !== null) {
+      const before = m.index > 0 ? text[m.index - 1] : " ";
+      if (/[\s.,;()\-]/.test(before) || m.index === 0) {
+        hits.push({ index: m.index, label: m[1], end: m.index + m[0].length });
+      }
     }
     if (hits.length === 0) return <span>{text}</span>;
 
@@ -167,7 +170,10 @@ function renderDescription(text: string) {
     let last = 0;
     hits.forEach(({ index, label, end }, i) => {
       const nextIdx = i + 1 < hits.length ? hits[i + 1].index : text.length;
-      if (index > last) parts.push(<span key={`t${i}`}>{text.slice(last, index).trim()} </span>);
+      if (index > last) {
+        const before = text.slice(last, index).trim();
+        if (before) parts.push(<span key={`t${i}`}>{before} </span>);
+      }
       parts.push(
         <span key={`l${i}`}>
           {parts.length > 0 && <br />}

@@ -67,19 +67,34 @@ function FullDescription({ text, accent }: { text: string; accent: string }) {
 
   const LINE_LABEL_RE = /^([A-Za-z][a-zA-Z]*(?:[\s][A-Za-z][a-zA-Z]*){0,3}):\s*(.*)$/;
 
-  // ── Inline-blob parser (no newlines in text) ───────────────────────────
-  // Uses greedy exec so "Job Title:" is captured as a 2-word label instead of
-  // splitting at "Title:" and leaving orphan "Job ". The {0,3} quantifier tries
-  // to consume as many extra title-case words as possible before the colon.
+  // ── Inline-blob parser (no newlines) ─────────────────────────────────────
+  // Matches ONLY single title-case words (≥3 chars, e.g. "Title:", "Required:",
+  // "Timings:") to avoid greedy false positives like "Assurance Engineer
+  // Availability Required:" being treated as a 4-word label. The preceding word
+  // (e.g. "Availability" before "Required:") will appear as plain text, which
+  // is acceptable for legacy blob data. New jobs stored via the fixed cron job
+  // will have proper newlines and use the newline parser instead.
   function buildRowsInline(raw: string): Row[] {
-    const INLINE_LABEL = /([A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*){0,3}):\s*/g;
+    // [A-Z][a-zA-Z]{2,} = uppercase first letter + 2+ more letters (≥3 chars total)
+    // Preceded by start-of-string or whitespace/punctuation to avoid mid-word matches
+    const INLINE_LABEL = /(?:^|(?<=[\s.,;()\-]))\b([A-Z][a-zA-Z]{2,}):\s+/g;
     const hits: Array<{ index: number; label: string; end: number }> = [];
     let m: RegExpExecArray | null;
     while ((m = INLINE_LABEL.exec(raw)) !== null) {
-      if (m[1].split(" ").length <= 4) {
-        hits.push({ index: m.index, label: m[1], end: m.index + m[0].length });
+      hits.push({ index: m.index + m[0].indexOf(m[1]), label: m[1], end: m.index + m[0].length });
+    }
+
+    // Fallback if lookbehind not supported: simple scan
+    if (hits.length === 0) {
+      const SIMPLE = /([A-Z][a-zA-Z]{2,}):\s+/g;
+      while ((m = SIMPLE.exec(raw)) !== null) {
+        const before = m.index > 0 ? raw[m.index - 1] : " ";
+        if (/[\s.,;()\-]/.test(before) || m.index === 0) {
+          hits.push({ index: m.index, label: m[1], end: m.index + m[0].length });
+        }
       }
     }
+
     if (hits.length === 0) return [{ kind: "text", content: raw }];
 
     const rows: Row[] = [];
