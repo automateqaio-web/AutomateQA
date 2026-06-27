@@ -125,6 +125,7 @@ export async function GET(request: NextRequest) {
   const supabase = adminClient();
   let fetched = 0;
   let inserted = 0;
+  let updated = 0;
   let skipped = 0;
   const errors: string[] = [];
 
@@ -167,6 +168,9 @@ export async function GET(request: NextRequest) {
     const newJobs = allJobs.filter(
       (j) => j.apply_url && !existingUrls.has(j.apply_url)
     );
+    const existingJobs = allJobs.filter(
+      (j) => j.apply_url && existingUrls.has(j.apply_url)
+    );
 
     // Insert new jobs in chunks of 50
     const CHUNK = 50;
@@ -180,7 +184,28 @@ export async function GET(request: NextRequest) {
         inserted += chunk.length;
       }
     }
-    skipped += allJobs.length - newJobs.length;
+
+    // Refresh descriptions of existing jobs in parallel batches of 10
+    const UPDATE_BATCH = 10;
+    for (let i = 0; i < existingJobs.length; i += UPDATE_BATCH) {
+      const batch = existingJobs.slice(i, i + UPDATE_BATCH);
+      await Promise.all(
+        batch.map(async (job) => {
+          const { error } = await supabase
+            .from("jobs")
+            .update({ description: job.description, fetched_at: job.fetched_at })
+            .eq("source", "adzuna")
+            .eq("apply_url", job.apply_url!);
+          if (error) {
+            errors.push(`Update ${job.apply_url}: ${error.message}`);
+          } else {
+            updated++;
+          }
+        })
+      );
+    }
+
+    skipped += allJobs.length - newJobs.length - existingJobs.length;
 
     // Purge Adzuna jobs older than PURGE_DAYS days
     const cutoff = new Date(Date.now() - PURGE_DAYS * 24 * 60 * 60 * 1000).toISOString();
@@ -196,7 +221,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { fetched, inserted, skipped, errors: errors.length ? errors : undefined },
+      { fetched, inserted, updated, skipped, errors: errors.length ? errors : undefined },
       { status: 200 }
     );
   } catch (err) {
