@@ -29,6 +29,13 @@ export function formatDate(dateString: string): string {
   });
 }
 
+export function formatExactDateTime(dateString: string): string {
+  const d = new Date(dateString);
+  const date = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "UTC" });
+  return `${date} · ${time} UTC`;
+}
+
 export function formatRelativeDate(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();

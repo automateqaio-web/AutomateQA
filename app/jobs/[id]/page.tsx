@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Job } from "@/types";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate, formatExactDateTime } from "@/lib/utils";
 import ShareButtons from "@/components/jobs/ShareButtons";
 import JobDetailLogo from "@/components/jobs/JobDetailLogo";
 
@@ -238,7 +238,7 @@ export default async function JobDetailPage(
     { icon: Briefcase, label: "Job Type",    value: isReferral ? "Referral" : "Regular", color: isReferral ? "#00FF88" : "#9CA3AF" },
     ...(job.experience_level ? [{ icon: Users, label: "Experience", value: job.experience_level, color: "#A855F7" }] : []),
     ...(job.salary ? [{ icon: DollarSign, label: "Salary", value: job.salary, color: "#00FF88" }] : []),
-    { icon: Calendar,  label: "Posted",      value: formatRelativeDate(postedDate), color: "#F97316" },
+    { icon: Calendar,  label: "Posted",      value: formatExactDateTime(postedDate), color: "#F97316" },
     { icon: Zap,       label: "Source",      value: job.source === "adzuna" ? "Adzuna (Auto-fetched)" : "Community Post", color: "#EAB308" },
   ] as { icon: ElementType; label: string; value: string; color: string }[];
 
@@ -312,7 +312,7 @@ export default async function JobDetailPage(
                 </div>
 
                 <p className="text-[#6B7280] text-sm flex items-center gap-1.5">
-                  <Clock size={12} /> Posted {formatRelativeDate(postedDate)}
+                  <Clock size={12} /> Posted {formatExactDateTime(postedDate)}
                 </p>
               </div>
 
@@ -381,20 +381,17 @@ export default async function JobDetailPage(
                 </div>
                 <FullDescription text={job.description} accent={c1} />
                 {job.source === "adzuna" && job.apply_url && (
-                  <div className="px-6 py-4 border-t border-white/6 flex items-center gap-3"
-                    style={{ background: "linear-gradient(135deg,rgba(0,255,136,0.04),rgba(0,212,255,0.02))" }}>
-                    <ExternalLink size={14} style={{ color: c1, flexShrink: 0 }} />
+                  <div className="mx-4 mb-4 mt-2 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3"
+                    style={{ borderColor: `${c1}33`, background: `linear-gradient(135deg,${c1}0D,${c2}08)` }}>
                     <p className="text-[#9CA3AF] text-xs leading-relaxed">
-                      This is a preview snippet. For the{" "}
-                      <span className="font-semibold text-white">complete job description</span>
-                      {" "}including full responsibilities, requirements, and benefits —{" "}
-                      <a href={job.apply_url} target="_blank" rel="noopener noreferrer"
-                        className="font-bold underline underline-offset-2 hover:opacity-80 transition-opacity"
-                        style={{ color: c1 }}>
-                        click Apply for this Role
-                      </a>
-                      .
+                      <span className="font-semibold" style={{ color: c1 }}>Preview only.</span>{" "}
+                      The full description — roles, responsibilities &amp; requirements — is on the employer&apos;s site.
                     </p>
+                    <a href={job.apply_url} target="_blank" rel="noopener noreferrer"
+                      className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-[#0B0B0B] hover:scale-[1.02] hover:shadow-lg transition-all whitespace-nowrap"
+                      style={{ background: `linear-gradient(135deg,${c1},${c2})` }}>
+                      View Full Job <ExternalLink size={11} />
+                    </a>
                   </div>
                 )}
               </div>
