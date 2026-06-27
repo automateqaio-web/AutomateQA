@@ -3,17 +3,17 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Code2, Users, Target, Heart, Rocket, Shield, Laugh, Loader2, Image as ImageIcon, Play, BookOpen } from "lucide-react";
+import { Code2, Users, Target, Heart, Rocket, Shield, Laugh, Loader2, Image as ImageIcon, Play, BookOpen, Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, withTimeout } from "@/lib/supabase/safeFetch";
 
 const values = [
-  { icon: Code2, title: "Code First", desc: "Real automation code, real examples, no fluff. We write tests that actually run in CI." },
-  { icon: Laugh, title: "Meme Culture", desc: "QA pain is universal. We turn the frustration into fuel with relatable humor." },
-  { icon: Users, title: "Community", desc: "Testers supporting testers. Share your wins and roast each other's flaky tests." },
-  { icon: Shield, title: "Quality Obsessed", desc: "We practice what we preach. Good content, good code, good vibes." },
-  { icon: Target, title: "Career Focused", desc: "Real skills, real interviews, real job advice for automation engineers." },
-  { icon: Rocket, title: "Always Shipping", desc: "New memes, new tutorials, new chaos every week. Never a dull standup." },
+  { icon: Code2,     title: "Code First",       desc: "Real automation code, real examples, no fluff. We write tests that actually run in CI." },
+  { icon: Laugh,     title: "Meme Culture",      desc: "QA pain is universal. We turn the frustration into fuel with relatable humor." },
+  { icon: Users,     title: "Community",         desc: "Testers supporting testers. Share your wins and roast each other's flaky tests." },
+  { icon: Shield,    title: "Quality Obsessed",  desc: "We practice what we preach. Good content, good code, good vibes." },
+  { icon: Briefcase, title: "Jobs Board",        desc: "Find QA & automation roles from top companies, updated daily. Your next career move starts here." },
+  { icon: Rocket,    title: "Always Shipping",   desc: "New memes, new tutorials, new jobs, new chaos every week. Never a dull standup." },
 ];
 
 interface LiveStats {
@@ -21,6 +21,7 @@ interface LiveStats {
   memes: number | null;
   videos: number | null;
   tutorials: number | null;
+  jobs: number | null;
 }
 
 function AnimatedCounter({ value }: { value: number }) {
@@ -71,7 +72,7 @@ function StatCard({
 }
 
 export default function AboutPage() {
-  const [stats, setStats] = useState<LiveStats>({ subscribers: null, memes: null, videos: null, tutorials: null });
+  const [stats, setStats] = useState<LiveStats>({ subscribers: null, memes: null, videos: null, tutorials: null, jobs: null });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -91,27 +92,32 @@ export default function AboutPage() {
       let videos: number | null = null;
       let tutorials: number | null = null;
 
+      let jobs: number | null = null;
+
       if (isSupabaseConfigured()) {
         const supabase = createClient();
         const results = await withTimeout(async () => {
-          const [memesRes, videosRes, learnRes] = await Promise.all([
+          const [memesRes, videosRes, learnRes, jobsRes] = await Promise.all([
             supabase.from("memes").select("id", { count: "exact", head: true }).eq("published", true),
             supabase.from("videos").select("id", { count: "exact", head: true }).eq("published", true),
             supabase.from("learning_content").select("id", { count: "exact", head: true }).eq("published", true),
+            supabase.from("jobs").select("id", { count: "exact", head: true }).eq("is_active", true),
           ]);
           return {
             memes: memesRes.count ?? null,
             videos: videosRes.count ?? null,
             tutorials: learnRes.count ?? null,
+            jobs: jobsRes.count ?? null,
           };
-        }, { memes: null, videos: null, tutorials: null }, 5000);
+        }, { memes: null, videos: null, tutorials: null, jobs: null }, 5000);
 
         memes = results.memes;
         videos = results.videos;
         tutorials = results.tutorials;
+        jobs = results.jobs;
       }
 
-      setStats({ subscribers, memes, videos, tutorials });
+      setStats({ subscribers, memes, videos, tutorials, jobs });
       setLoading(false);
     };
 
@@ -137,12 +143,13 @@ export default function AboutPage() {
       </div>
 
       {/* Live Stats */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           <StatCard icon={Users}     label="YouTube Subscribers" value={stats.subscribers} loading={loading} color="text-red-400 bg-red-500/10" />
           <StatCard icon={ImageIcon} label="QA Memes"            value={stats.memes}       loading={loading} color="text-pink-400 bg-pink-500/10" />
           <StatCard icon={Play}      label="Videos"              value={stats.videos}      loading={loading} color="text-blue-400 bg-blue-500/10" />
           <StatCard icon={BookOpen}  label="Tutorials"           value={stats.tutorials}   loading={loading} color="text-[#00FF88] bg-[#00FF88]/10" />
+          <StatCard icon={Briefcase} label="Active Jobs"         value={stats.jobs}        loading={loading} color="text-orange-400 bg-orange-500/10" />
         </div>
       </div>
 
@@ -169,7 +176,13 @@ export default function AboutPage() {
             </p>
             <p>
               Whether you&apos;re learning Playwright from scratch, trying to survive your next sprint planning,
-              or just need validation that yes, you&apos;re right and the bug is real — AutomateQA is your home.
+              hunting for your next QA role, or just need validation that yes, you&apos;re right and the bug is
+              real — AutomateQA is your home.
+            </p>
+            <p>
+              Today, AutomateQA brings together learning resources, QA memes, interview prep, and a dedicated{" "}
+              <strong className="text-white">Jobs Board</strong> that surfaces QA &amp; automation roles from
+              companies worldwide — updated daily so you never miss an opportunity.
             </p>
           </div>
         </div>
@@ -205,11 +218,12 @@ export default function AboutPage() {
           <h2 className="text-3xl font-black text-white mb-4">Platform Vision</h2>
           <p className="text-[#9CA3AF] leading-relaxed max-w-2xl mx-auto mb-8">
             We&apos;re building the ultimate QA community platform — a place where automation testing content,
-            career resources, and genuine human connection intersect. Think YouTube meets Dev.to meets
-            a really good meme account, but specifically for the QA world.
+            career resources, job opportunities, and genuine human connection intersect. Think YouTube meets
+            Dev.to meets LinkedIn Jobs meets a really good meme account, but specifically for the QA world.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/memes" className="btn-primary">Browse Memes</Link>
+            <Link href="/jobs" className="btn-primary">Browse Jobs</Link>
+            <Link href="/memes" className="btn-outline">Browse Memes</Link>
             <Link href="/videos" className="btn-outline">Watch Videos</Link>
             <Link href="/contact" className="btn-outline">Join the Mission</Link>
           </div>

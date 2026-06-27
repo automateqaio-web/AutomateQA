@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const EFFECTIVE_DATE = "June 6, 2026";
+const EFFECTIVE_DATE = "June 27, 2026";
 const CONTACT_EMAIL = "automate.qa.io@gmail.com";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -89,13 +89,11 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 space-y-2">
               <li>To respond to your inquiries and support requests.</li>
               <li>To improve the platform based on usage patterns.</li>
-              <li>To display relevant content and improve your browsing experience.</li>
+              <li>To display relevant content — including job listings — and improve your browsing experience.</li>
               <li>To monitor and maintain the security of our platform.</li>
+              <li>To send newsletter emails to subscribers (you may unsubscribe at any time).</li>
             </ul>
             <p className="mt-3">We do <strong className="text-white">not</strong> sell, rent, or trade your personal information to third parties for their marketing purposes.</p>
-            <p className="mt-3">
-              <strong className="text-white">Newsletter:</strong> A newsletter feature is planned for a future release. This policy will be updated before any email subscriptions are collected.
-            </p>
           </Section>
 
           <Section title="4. Cookies">
@@ -115,10 +113,11 @@ export default function PrivacyPage() {
           <Section title="5. Third-Party Services">
             <p>We use the following third-party services that may process your data under their own privacy policies:</p>
             <ul className="list-disc pl-5 space-y-2 mt-2">
-              <li><strong className="text-white">Supabase</strong> — database and authentication. Data stored in secure cloud infrastructure.</li>
+              <li><strong className="text-white">Supabase</strong> — database and backend. Data stored in secure cloud infrastructure.</li>
+              <li><strong className="text-white">Adzuna API</strong> — we fetch publicly available job listings from Adzuna to populate our Jobs Board. No personal user data is shared with Adzuna. Job listings link to employer or Adzuna sites with their own privacy policies.</li>
               <li><strong className="text-white">YouTube Data API v3</strong> — we display publicly available YouTube channel statistics.</li>
-              <li><strong className="text-white">Vercel / hosting provider</strong> — hosting and edge network delivery.</li>
-              <li><strong className="text-white">Google Analytics</strong> (if enabled) — anonymised usage statistics.</li>
+              <li><strong className="text-white">Vercel</strong> — hosting and edge network delivery.</li>
+              <li><strong className="text-white">Clearbit / Google S2</strong> — we load company logos for job listings using publicly available favicon and logo services. No personal data is transmitted.</li>
             </ul>
             <p className="mt-3">
               We encourage you to review the privacy policies of these services. We are not responsible for their data practices.
@@ -169,7 +168,7 @@ export default function PrivacyPage() {
             <div className="mt-4 p-4 rounded-xl bg-[#111] border border-white/10">
               <p className="text-white font-semibold mb-1">AutomateQA</p>
               <p>Email: <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#00FF88] hover:underline">{CONTACT_EMAIL}</a></p>
-              <p>Website: <Link href="/" className="text-[#00FF88] hover:underline">automateqa.io</Link></p>
+              <p>Website: <Link href="/" className="text-[#00FF88] hover:underline">automateqa.online</Link></p>
             </div>
           </Section>
 

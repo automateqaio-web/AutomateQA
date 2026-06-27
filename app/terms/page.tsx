@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const EFFECTIVE_DATE = "June 6, 2025";
+const EFFECTIVE_DATE = "June 27, 2026";
 const CONTACT_EMAIL = "automate.qa.io@gmail.com";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -61,12 +61,14 @@ export default function TermsPage() {
 
           <Section title="2. Description of Service">
             <p>
-              AutomateQA is a content platform for QA engineers and automation testers. The platform provides:
+              AutomateQA is a content and career platform for QA engineers and automation testers. The platform provides:
             </p>
             <ul className="list-disc pl-5 space-y-2 mt-2">
               <li>QA and automation-related memes (including AI-generated images)</li>
               <li>Educational videos and tutorials on tools like Playwright, Selenium, and Cypress</li>
               <li>Blog articles on automation testing, career advice, and corporate culture</li>
+              <li>Interview preparation resources and practice questions</li>
+              <li>A <strong className="text-white">Jobs Board</strong> aggregating QA and automation testing roles from third-party sources (including Adzuna) and community-submitted listings</li>
               <li>YouTube channel statistics and creator analytics</li>
             </ul>
           </Section>
@@ -125,9 +127,24 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="7. Newsletter and Communications">
+          <Section title="7. Jobs Board">
             <p>
-              A newsletter feature is planned for a future release of AutomateQA. No email subscriptions are currently being collected. When the newsletter launches, these Terms will be updated with the relevant subscription terms and opt-out options.
+              AutomateQA operates a Jobs Board that aggregates QA and automation testing job listings from third-party providers (including Adzuna) and accepts community-submitted postings. By using the Jobs Board, you agree that:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li>Job listings are sourced from third parties and AutomateQA does not guarantee their accuracy, availability, or legitimacy.</li>
+              <li>Clicking &quot;Apply&quot; redirects you to the employer&apos;s or third-party site, which has its own terms and privacy policy.</li>
+              <li>AutomateQA is not a recruitment agency and is not party to any employment agreement between you and any employer.</li>
+              <li>We reserve the right to remove any listing that violates these Terms or applicable law.</li>
+            </ul>
+            <p className="mt-3">
+              Community job postings submitted by users must be genuine opportunities and must not be used for spam, phishing, or fraudulent recruitment. Violations will result in immediate removal.
+            </p>
+          </Section>
+
+          <Section title="8. Newsletter and Communications">
+            <p>
+              AutomateQA offers an optional newsletter subscription. By subscribing, you consent to receive periodic emails about new content, job alerts, and platform updates. You may unsubscribe at any time via the link included in every email.
             </p>
             <p className="mt-2">
               For general inquiries, you may contact us at{" "}
@@ -135,7 +152,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="8. Disclaimer of Warranties">
+          <Section title="9. Disclaimer of Warranties">
             <p>
               The platform and all content are provided on an <strong className="text-white">&quot;AS IS&quot; and &quot;AS AVAILABLE&quot;</strong> basis without warranties of any kind, either express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
             </p>
@@ -149,7 +166,7 @@ export default function TermsPage() {
             </ul>
           </Section>
 
-          <Section title="9. Limitation of Liability">
+          <Section title="10. Limitation of Liability">
             <p>
               To the fullest extent permitted by applicable law, AutomateQA and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages — including loss of data, revenue, or goodwill — arising from:
             </p>
@@ -161,36 +178,36 @@ export default function TermsPage() {
             </ul>
           </Section>
 
-          <Section title="10. Indemnification">
+          <Section title="11. Indemnification">
             <p>
               You agree to indemnify, defend, and hold harmless AutomateQA and its affiliates, operators, and contributors from and against any claims, damages, losses, liabilities, costs, and expenses (including legal fees) arising from your use of the platform or violation of these Terms.
             </p>
           </Section>
 
-          <Section title="11. Modifications to the Service">
+          <Section title="12. Modifications to the Service">
             <p>
               AutomateQA reserves the right to modify, suspend, or discontinue any part of the platform at any time, with or without notice. We are not liable to you or any third party for any modification, suspension, or discontinuation of the service.
             </p>
           </Section>
 
-          <Section title="12. Changes to These Terms">
+          <Section title="13. Changes to These Terms">
             <p>
               We may revise these Terms of Service from time to time. The most current version will always be posted on this page with an updated effective date. Continued use of the platform after changes are posted constitutes your acceptance of the revised terms.
             </p>
           </Section>
 
-          <Section title="13. Governing Law">
+          <Section title="14. Governing Law">
             <p>
               These Terms shall be governed by and construed in accordance with the laws of <strong className="text-white">India</strong>, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in India.
             </p>
           </Section>
 
-          <Section title="14. Contact Us">
+          <Section title="15. Contact Us">
             <p>If you have any questions about these Terms of Service, please contact us:</p>
             <div className="mt-4 p-4 rounded-xl bg-[#111] border border-white/10">
               <p className="text-white font-semibold mb-1">AutomateQA</p>
               <p>Email: <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#00FF88] hover:underline">{CONTACT_EMAIL}</a></p>
-              <p>Website: <Link href="/" className="text-[#00FF88] hover:underline">automateqa.io</Link></p>
+              <p>Website: <Link href="/" className="text-[#00FF88] hover:underline">automateqa.online</Link></p>
             </div>
           </Section>
 
