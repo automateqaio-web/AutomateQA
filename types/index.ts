@@ -382,3 +382,149 @@ export const CATEGORY_COLORS: Record<string, string> = {
   "HR": "bg-pink-500/20 text-pink-400 border-pink-500/30",
   "General": "bg-gray-500/20 text-gray-300 border-gray-500/30",
 };
+
+// ── Advertisements ────────────────────────────────────────────────────────────
+
+export type AdType =
+  | "promotion" | "collaboration" | "sponsor" | "course"
+  | "announcement" | "event" | "hiring" | "affiliate" | "custom";
+
+export type AdDisplayStyle =
+  | "premium_banner" | "glassmorphism_card" | "floating_banner"
+  | "hero_banner" | "sidebar_card" | "bottom_sticky" | "inline_banner"
+  | "popup" | "toast" | "ribbon" | "small_card" | "full_width_banner";
+
+export type AdAnimation = "fade" | "slide" | "zoom" | "bounce" | "pulse" | "shimmer" | "none";
+export type AdCtaOpen  = "same_tab" | "new_tab";
+
+export interface Ad {
+  id: string;
+  name: string;
+  type: AdType;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  cta_text: string | null;
+  cta_link: string | null;
+  cta_open: AdCtaOpen;
+  desktop_image_url: string | null;
+  mobile_image_url: string | null;
+  logo_url: string | null;
+  bg_color: string | null;
+  gradient: string | null;
+  text_color: string | null;
+  button_color: string | null;
+  badge: string | null;
+  display_style: AdDisplayStyle;
+  animation: AdAnimation;
+  priority: number;
+  is_active: boolean;
+  impressions: number;
+  clicks: number;
+  last_viewed_at: string | null;
+  last_clicked_at: string | null;
+  created_at: string;
+  updated_at: string;
+  // joined relations
+  locations?: AdLocationRecord[];
+  schedule?: AdSchedule | null;
+  targeting?: AdTargeting | null;
+}
+
+export interface AdLocationRecord {
+  id: string;
+  ad_id: string;
+  location: string;
+  css_selector: string | null;
+}
+
+export interface AdSchedule {
+  id: string;
+  ad_id: string;
+  start_date: string | null;
+  end_date: string | null;
+  timezone: string;
+}
+
+export interface AdTargeting {
+  id: string;
+  ad_id: string;
+  show_to_logged_in: boolean;
+  show_to_guests: boolean;
+  devices: string[];
+  countries: string[] | null;
+  user_type: "all" | "new" | "returning";
+}
+
+// ── Ad constants ──────────────────────────────────────────────────────────────
+
+export const AD_TYPES: { value: AdType; label: string }[] = [
+  { value: "promotion",     label: "Promotion"    },
+  { value: "collaboration", label: "Collaboration" },
+  { value: "sponsor",       label: "Sponsor"       },
+  { value: "course",        label: "Course"        },
+  { value: "announcement",  label: "Announcement"  },
+  { value: "event",         label: "Event"         },
+  { value: "hiring",        label: "Hiring"        },
+  { value: "affiliate",     label: "Affiliate"     },
+  { value: "custom",        label: "Custom"        },
+];
+
+export const AD_DISPLAY_STYLES: { value: AdDisplayStyle; label: string; desc: string }[] = [
+  { value: "premium_banner",     label: "Premium Banner",       desc: "Full-width gradient banner with CTA" },
+  { value: "glassmorphism_card", label: "Glassmorphism Card",   desc: "Frosted-glass floating card"         },
+  { value: "floating_banner",    label: "Floating Banner",      desc: "Slides in from corner"               },
+  { value: "hero_banner",        label: "Hero Banner",          desc: "Large immersive hero section"        },
+  { value: "sidebar_card",       label: "Sidebar Card",         desc: "Compact card for sidebars"           },
+  { value: "bottom_sticky",      label: "Bottom Sticky Bar",    desc: "Fixed bottom bar"                    },
+  { value: "inline_banner",      label: "Inline Banner",        desc: "Fits inline inside content"          },
+  { value: "popup",              label: "Popup Modal",          desc: "Centered modal overlay"              },
+  { value: "toast",              label: "Toast Notification",   desc: "Corner toast notification"           },
+  { value: "ribbon",             label: "Ribbon",               desc: "Thin top/bottom ribbon bar"          },
+  { value: "small_card",         label: "Small Card",           desc: "Minimal compact card"                },
+  { value: "full_width_banner",  label: "Full Width Banner",    desc: "Edge-to-edge banner"                 },
+];
+
+export const AD_ANIMATIONS: { value: AdAnimation; label: string }[] = [
+  { value: "fade",    label: "Fade"    },
+  { value: "slide",   label: "Slide"   },
+  { value: "zoom",    label: "Zoom"    },
+  { value: "bounce",  label: "Bounce"  },
+  { value: "pulse",   label: "Pulse"   },
+  { value: "shimmer", label: "Shimmer" },
+  { value: "none",    label: "None"    },
+];
+
+export const AD_LOCATIONS: { value: string; label: string; group: string }[] = [
+  { value: "homepage_top",             label: "Homepage — Top",                     group: "Homepage"       },
+  { value: "homepage_middle",          label: "Homepage — Middle",                  group: "Homepage"       },
+  { value: "homepage_bottom",          label: "Homepage — Bottom",                  group: "Homepage"       },
+  { value: "interview_listing",        label: "Interview Prep — Listing",           group: "Interview Prep" },
+  { value: "interview_sidebar",        label: "Interview Prep — Sidebar",           group: "Interview Prep" },
+  { value: "interview_after_q5",       label: "Interview Prep — After 5 Questions", group: "Interview Prep" },
+  { value: "interview_detail_sidebar", label: "Interview Detail — Sidebar",         group: "Interview Prep" },
+  { value: "blog_listing",             label: "Blog — Listing",                     group: "Blog"           },
+  { value: "blog_sidebar",             label: "Blog — Sidebar",                     group: "Blog"           },
+  { value: "blog_after_article",       label: "Blog — After Article",               group: "Blog"           },
+  { value: "jobs_listing",             label: "Jobs Board — Listing",               group: "Jobs"           },
+  { value: "jobs_detail_sidebar",      label: "Jobs Board — Detail Sidebar",        group: "Jobs"           },
+  { value: "learn_listing",            label: "Learn — Listing",                    group: "Learn"          },
+  { value: "learn_sidebar",            label: "Learn — Sidebar",                    group: "Learn"          },
+  { value: "tips_listing",             label: "Tips — Listing",                     group: "Tips"           },
+  { value: "videos_listing",           label: "Videos — Listing",                   group: "Videos"         },
+  { value: "sidebar_global",           label: "Global Sidebar",                     group: "Global"         },
+  { value: "footer",                   label: "Footer",                             group: "Global"         },
+  { value: "custom",                   label: "Custom (CSS Selector)",              group: "Custom"         },
+];
+
+export const AD_BADGE_PRESETS = [
+  "🔥 Sponsored",
+  "🚀 Promotion",
+  "⭐ Premium",
+  "🤝 Collaboration",
+  "🎁 Limited Offer",
+  "🎯 Featured",
+  "📢 Announcement",
+  "💼 Hiring",
+  "📚 Course",
+];

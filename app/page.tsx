@@ -6,6 +6,7 @@ import FeaturedVideos from "@/components/home/FeaturedVideos";
 import TrendingMemes from "@/components/home/TrendingMemes";
 import LatestBlogs from "@/components/home/LatestBlogs";
 import FeaturedTips from "@/components/home/FeaturedTips";
+import AdRenderer from "@/components/ads/AdRenderer";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -85,12 +86,15 @@ export default async function HomePage() {
 
   return (
     <>
+      <AdRenderer location="homepage_top" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" />
       <HeroSection />
       <JobsBoardBanner />
       <HomeFeatureCards />
+      <AdRenderer location="homepage_middle" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4" />
       <FeaturedVideos videos={videos} />
       <TrendingMemes memes={memes} />
       <FeaturedTips tips={tips} />
+      <AdRenderer location="homepage_bottom" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4" />
       <LatestBlogs blogs={blogs} />
     </>
   );

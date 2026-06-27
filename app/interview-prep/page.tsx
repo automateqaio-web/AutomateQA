@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { InterviewQuestion } from "@/types";
 import InterviewPrepListing from "@/components/interview-prep/InterviewPrepListing";
+import AdRenderer from "@/components/ads/AdRenderer";
 
 export const revalidate = 60;
 
@@ -175,6 +176,7 @@ export default async function InterviewPrepPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
+      <AdRenderer location="interview_listing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4" />
       <InterviewPrepListing initialQuestions={initialQuestions} />
     </>
   );

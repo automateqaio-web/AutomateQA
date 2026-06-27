@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Laugh, Play, FileText, LogOut, Home,
-  BookOpen, Lightbulb, BarChart3, Settings, Menu, X, MessageCircle, BrainCircuit, Briefcase,
+  BookOpen, Lightbulb, BarChart3, Settings, Menu, X, MessageCircle, BrainCircuit, Briefcase, Megaphone,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -23,6 +23,12 @@ const navGroups = [
       { href: "/admin/interview-prep", icon: BrainCircuit,    label: "Interview Prep" },
       { href: "/admin/comments",       icon: MessageCircle,   label: "Comments" },
       { href: "/admin/jobs",           icon: Briefcase,       label: "Jobs Board" },
+    ],
+  },
+  {
+    label: "Marketing",
+    items: [
+      { href: "/admin/ads", icon: Megaphone, label: "Advertisements" },
     ],
   },
   {

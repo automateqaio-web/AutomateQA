@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lightbulb, Zap, Code2, Shield } from "lucide-react";
 import TipsListing from "@/components/tips/TipsListing";
 import ComingSoon from "@/components/shared/ComingSoon";
+import AdRenderer from "@/components/ads/AdRenderer";
 import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 60;
@@ -146,6 +147,7 @@ export default async function AutomationTipsPage() {
         </div>
       </div>
 
+      <AdRenderer location="tips_listing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4" />
       <TipsListing initialItems={initialItems} />
     </div>
     </>

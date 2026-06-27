@@ -3,6 +3,7 @@ import { Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Job } from "@/types";
 import JobFilters from "@/components/jobs/JobFilters";
+import AdRenderer from "@/components/ads/AdRenderer";
 
 export const revalidate = 3600; // re-render at most once per hour (ISR)
 
@@ -136,6 +137,9 @@ export default async function JobsPage() {
             })()}
           </div>
         </div>
+
+        {/* ── Ad slot above job list ─────────────────────────────────────── */}
+        <AdRenderer location="jobs_listing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-2" />
 
         {/* ── Content ────────────────────────────────────────────────────── */}
         {jobs.length === 0 ? (

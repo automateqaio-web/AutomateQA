@@ -3,6 +3,7 @@ import { BookOpen, GraduationCap, Zap, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import LearnListing from "@/components/learn/LearnListing";
 import LearnWaitlist from "@/components/learn/LearnWaitlist";
+import AdRenderer from "@/components/ads/AdRenderer";
 import { createClient } from "@/lib/supabase/server";
 
 
@@ -114,6 +115,7 @@ export default async function LearnPage() {
         </Link>
       </div>
 
+      <AdRenderer location="learn_listing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4" />
       <LearnListing />
     </div>
   );

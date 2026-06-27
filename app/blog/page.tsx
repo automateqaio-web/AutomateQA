@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BookOpen } from "lucide-react";
 import BlogListing from "@/components/blog/BlogListing";
 import ComingSoon from "@/components/shared/ComingSoon";
+import AdRenderer from "@/components/ads/AdRenderer";
 import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 60;
@@ -126,6 +127,7 @@ export default async function BlogPage() {
           </p>
         </div>
       </div>
+      <AdRenderer location="blog_listing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4" />
       <BlogListing initialBlogs={initialBlogs} />
     </div>
     </>
