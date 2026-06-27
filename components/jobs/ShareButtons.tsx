@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Share2, Copy, Check } from "lucide-react";
 
 interface Props {
@@ -13,10 +13,15 @@ interface Props {
 export default function ShareButtons({ jobId, title, company, location }: Props) {
   const [copied, setCopied] = useState(false);
 
-  const siteBase = typeof window !== "undefined"
-    ? window.location.origin
-    : (process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online");
-  const url      = `${siteBase}/jobs/${jobId}`;
+  // Stable initial value matches SSR output — update to actual origin after mount
+  // so server and client render the same href on first paint (no hydration mismatch).
+  const fallback = process.env.NEXT_PUBLIC_SITE_URL || "https://automateqa.online";
+  const [url, setUrl] = useState(`${fallback}/jobs/${jobId}`);
+
+  useEffect(() => {
+    setUrl(`${window.location.origin}/jobs/${jobId}`);
+  }, [jobId]);
+
   const shareText = `🚀 ${title} at ${company} (${location})\n\nApply via AutomateQA 👇`;
 
   const nativeShare = async () => {
@@ -27,7 +32,6 @@ export default function ShareButtons({ jobId, title, company, location }: Props)
         return;
       }
     } catch { /* cancelled */ }
-    // fallback to clipboard
     copyLink();
   };
 
@@ -39,9 +43,9 @@ export default function ShareButtons({ jobId, title, company, location }: Props)
     } catch { /* unavailable */ }
   };
 
-  const waLink  = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${url}`)}`;
-  const twLink  = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
-  const liLink  = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+  const waLink = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${url}`)}`;
+  const twLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
+  const liLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   return (
     <div className="flex flex-col gap-2">

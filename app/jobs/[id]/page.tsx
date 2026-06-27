@@ -58,26 +58,55 @@ function getReferralHref(contact: string) {
   return { href: `mailto:${contact}?subject=QA%20Referral%20Request`, isEmail: true };
 }
 
-// ── Full description renderer — true line-by-line parser ─────────────────────
-// Splits the raw text by newlines first, then detects "Label: value" on each
-// line (case-insensitive, 1–4 words before the colon). This avoids the
-// "split-in-the-middle-of-a-label" bug that hit "Job Title:" → "Job" + "Title:".
+// ── Full description renderer ─────────────────────────────────────────────────
 function FullDescription({ text, accent }: { text: string; accent: string }) {
-  const LABEL_RE = /^([A-Za-z][a-zA-Z]*(?:[\s][A-Za-z][a-zA-Z]*){0,3}):\s*(.*)$/;
-
   type Row =
     | { kind: "label";  label: string; value: string }
     | { kind: "bullet"; content: string }
     | { kind: "text";   content: string };
 
-  // ── Build rows from newline-separated lines ─────────────────────────────
-  function buildRows(raw: string): Row[] {
+  const LINE_LABEL_RE = /^([A-Za-z][a-zA-Z]*(?:[\s][A-Za-z][a-zA-Z]*){0,3}):\s*(.*)$/;
+
+  // ── Inline-blob parser (no newlines in text) ───────────────────────────
+  // Uses greedy exec so "Job Title:" is captured as a 2-word label instead of
+  // splitting at "Title:" and leaving orphan "Job ". The {0,3} quantifier tries
+  // to consume as many extra title-case words as possible before the colon.
+  function buildRowsInline(raw: string): Row[] {
+    const INLINE_LABEL = /([A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*){0,3}):\s*/g;
+    const hits: Array<{ index: number; label: string; end: number }> = [];
+    let m: RegExpExecArray | null;
+    while ((m = INLINE_LABEL.exec(raw)) !== null) {
+      if (m[1].split(" ").length <= 4) {
+        hits.push({ index: m.index, label: m[1], end: m.index + m[0].length });
+      }
+    }
+    if (hits.length === 0) return [{ kind: "text", content: raw }];
+
+    const rows: Row[] = [];
+    let last = 0;
+    for (let i = 0; i < hits.length; i++) {
+      const { index, label, end } = hits[i];
+      const nextIdx = i + 1 < hits.length ? hits[i + 1].index : raw.length;
+      if (index > last) {
+        const before = raw.slice(last, index).trim();
+        if (before) rows.push({ kind: "text", content: before });
+      }
+      rows.push({ kind: "label", label, value: raw.slice(end, nextIdx).trim() });
+      last = nextIdx;
+    }
+    if (last < raw.length) {
+      const rest = raw.slice(last).trim();
+      if (rest) rows.push({ kind: "text", content: rest });
+    }
+    return rows;
+  }
+
+  // ── Newline-separated parser ───────────────────────────────────────────
+  function buildRowsNewline(raw: string): Row[] {
     const rawLines = raw.split(/\r?\n/).map(l => l.trim());
 
-    // Pre-process: merge orphan plain words (≤3 words, no colon) that precede a
-    // label line — e.g. "Job\nTitle: x" → "Job Title: x",
-    // "Project\nDescription: x" → "Project Description: x",
-    // "Key\nSkills: x" → "Key Skills: x"
+    // Merge orphan plain words (≤3 words, no colon) with the following label line
+    // e.g. "Job\nTitle: x" → "Job Title: x"
     const lines: string[] = [];
     let j = 0;
     while (j < rawLines.length) {
@@ -88,12 +117,11 @@ function FullDescription({ text, accent }: { text: string; accent: string }) {
         line.split(/\s+/).length <= 3 &&
         /^[A-Za-z]/.test(line) &&
         !/^[•·●\-*]\s/.test(line);
-      if (isShortPlain && j + 1 < rawLines.length && rawLines[j + 1].match(LABEL_RE)) {
+      if (isShortPlain && j + 1 < rawLines.length && rawLines[j + 1].match(LINE_LABEL_RE)) {
         lines.push(line + " " + rawLines[j + 1]);
         j += 2;
       } else {
-        lines.push(line);
-        j++;
+        lines.push(line); j++;
       }
     }
 
@@ -102,44 +130,27 @@ function FullDescription({ text, accent }: { text: string; accent: string }) {
     while (i < lines.length) {
       const line = lines[i].trim();
       if (!line) { i++; continue; }
-
-      // Bullet point
       if (/^[•·●\-*]\s/.test(line)) {
         rows.push({ kind: "bullet", content: line.replace(/^[•·●\-*]\s*/, "").trim() });
         i++; continue;
       }
-
-      const m = line.match(LABEL_RE);
-      if (m) {
-        const wordCount = m[1].trim().split(/\s+/).length;
-        if (wordCount <= 4) {
-          let value = m[2].trim();
-          // If value is empty, the next non-label line is the value
-          if (!value && i + 1 < lines.length) {
-            const next = lines[i + 1].trim();
-            if (next && !next.match(LABEL_RE)) { value = next; i++; }
-          }
-          rows.push({ kind: "label", label: m[1], value });
-          i++; continue;
+      const mm = line.match(LINE_LABEL_RE);
+      if (mm && mm[1].trim().split(/\s+/).length <= 4) {
+        let value = mm[2].trim();
+        if (!value && i + 1 < lines.length) {
+          const next = lines[i + 1].trim();
+          if (next && !next.match(LINE_LABEL_RE)) { value = next; i++; }
         }
+        rows.push({ kind: "label", label: mm[1], value });
+        i++; continue;
       }
-
       rows.push({ kind: "text", content: line });
       i++;
     }
     return rows;
   }
 
-  // ── For single-blob text (no newlines), just show nicely ───────────────
-  if (!text.includes("\n")) {
-    return (
-      <div className="px-6 py-5">
-        <p className="text-[#C9D1D9] text-[13px] leading-7 whitespace-pre-wrap">{text}</p>
-      </div>
-    );
-  }
-
-  const rows = buildRows(text);
+  const rows = text.includes("\n") ? buildRowsNewline(text) : buildRowsInline(text);
 
   return (
     <div className="divide-y divide-white/5">
@@ -147,11 +158,10 @@ function FullDescription({ text, accent }: { text: string; accent: string }) {
         if (row.kind === "label") {
           return (
             <div key={idx} className="flex hover:bg-white/[0.02] transition-colors">
-              {/* Colored accent strip */}
               <div className="w-0.5 flex-shrink-0 self-stretch" style={{ background: `${accent}80` }} />
               <div className="flex-1 px-5 py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-5">
                 <span
-                  className="flex-shrink-0 font-bold text-[12px] uppercase tracking-wider sm:w-40 mt-0.5"
+                  className="flex-shrink-0 font-bold text-[12px] uppercase tracking-wider sm:w-44 mt-0.5"
                   style={{ color: accent }}
                 >
                   {row.label}
@@ -163,16 +173,14 @@ function FullDescription({ text, accent }: { text: string; accent: string }) {
             </div>
           );
         }
-
         if (row.kind === "bullet") {
           return (
-            <div key={idx} className="flex gap-3 px-6 py-2 hover:bg-white/[0.02] transition-colors">
+            <div key={idx} className="flex gap-3 px-6 py-2.5 hover:bg-white/[0.02] transition-colors">
               <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-[7px]" style={{ background: accent }} />
               <span className="text-[#C9D1D9] text-[13px] leading-relaxed">{row.content}</span>
             </div>
           );
         }
-
         return (
           <p key={idx} className="px-6 py-3 text-[#C9D1D9] text-[13px] leading-relaxed">
             {row.content}

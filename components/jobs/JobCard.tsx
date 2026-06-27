@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { MapPin, Clock, Wifi, DollarSign, ExternalLink, Mail, Link2, Briefcase, Building2, ChevronDown, ChevronUp, Share2, Check } from "lucide-react";
 import { Job } from "@/types";
@@ -148,18 +148,41 @@ function getReferralHref(contact: string) {
   return { href: `mailto:${contact}`, isEmail: true, isLinkedIn: false };
 }
 
-// ── Parse description for card preview — line-by-line label detection ─────────
+// ── Parse description for card preview ───────────────────────────────────────
 function renderDescription(text: string) {
-  const LABEL_RE = /^([A-Za-z][a-zA-Z]*(?:\s[A-Za-z][a-zA-Z]*){0,3}):\s*(.*)$/;
+  const LINE_LABEL_RE = /^([A-Za-z][a-zA-Z]*(?:\s[A-Za-z][a-zA-Z]*){0,3}):\s*(.*)$/;
+
+  // Single-blob (no newlines): use greedy exec to find inline labels.
+  // Greedy {0,3} ensures "Job Title:" is captured as 2 words, not "Title:" leaving orphan "Job ".
   if (!text.includes("\n")) {
-    return <span>{text}</span>;
+    const INLINE = /([A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*){0,3}):\s*/g;
+    const hits: Array<{ index: number; label: string; end: number }> = [];
+    let m: RegExpExecArray | null;
+    while ((m = INLINE.exec(text)) !== null) {
+      if (m[1].split(" ").length <= 4) hits.push({ index: m.index, label: m[1], end: m.index + m[0].length });
+    }
+    if (hits.length === 0) return <span>{text}</span>;
+
+    const parts: ReactNode[] = [];
+    let last = 0;
+    hits.forEach(({ index, label, end }, i) => {
+      const nextIdx = i + 1 < hits.length ? hits[i + 1].index : text.length;
+      if (index > last) parts.push(<span key={`t${i}`}>{text.slice(last, index).trim()} </span>);
+      parts.push(
+        <span key={`l${i}`}>
+          {parts.length > 0 && <br />}
+          <strong className="text-white font-semibold">{label}:</strong>{" "}
+          {text.slice(end, nextIdx).trim()}
+        </span>
+      );
+      last = nextIdx;
+    });
+    return <>{parts}</>;
   }
 
-  // Pre-process: merge orphan plain words (≤3 words, no colon) that precede a
-  // label line — e.g. "Job\nTitle: x" → "Job Title: x",
-  // "Project\nDescription: x" → "Project Description: x"
+  // Newline-separated: merge orphan words then detect per-line labels.
   const raw = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const merged: string[] = [];
+  const lines: string[] = [];
   let i = 0;
   while (i < raw.length) {
     const line = raw[i];
@@ -168,25 +191,23 @@ function renderDescription(text: string) {
       line.split(/\s+/).length <= 3 &&
       /^[A-Za-z]/.test(line) &&
       !/^[•·●\-*]\s/.test(line);
-    if (isShortPlain && i + 1 < raw.length && raw[i + 1].match(LABEL_RE)) {
-      merged.push(line + " " + raw[i + 1]);
-      i += 2;
+    if (isShortPlain && i + 1 < raw.length && raw[i + 1].match(LINE_LABEL_RE)) {
+      lines.push(line + " " + raw[i + 1]); i += 2;
     } else {
-      merged.push(line);
-      i++;
+      lines.push(line); i++;
     }
   }
 
   return (
     <>
-      {merged.map((line, idx) => {
-        const m = line.match(LABEL_RE);
-        if (m && m[1].split(" ").length <= 4) {
+      {lines.map((line, idx) => {
+        const mm = line.match(LINE_LABEL_RE);
+        if (mm && mm[1].split(" ").length <= 4) {
           return (
             <span key={idx}>
               {idx > 0 && <br />}
-              <strong className="text-white font-semibold">{m[1]}:</strong>{" "}
-              {m[2] || ""}
+              <strong className="text-white font-semibold">{mm[1]}:</strong>{" "}
+              {mm[2] || ""}
             </span>
           );
         }
