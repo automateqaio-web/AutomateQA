@@ -340,7 +340,7 @@ export default function JobCard({ job }: { job: Job }) {
         {/* ── Description with bold labels + expand toggle ── */}
         <div>
           <p
-            className="text-[#C9D1D9] text-[13px] leading-relaxed transition-all"
+            className="text-[#C9D1D9] text-[13px] leading-relaxed transition-all text-justify"
             style={expanded ? undefined : {
               display: "-webkit-box",
               WebkitLineClamp: CLAMP_LINES,
