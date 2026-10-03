@@ -528,3 +528,38 @@ export const AD_BADGE_PRESETS = [
   "💼 Hiring",
   "📚 Course",
 ];
+
+// ── Game Scorekeeper ──────────────────────────────────────────
+
+export interface Player {
+  id: string;
+  name: string;
+  created_at: string;
+  last_played_at: string | null;
+}
+
+export interface PlayerStats extends Player {
+  games_played: number;
+}
+
+export type GameStatus = "in_progress" | "completed";
+
+export interface Game {
+  id: string;
+  game_number: number;
+  rounds: number;
+  status: GameStatus;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface RoundScore {
+  game_id: string;
+  player_id: string;
+  round: number;
+  score: number;
+}
+
+export const GAME_MIN_PLAYERS = 2;
+export const GAME_MAX_PLAYERS = 10;
+export const GAME_MAX_ROUNDS = 50;

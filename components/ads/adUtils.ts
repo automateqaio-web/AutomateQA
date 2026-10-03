@@ -1,6 +1,9 @@
+import type { MotionProps } from "framer-motion";
 import type { AdAnimation } from "@/types";
 
-export function getAdAnimationVariants(animation: AdAnimation) {
+export function getAdAnimationVariants(
+  animation: AdAnimation
+): Pick<MotionProps, "initial" | "animate" | "transition"> {
   switch (animation) {
     case "fade":
       return {
