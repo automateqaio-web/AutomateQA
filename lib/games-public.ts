@@ -6,7 +6,7 @@ export type PublicGame = Game & {
   round_scores: RoundScore[];
 };
 
-const SELECT = "*, game_players(seat, player:players(id, name)), round_scores(*)";
+const SELECT = "*, game_players!game_players_game_id_fkey(seat, player:players(id, name)), round_scores!round_scores_game_id_fkey(*)";
 
 function configured() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

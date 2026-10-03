@@ -23,7 +23,7 @@ export default function AdminGamesPage() {
     (async () => {
       const { data, error: err } = await supabase
         .from("games")
-        .select("*, game_players(seat, player:players(id, name)), round_scores(*)")
+        .select("*, game_players!game_players_game_id_fkey(seat, player:players(id, name)), round_scores!round_scores_game_id_fkey(*)")
         .order("created_at", { ascending: false })
         .limit(100);
       if (err) setError("Failed to load games. Has games-migration.sql been run?");

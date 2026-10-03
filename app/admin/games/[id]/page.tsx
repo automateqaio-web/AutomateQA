@@ -30,7 +30,7 @@ export default function GamePlayPage() {
     (async () => {
       const { data, error: err } = await supabase
         .from("games")
-        .select("*, game_players(seat, player:players(*)), round_scores(*)")
+        .select("*, game_players!game_players_game_id_fkey(seat, player:players(*)), round_scores!round_scores_game_id_fkey(*)")
         .eq("id", id)
         .single();
       if (err) setError("Game not found.");

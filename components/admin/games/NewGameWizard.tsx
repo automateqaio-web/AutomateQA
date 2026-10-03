@@ -49,7 +49,7 @@ export default function NewGameWizard() {
       if (replayId) {
         const { data: prev } = await supabase
           .from("games")
-          .select("game_number, rounds, game_players(player_id, seat)")
+          .select("game_number, rounds, game_players!game_players_game_id_fkey(player_id, seat)")
           .eq("id", replayId)
           .single();
         if (prev) {
